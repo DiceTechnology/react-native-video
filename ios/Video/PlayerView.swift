@@ -6,10 +6,10 @@
 //
 
 import AVDoris
+import AVKit
 
-class PlayerView: UIView {
-    private var controller: PlayerViewController
-    
+class PlayerView: UIView, JSInputProtocol {
+    var jsBridge: RCTBridge?
     //Events
     @objc var onBackButton: RCTBubblingEventBlock?
     @objc var onFavouriteButton: RCTBubblingEventBlock?
@@ -40,15 +40,27 @@ class PlayerView: UIView {
     
     //Props
     //MARK: Differs (source)
-    @objc var src: NSDictionary? { didSet { controller.source = try? Source(dict: src) } }
-    @objc var partialVideoInformation: NSDictionary? { didSet { controller.partialVideoInformation = try? PartialVideoInformation(dict: partialVideoInformation) } }
-    @objc var translations: NSDictionary? { didSet { controller.translations = try? Translations(dict: translations) } }
-    @objc var buttons: NSDictionary? { didSet { controller.buttons = try? Buttons(dict: buttons) } }
-    @objc var theme: NSDictionary? { didSet { controller.theme = try? Theme(dict: theme) } }
-    @objc var relatedVideos: NSDictionary? { didSet { controller.relatedVideos = try? RelatedVideos(dict: relatedVideos) } }
-    @objc var metadata: NSDictionary?  { didSet { controller.metadata = try? Metadata(dict: metadata) } }
-    @objc var isFavourite: Bool = false { didSet { controller.isFavourite = isFavourite } }
-    @objc var controls: Bool = false { didSet { controller.controls = controls } }
+    @objc var src: NSDictionary? {
+        didSet { jsProps.source.value = try? Source(dict: src) } }
+    @objc var partialVideoInformation: NSDictionary? {
+        didSet { jsProps.partialVideoInformation.value = try? PartialVideoInformation(dict: partialVideoInformation) } }
+    @objc var translations: NSDictionary? {
+        didSet { jsProps.translations.value = try? Translations(dict: translations) } }
+    @objc var buttons: NSDictionary? {
+        didSet { jsProps.buttons.value = try? Buttons(dict: buttons) } }
+    @objc var theme: NSDictionary? {
+        didSet { jsProps.theme.value = try? Theme(dict: theme) } }
+    @objc var relatedVideos: NSDictionary? {
+        didSet { jsProps.relatedVideos.value = try? RelatedVideos(dict: relatedVideos) } }
+    @objc var metadata: NSDictionary? {
+        didSet { jsProps.metadata.value = try? Metadata(dict: metadata) } }
+    @objc var overlayConfig: NSDictionary? {
+        didSet { jsProps.overlayConfig.value = try? OverlayConfig(dict: overlayConfig) } }
+    @objc var isFavourite: Bool = false {
+        didSet { jsProps.isFavourite.value = isFavourite } }
+    @objc var controls: Bool = false {
+        didSet { jsProps.controls.value = controls } }
+    
 
     //FIXME: review unused variables
     @objc var selectedTextTrack: NSDictionary?
@@ -81,14 +93,8 @@ class PlayerView: UIView {
     @objc var fullscreen: Bool = false
     @objc var `repeat`: Bool = false
     
-    init(controller: PlayerViewController) {
-        self.controller = controller
-        super.init(frame: .zero)                
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    var jsDoris: JSDoris?
+    var jsProps = JSProps()
     
     func seekToNow() {
         //TODO
@@ -98,16 +104,30 @@ class PlayerView: UIView {
         //TODO
     }
     
+    //TODO: pass this value as part of source
     func seekToPosition(position: Double) {
-        controller.startAt = position
+        jsProps.startAt.value = position
     }
     
     func replaceAdTagParameters(payload: NSDictionary) {
-        controller.replaceAdTagParameters(parameters: AdTagParameters(payload: payload))
+        jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
+                                                extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
+                                                                                       viewHeight: frame.height))
     }
     
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-        controller.viewDidMoveToWindow()
+    private func setupDoris() {
+        jsDoris = JSDorisFactory.build(jsProps: jsProps,
+                                       containerView: self,
+                                       jsInput: self,
+                                       bridge: jsBridge)
+        
+        jsDoris?.setup(with: jsProps)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if jsDoris == nil {
+            setupDoris()
+        }
     }
 }

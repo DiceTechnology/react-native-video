@@ -18,7 +18,7 @@ class AdTagParametersModifier {
         var newAdTagParameters = adTagParameters
         
         AppIdFetcher.shared.fetchAppId { appID in
-            newAdTagParameters?.updateValue("\(appID ?? 0)", forKey: "msid")
+            newAdTagParameters?.updateValue(appID ?? "", forKey: "msid")
             
             if #available(tvOS 14, *) {
                 ATTrackingManager.requestTrackingAuthorization { status in

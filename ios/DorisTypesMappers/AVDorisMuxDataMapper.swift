@@ -19,7 +19,7 @@ class AVDorisMuxDataMapper {
         videoData.videoTitle = muxData.videoTitle
         videoData.videoId = muxData.videoId
         videoData.videoStreamType = muxData.videoStreamType
-        videoData.videoIsLive = NSNumber(value: muxData.videoIsLive)
+        videoData.videoIsLive = muxData.videoIsLive
         
         return (playerData: playerData, videoData: videoData)
     }

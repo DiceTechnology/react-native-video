@@ -16,7 +16,7 @@ enum AVDorisSourceType {
 class AVDorisSourceMapper {
     private let adTagParametersModifier = AdTagParametersModifier()
     
-    func map(source: Source?, view: PlayerView?, completion: @escaping (AVDorisSourceType) -> Void) {
+    func map(source: Source?, view: UIView?, completion: @escaping (AVDorisSourceType) -> Void) {
         guard let source = source else { return }
         
         var drmData: DorisDRMSource?
@@ -42,9 +42,7 @@ class AVDorisSourceMapper {
                     let vodDAISource = DAISource(contentSourceId: contentSourceId,
                                                  videoId: videoId,
                                                  authToken: ima.authToken,
-                                                 adTagParameters: newAdTagParameters,
-                                                 adTagParametersValidFrom: ima.startDate,
-                                                 adTagParametersValidUntil: ima.endDate)
+                                                 adTagParameters: newAdTagParameters)
                     
                     vodDAISource.drm = drmData
                     
