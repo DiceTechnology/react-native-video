@@ -11,9 +11,8 @@ import Foundation
 @objc(RCTVideoManager)
 class RCTVideoManager: RCTViewManager {
     override func view() -> UIView! {
-        let controller = PlayerViewController()
-        let view = PlayerView(controller: controller)
-        controller.view = view
+        let view = PlayerView()
+        view.jsBridge = bridge
         return view
     }
     

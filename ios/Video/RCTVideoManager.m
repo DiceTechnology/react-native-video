@@ -28,6 +28,7 @@ RCT_EXPORT_VIEW_PROPERTY(theme, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(translations, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(relatedVideos, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(metadata, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(overlayConfig, NSDictionary);
 
 /* Should support: onLoadStart, onLoad, and onError to stay consistent with Image */
 RCT_EXPORT_VIEW_PROPERTY(onVideoLoadStart, RCTBubblingEventBlock);

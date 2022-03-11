@@ -21,6 +21,7 @@
         "eslint-plugin-react": "3.16.1"
     },
     "dependencies": {
+        "@dicetechnology/avdoris": "git+ssh://git@github.com/DiceTechnology/avdoris.git#feat/ios-ui",
         "@imggaming/dice-shield": "git+ssh://git@github.com:DiceTechnology/dice-shield.git#semver:=2.9.1",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
