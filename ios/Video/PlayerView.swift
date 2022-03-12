@@ -93,11 +93,7 @@ class PlayerView: UIView, JSInputProtocol {
     @objc var fullscreen: Bool = false
     @objc var `repeat`: Bool = false
     
-<<<<<<< HEAD
     var jsDoris: JSDoris?
-=======
-    var dorisController: DorisController?
->>>>>>> 2d45269ed40433f595241f280191cf9337436b0c
     var jsProps = JSProps()
     
     func seekToNow() {
@@ -114,38 +110,23 @@ class PlayerView: UIView, JSInputProtocol {
     }
     
     func replaceAdTagParameters(payload: NSDictionary) {
-<<<<<<< HEAD
         jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
-=======
-        dorisController?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
->>>>>>> 2d45269ed40433f595241f280191cf9337436b0c
                                                 extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
                                                                                        viewHeight: frame.height))
     }
     
     private func setupDoris() {
-<<<<<<< HEAD
         jsDoris = JSDorisFactory.build(jsProps: jsProps,
                                        containerView: self,
                                        jsInput: self,
                                        bridge: jsBridge)
         
         jsDoris?.setup(with: jsProps)
-=======
-        dorisController = DorisControllerFactory.build(jsProps: jsProps,
-                                                       containerView: self,
-                                                       jsInput: self,
-                                                       bridge: jsBridge)
->>>>>>> 2d45269ed40433f595241f280191cf9337436b0c
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-<<<<<<< HEAD
         if jsDoris == nil {
-=======
-        if dorisController == nil {
->>>>>>> 2d45269ed40433f595241f280191cf9337436b0c
             setupDoris()
         }
     }
