@@ -121,6 +121,9 @@ class PlayerView: UIView, JSInputProtocol {
                                        jsInput: self,
                                        bridge: jsBridge)
         
+        //        jsProps.overlayConfig.value = OverlayConfig(type: .side, button: "", components: [.init(name: "rightSideComponentName", type: .side, initialProps: ["": ""])])
+        jsProps.overlayConfig.value = OverlayConfig(type: .expanded, button: "", components: [.init(name: "DiceTV", type: .side, initialProps: ["": ""]),
+                                                                                              .init(name: "DiceTV", type: .bottom, initialProps: ["": ""])])
         jsDoris?.setup(with: jsProps)
     }
     

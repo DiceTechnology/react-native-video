@@ -34,15 +34,15 @@ struct OverlayConfig: SuperCodable {
                 return .none
             }
             
-//            let sideJSComponentView = RCTRootView(bridge: bridge,
-//                                                  moduleName: sideComponent.name,
-//                                                  initialProperties: sideComponent.initialProps)
-//
-//            let bottomJSComponentView = RCTRootView(bridge: bridge,
-//                                                    moduleName: bottomComponent.name,
-//                                                    initialProperties: bottomComponent.initialProps)
-            return .rightAndBottom(rightView: UIView(),
-                                   bottomView: UIView())
+            let sideJSComponentView = RCTRootView(bridge: bridge,
+                                                  moduleName: sideComponent.name,
+                                                  initialProperties: sideComponent.initialProps)
+            
+            let bottomJSComponentView = RCTRootView(bridge: bridge,
+                                                    moduleName: bottomComponent.name,
+                                                    initialProperties: bottomComponent.initialProps)
+            return .rightAndBottom(rightView: sideJSComponentView,
+                                   bottomView: bottomJSComponentView)
         case .side:
             guard
                 let sideComponent = components.first(where: {$0.type == .side})
@@ -50,10 +50,10 @@ struct OverlayConfig: SuperCodable {
                 return .none
             }
             
-//            let sideJSComponentView = RCTRootView(bridge: bridge,
-//                                                  moduleName: sideComponent.name,
-//                                                  initialProperties: sideComponent.initialProps)
-            return .right(rightView: UIView())
+            let sideJSComponentView = RCTRootView(bridge: bridge,
+                                                  moduleName: sideComponent.name,
+                                                  initialProperties: sideComponent.initialProps)
+            return .right(rightView: sideJSComponentView)
         default: return .none
         }
     }
