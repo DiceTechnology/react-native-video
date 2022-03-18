@@ -3,6 +3,7 @@ package com.brentvatne.exoplayer;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 
 import com.brentvatne.entity.RNMetadata;
@@ -19,6 +20,9 @@ import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.endeavor.DebugUtil;
+import com.google.android.exoplayer2.endeavor.ExoConfig;
+import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.gson.Gson;
 import com.imggaming.translations.DiceLocalizedStrings;
@@ -42,6 +46,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_TYPE = "type";
     private static final String PROP_SRC_DRM = "drm";
     private static final String PROP_SRC_IMA = "ima";
+    private static final String PROP_SRC_AD_TAG_URL = "adTagUrl";
     private static final String PROP_SRC_CHANNEL_ID = "channelId";
     private static final String PROP_SRC_SERIES_ID = "seriesId";
     private static final String PROP_SRC_SEASON_ID = "seasonId";
@@ -120,10 +125,30 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final int COMMAND_SEEK_TO_POSITION = 3;
     private static final int COMMAND_REPLACE_AD_TAG_PARAMETERS = 4;
 
+    private static final boolean IS_DEBUG = false;
+
     private final ReactApplicationContext reactApplicationContext;
 
     public ReactTVExoplayerViewManager(ReactApplicationContext reactApplicationContext) {
         this.reactApplicationContext = reactApplicationContext;
+        setPlayerConfig();
+    }
+
+    private void setPlayerConfig() {
+        if (IS_DEBUG) {
+            DebugUtil.debug_drm = true;
+            DebugUtil.debug_media = true;
+            DebugUtil.debug_manifest = true;
+            // Change the ip and port to your file upload server.
+            DebugUtil.upload_server = "http://172.16.2.142:4660/file/manifest/";
+        }
+        ExoConfig.getInstance().setHttpTimeoutMs(6000);
+        ExoConfig.getInstance().setObtainKeyIdsFromManifest(true);
+
+        Log.d(WebUtil.DEBUG, String.format("config player - httpTimeoutMs %d, keyIdsMode %s, debug %b",
+                ExoConfig.getInstance().getHttpTimeoutMs(),
+                ExoConfig.getInstance().isObtainKeyIdsFromManifest() ? "manifest" : "stream",
+                IS_DEBUG));
     }
 
     @Override
@@ -168,6 +193,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     @ReactProp(name = PROP_SRC)
     public void setSrc(final ReactTVExoplayerView videoView, @Nullable ReadableMap src) {
         Context context = videoView.getContext().getApplicationContext();
+        // MockStreamSource.logRNParam(0, "src", ReadableType.Map, src);
 
         String uriString = src.hasKey(PROP_SRC_URI) ? src.getString(PROP_SRC_URI) : null;
         String id = src.hasKey(PROP_SRC_ID) ? src.getString(PROP_SRC_ID) : null;
@@ -182,6 +208,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         String playlistId = src.hasKey(PROP_SRC_PLAYLIST_ID) ? src.getString(PROP_SRC_PLAYLIST_ID) : null;
         String duration = src.hasKey(PROP_SRC_DURATION) ? src.getString(PROP_SRC_DURATION) : null;
         String channelName = src.hasKey(PROP_SRC_CHANNEL_NAME) ? src.getString(PROP_SRC_CHANNEL_NAME) : null;
+        String adTagUrl = src.hasKey(PROP_SRC_AD_TAG_URL) ? src.getString(PROP_SRC_AD_TAG_URL) : null;
 
         ReadableMap config = src.hasKey(PROP_SRC_CONFIG) ? src.getMap(PROP_SRC_CONFIG) : null;
         ReadableMap muxData = (config != null && config.hasKey(PROP_SRC_MUX_DATA)) ? config.getMap(PROP_SRC_MUX_DATA) : null;
@@ -203,6 +230,13 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                         .replace("Bearer ", ""));
                 actionToken = ActionToken.fromJson(new Gson().toJson(drmMap));
             }
+            Log.d(WebUtil.DEBUG, String.format("setSrc - title %s, isImaDai %b, adTag %s, license %s, token %s, url %s",
+                    channelName == null && muxData != null && muxData.hasKey("videoTitle") ? muxData.getString("videoTitle") : channelName,
+                    ima != null,
+                    adTagUrl == null ? "-" : adTagUrl,
+                    (actionToken == null ? "-" : actionToken.getLicensingServerUrl()),
+                    (actionToken == null ? "-" : actionToken.getCroToken()),
+                    uriString));
 
             videoView.setSrc(
                     uriString,
@@ -220,7 +254,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     playlistId,
                     duration != null ? Integer.parseInt(duration) : 0,
                     channelName,
-                    apsTestMode);
+                    apsTestMode,
+                    adTagUrl);
         } else {
             int identifier = context.getResources().getIdentifier(
                     uriString,
@@ -543,13 +578,21 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         // This will be called whenever a command is sent from react-native.
         switch (commandId) {
             case COMMAND_SEEK_TO_NOW:
-                root.seekTo(C.TIME_UNSET);
+                Log.d(WebUtil.DEBUG, "resumeToNow");
+                root.resumeTo(C.TIME_UNSET);
                 break;
             case COMMAND_SEEK_TO_TIMESTAMP:
-                root.seekTo(args.getString(0));
+                String timestamp = args.getString(0);
+                Log.d(WebUtil.DEBUG, "resumeToTimeStamp " + timestamp);
+                long positionMs = root.parseTimestamp(timestamp);
+                if (positionMs != C.POSITION_UNSET) {
+                    root.resumeTo(positionMs);
+                }
                 break;
             case COMMAND_SEEK_TO_POSITION:
-                root.seekTo(args.getInt(0) * 1000);
+                long resumeMs = args.getInt(0) * 1000;
+                Log.d(WebUtil.DEBUG, "resumeToPosition " + resumeMs);
+                root.resumeTo(resumeMs);
                 break;
             case COMMAND_REPLACE_AD_TAG_PARAMETERS:
                 root.replaceAdTagParameters(args.getMap(0) != null ? args.getMap(0).toHashMap() : null);
