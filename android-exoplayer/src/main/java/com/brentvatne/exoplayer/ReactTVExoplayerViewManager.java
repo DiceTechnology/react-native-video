@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.endeavor.DebugUtil;
 import com.google.android.exoplayer2.endeavor.ExoConfig;
+import com.google.android.exoplayer2.endeavor.LimitedSeekRange;
 import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
 import com.google.gson.Gson;
@@ -60,6 +61,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_APS = "aps";
     private static final String PROP_SRC_APS_TEST_MODE = "testMode";
     private static final String PROP_SRC_METADATA = "metadata";
+    private static final String PROP_SRC_LIMIT_RANGE = "limitedSeekableRange";
+
+    private static final String PROP_LIMIT_SEEKABLE_RANGE = "limitSeekableRange";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -221,6 +225,12 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         ReadableMap aps = src.hasKey(PROP_SRC_APS) ? src.getMap(PROP_SRC_APS) : null;
         boolean apsTestMode = (aps != null && aps.hasKey(PROP_SRC_APS_TEST_MODE)) && aps.getBoolean(PROP_SRC_APS_TEST_MODE);
 
+        LimitedSeekRange limitedSeekRange = null;
+        ReadableMap range = src.hasKey(PROP_SRC_LIMIT_RANGE) ? src.getMap(PROP_SRC_LIMIT_RANGE) : null;
+        if (range != null) {
+            limitedSeekRange = LimitedSeekRange.from(range.getString("start"), range.getString("end"));
+        }
+
         if (TextUtils.isEmpty(uriString)) {
             return;
         }
@@ -259,7 +269,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     channelName,
                     apsTestMode,
                     adTagUrl,
-                    Watermark.fromMap(metadata));
+                    Watermark.fromMap(metadata),
+                    limitedSeekRange);
         } else {
             int identifier = context.getResources().getIdentifier(
                     uriString,
@@ -297,6 +308,11 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     title,
                     type));
         }
+    }
+
+    @ReactProp(name = PROP_LIMIT_SEEKABLE_RANGE)
+    public void setLimitedSeekableRange(final ReactTVExoplayerView videoView, @Nullable ReadableMap range) {
+        videoView.setLimitedSeekRange(LimitedSeekRange.from(range.getString("start"), range.getString("end")));
     }
 
     @ReactProp(name = PROP_RESIZE_MODE)
