@@ -63,8 +63,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_METADATA = "metadata";
     private static final String PROP_SRC_LIMIT_RANGE = "limitedSeekableRange";
 
-    private static final String PROP_LIMIT_SEEKABLE_RANGE = "limitSeekableRange";
-
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
     private static final String PROP_METADATA_CHANNEL_LOGO_URL = "channelLogoUrl";
@@ -130,6 +128,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final int COMMAND_SEEK_TO_TIMESTAMP = 2;
     private static final int COMMAND_SEEK_TO_POSITION = 3;
     private static final int COMMAND_REPLACE_AD_TAG_PARAMETERS = 4;
+    private static final int COMMAND_LIMIT_SEEKABLE_RANGE = 5;
 
     private static final boolean IS_DEBUG = false;
 
@@ -225,11 +224,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         ReadableMap aps = src.hasKey(PROP_SRC_APS) ? src.getMap(PROP_SRC_APS) : null;
         boolean apsTestMode = (aps != null && aps.hasKey(PROP_SRC_APS_TEST_MODE)) && aps.getBoolean(PROP_SRC_APS_TEST_MODE);
 
-        LimitedSeekRange limitedSeekRange = null;
-        ReadableMap range = src.hasKey(PROP_SRC_LIMIT_RANGE) ? src.getMap(PROP_SRC_LIMIT_RANGE) : null;
-        if (range != null) {
-            limitedSeekRange = LimitedSeekRange.from(range.getString("start"), range.getString("end"));
-        }
+        LimitedSeekRange limitedSeekRange = generateRange(src.hasKey(PROP_SRC_LIMIT_RANGE) ? src.getMap(PROP_SRC_LIMIT_RANGE) : null);
 
         if (TextUtils.isEmpty(uriString)) {
             return;
@@ -308,11 +303,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     title,
                     type));
         }
-    }
-
-    @ReactProp(name = PROP_LIMIT_SEEKABLE_RANGE)
-    public void setLimitedSeekableRange(final ReactTVExoplayerView videoView, @Nullable ReadableMap range) {
-        videoView.setLimitedSeekRange(LimitedSeekRange.from(range.getString("start"), range.getString("end")));
     }
 
     @ReactProp(name = PROP_RESIZE_MODE)
@@ -589,7 +579,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                 "seekToPosition",
                 COMMAND_SEEK_TO_POSITION,
                 "replaceAdTagParameters",
-                COMMAND_REPLACE_AD_TAG_PARAMETERS
+                COMMAND_REPLACE_AD_TAG_PARAMETERS,
+                "limitSeekableRange",
+                COMMAND_LIMIT_SEEKABLE_RANGE
         );
     }
 
@@ -617,6 +609,19 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             case COMMAND_REPLACE_AD_TAG_PARAMETERS:
                 root.replaceAdTagParameters(args.getMap(0) != null ? args.getMap(0).toHashMap() : null);
                 break;
+            case COMMAND_LIMIT_SEEKABLE_RANGE:
+                root.setLimitedSeekRange(generateRange(args.getMap(0)));
+                break;
         }
+    }
+
+    private LimitedSeekRange generateRange(ReadableMap map) {
+        LimitedSeekRange limitedSeekRange = null;
+        if (map != null) {
+            long start = (map.hasKey("start") ? Math.round(map.getDouble("start")) : C.TIME_UNSET);
+            long end = (map.hasKey("end") ? Math.round(map.getDouble("end")) : C.TIME_UNSET);
+            limitedSeekRange = LimitedSeekRange.from(start, end);
+        }
+        return limitedSeekRange;
     }
 }

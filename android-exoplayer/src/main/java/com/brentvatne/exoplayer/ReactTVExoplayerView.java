@@ -237,10 +237,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private final int ANIMATION_DURATION_CONTROLS_VISIBILITY = 500;
 
     // For testing of limited seek range.
-    protected static final boolean test_limit_range = false;
-    protected long test_limit_count = 0;
+    private static final boolean test_limit_range = false;
     private static final long test_limit_interval = 480; // 2 minutes / 250 ms
-    private static final long test_limit_duration = 48 * 60_000;
+    private static final long test_limit_duration = 61 * 60_000;
+    private long test_limit_count = 0;
 
     @SuppressLint("HandlerLeak")
     private final Handler jsProgressHandler = new Handler() {
@@ -557,8 +557,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setMuxProperties(src.getMuxData(), String.valueOf(correlationId), exoDorisPlayerView.getVideoSurfaceView())
                     .setTextTracks(src.getTextTracks())
                     .setMaxVideoSize(viewWidth, viewHeight)
-                    .setDrmParams(actionToken)
-                    .setLimitedSeekRange(src.getLimitedSeekRange());
+                    .setDrmParams(actionToken);
 
             if (isImaDaiStream) {
                 ImaDaiProperties imaDaiProperties = new ImaDaiPropertiesBuilder()
@@ -583,12 +582,16 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 trySeekToResumePosition();
             }
 
-            // For testing of limited seek range.
-            if (isLive && src.getLimitedSeekRange() == null && test_limit_range) {
-                test_limit_count = 0;
-                long durationMs = 5400_000;
-                sourceBuilder.setLimitedSeekRange(LimitedSeekRange.mock(0, durationMs));
-                Log.d("=====", String.format("limitSeekRange %d, %.1fhr", 0, durationMs / 3600_000f));
+            if (isLive) {
+                sourceBuilder.setLimitedSeekRange(src.getLimitedSeekRange());
+
+                // For testing of limited seek range.
+                if (src.getLimitedSeekRange() == null && test_limit_range) {
+                    test_limit_count = 0;
+                    long durationMs = 5400_000;
+                    sourceBuilder.setLimitedSeekRange(LimitedSeekRange.mock(0, durationMs));
+                    Log.d("=====", String.format("limitSeekRange %d, %.1fhr", 0, durationMs / 3600_000f));
+                }
             }
             source = sourceBuilder.build();
 
@@ -967,9 +970,23 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             startProgressHandler();
         } else if (player != null) {
             // When reach the endTime of limited seek range, we need to notify the JS side to show the restart layout.
-            // The eventEmitter.end() does not work for live channel, not sure how to notify the JS side.
+            // We will seek to start position at first, and then play() when user click the restart button.
             if (LimitedSeekRange.isUseAsVod(player.getLimitedSeekRange()) && player.getPlaybackState() == Player.STATE_ENDED) {
-                // eventEmitter.end();
+                player.seekTo(0);
+
+                // For testing of limited seek range.
+                if (test_limit_range) {
+                    Log.d("=====", "vod ended");
+                    jsProgressHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("=====", "vod restart");
+                            ReactTVExoplayerView.this.setPausedModifier(false);
+                        }
+                    }, 10_000);
+                } else {
+                    eventEmitter.endLiveChannelAsVod();
+                }
             }
         }
     }
@@ -1378,8 +1395,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     public void setLimitedSeekRange(LimitedSeekRange limitedSeekRange) {
-        player.limitSeekRange(limitedSeekRange);
-        exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
+        if (isLive) {
+            player.limitSeekRange(limitedSeekRange);
+            exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
+        }
     }
 
     public void setProgressUpdateInterval(final float progressUpdateInterval) {
