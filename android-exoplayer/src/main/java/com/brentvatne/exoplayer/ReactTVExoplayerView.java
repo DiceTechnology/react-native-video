@@ -236,12 +236,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private final float NATIVE_PROGRESS_UPDATE_INTERVAL = 250.0f;
     private final int ANIMATION_DURATION_CONTROLS_VISIBILITY = 500;
 
-    // For testing of limited seek range.
-    private static final boolean test_limit_range = false;
-    private static final long test_limit_interval = 480; // 2 minutes / 250 ms
-    private static final long test_limit_duration = 61 * 60_000;
-    private long test_limit_count = 0;
-
     @SuppressLint("HandlerLeak")
     private final Handler jsProgressHandler = new Handler() {
         @Override
@@ -252,19 +246,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     long position = player.getCurrentPosition();
                     long bufferedDuration = player.getBufferedPosition();
                     long duration = player.getDuration();
-
-                    // For testing of limited seek range.
-                    if (isLive && test_limit_range) {
-                        test_limit_count++;
-                        Log.d("=====", String.format("progress %d, %.3f %.3f %.3f, %tT", test_limit_count, position / 1000f, bufferedDuration / 1000f, duration / 1000f, new Date(player.getWindowStartTime())));
-                        if (test_limit_count % test_limit_interval == test_limit_interval / 4) {
-                            int hour = Math.round(exoPlayer.getDuration() / 3600_000f) - (int) (test_limit_count / test_limit_interval);
-                            if (hour >= 0) {
-                                Log.d("=====", String.format("limitSeekRange %d, %.1fhr", hour, test_limit_duration / 3600_000f));
-                                setLimitedSeekRange(LimitedSeekRange.mock(hour, test_limit_duration));
-                            }
-                        }
-                    }
 
                     if (!isLive) {
                         boolean isAboutToEnd = duration - position <= 10_000;
@@ -584,14 +565,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             if (isLive) {
                 sourceBuilder.setLimitedSeekRange(src.getLimitedSeekRange());
-
-                // For testing of limited seek range.
-                if (src.getLimitedSeekRange() == null && test_limit_range) {
-                    test_limit_count = 0;
-                    long durationMs = 5400_000;
-                    sourceBuilder.setLimitedSeekRange(LimitedSeekRange.mock(0, durationMs));
-                    Log.d("=====", String.format("limitSeekRange %d, %.1fhr", 0, durationMs / 3600_000f));
-                }
             }
             source = sourceBuilder.build();
 
@@ -973,20 +946,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             // We will seek to start position at first, and then play() when user click the restart button.
             if (LimitedSeekRange.isUseAsVod(player.getLimitedSeekRange()) && player.getPlaybackState() == Player.STATE_ENDED) {
                 player.seekTo(0);
-
-                // For testing of limited seek range.
-                if (test_limit_range) {
-                    Log.d("=====", "vod ended");
-                    jsProgressHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("=====", "vod restart");
-                            ReactTVExoplayerView.this.setPausedModifier(false);
-                        }
-                    }, 10_000);
-                } else {
-                    eventEmitter.endLiveChannelAsVod();
-                }
+                eventEmitter.endLiveChannelAsVod();
             }
         }
     }
