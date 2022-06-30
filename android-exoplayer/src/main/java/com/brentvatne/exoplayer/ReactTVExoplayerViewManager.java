@@ -620,7 +620,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         if (map != null) {
             long start = (map.hasKey("start") ? Math.round(map.getDouble("start")) : C.TIME_UNSET);
             long end = (map.hasKey("end") ? Math.round(map.getDouble("end")) : C.TIME_UNSET);
-            limitedSeekRange = LimitedSeekRange.from(start, end);
+            boolean seekToStart = (map.hasKey("seekToStart") && map.getBoolean("seekToStart"));
+            limitedSeekRange = LimitedSeekRange.from(start, end, seekToStart);
         }
         return limitedSeekRange;
     }
