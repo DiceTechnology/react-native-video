@@ -82,10 +82,10 @@ public class DceWatchFromWidget extends LinearLayoutCompat {
         }
         if (!limitedSeekRange.isSeekToStart()) {
             labelTextView.setText(DiceLocalizedStrings.getInstance().string(StringId.epgProgrammeStartBeginning));
-            icon.setImageResource(R.drawable.ic_watch_from_beginning);
+            icon.setImageResource(R.drawable.ic_watch_from_beginning_selector);
         } else {
             labelTextView.setText(DiceLocalizedStrings.getInstance().string(StringId.epgProgrammeStartLive));
-            icon.setImageResource(R.drawable.ic_watch_from_live);
+            icon.setImageResource(R.drawable.ic_watch_from_live_selector);
         }
 
         ValueAnimator fadeIn = ValueAnimator.ofFloat(0f, 1f);

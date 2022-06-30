@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:duplicateParentState="true"
     android:background="@drawable/bg_dce_watch_from_beginning_selector"
     android:orientation="horizontal"
     android:visibility="visible">
@@ -12,12 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
         android:adjustViewBounds="true"
-        android:src="@drawable/ic_watch_from_beginning"
+        android:duplicateParentState="true"
+        android:src="@drawable/ic_watch_from_beginning_selector"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -26,9 +28,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginTop="6dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginBottom="6dp"
-        android:textColor="@color/dce_player_main_text_color"
+        android:duplicateParentState="true"
+        android:textColor="@color/dce_watch_from_text_selector"
         android:textSize="@dimen/dce_player_watch_from_text_size"
         tools:text="Watch from Beginning" />
 
