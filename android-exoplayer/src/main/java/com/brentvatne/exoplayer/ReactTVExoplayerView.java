@@ -1,5 +1,7 @@
 package com.brentvatne.exoplayer;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -17,6 +19,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Choreographer;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,6 +104,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.imggaming.widgets.DceWatchFromWidget;
 import com.imggaming.widgets.DceWatermarkWidget;
 import com.previewseekbar.base.PreviewView;
 
@@ -168,6 +172,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private ExoDorisPlayerView exoDorisPlayerView;
     private DceWatermarkWidget watermarkWidget;
+    private DceWatchFromWidget watchFromWidget;
     private ExoDoris player;
     private ExoDorisImaDaiPlayer exoDorisImaDaiPlayer;
     private ExoDorisImaCsaiPlayer exoDorisImaCsaiPlayer;
@@ -378,6 +383,23 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             exoDorisPlayerView.addView(watermarkWidget, 1);
         }
 
+        // Watch from beginning/live.
+        watchFromWidget = new DceWatchFromWidget(themedReactContext);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+        layoutParams.leftMargin = 30;
+        layoutParams.bottomMargin = 40;
+        layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
+        exoDorisPlayerView.addView(watchFromWidget, layoutParams);
+        watchFromWidget.setOnClickListener(v -> {
+            if (watchFromWidget.isWatchFromBeginning()) {
+                player.seekTo(0);
+            } else {
+                player.seekTo(C.TIME_UNSET);
+            }
+            watchFromWidget.hide();
+        });
+        watchFromWidget.setVisibility(GONE);
+
         setEpg(false); // default value
         setStats(false);
 
@@ -580,6 +602,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 player.load(source, !haveResumePosition);
             }
 
+            watchFromWidget.setLimitedSeekRange(player.getLimitedSeekRange());
             exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
 
             playerNeedsSource = false;
@@ -956,6 +979,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (state == Player.STATE_BUFFERING || state == Player.STATE_READY) {
             trySeekToResumePosition();
         }
+        updateWatchFrom();
 
         String text = "onStateChanged: playbackState = " + state;
         switch (state) {
@@ -1247,6 +1271,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
         if (errorString != null) {
             resetSourceUrl();
+            watchFromWidget.hide();
             eventEmitter.error(errorString, ex);
         }
         playerNeedsSource = true;
@@ -1357,6 +1382,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setLimitedSeekRange(LimitedSeekRange limitedSeekRange) {
         if (isLive) {
             player.limitSeekRange(limitedSeekRange);
+            watchFromWidget.setLimitedSeekRange(player.getLimitedSeekRange());
             exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
         }
     }
@@ -1836,6 +1862,13 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void hideWatermark() {
         if (watermarkWidget != null) {
             watermarkWidget.hide();
+        }
+    }
+
+    private void updateWatchFrom() {
+        int state = player == null ? Player.STATE_IDLE : player.getPlaybackState();
+        if (state == Player.STATE_READY || state == Player.STATE_BUFFERING) {
+            watchFromWidget.show();
         }
     }
 
