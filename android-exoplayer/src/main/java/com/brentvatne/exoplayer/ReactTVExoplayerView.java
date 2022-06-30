@@ -1866,8 +1866,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     private void updateWatchFrom() {
-        int state = player == null ? Player.STATE_IDLE : player.getPlaybackState();
-        if (state == Player.STATE_READY || state == Player.STATE_BUFFERING) {
+        if (player != null && player.getPlaybackState() == Player.STATE_READY) {
             watchFromWidget.show();
         }
     }
