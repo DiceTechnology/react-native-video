@@ -396,7 +396,7 @@ static NSString *const playerVersion = @"react-native-video/3.3.1";
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    if(_waterMarkImageView.image == nil){
+    if(_waterMarkImageView.image == nil) {
         [WatermarkManager setupWatermarkFromSourceWithSource:_source watermarkView:_waterMarkImageView parent:_dorisUI.view];
     }
 }
@@ -408,9 +408,11 @@ static NSString *const playerVersion = @"react-native-video/3.3.1";
     
     NSNumber *_Nullable _start;
     NSNumber *_Nullable _end;
+    BOOL _seekToStart;
     
     id start = [ranges objectForKey:@"start"];
     id end = [ranges objectForKey:@"end"];
+    id seekToStart = [ranges objectForKey:@"seekToStart"];
     
     if (start && [start isKindOfClass:NSNumber.class]) {
         NSNumber *startNumber = start;
@@ -424,7 +426,13 @@ static NSString *const playerVersion = @"react-native-video/3.3.1";
         _end = [[NSNumber alloc] initWithDouble:date.timeIntervalSinceNow];
     }
     
-    [_dorisUI.input limitSeekableRangeWithStart:_start end:_end];
+    if ([seekToStart boolValue]) {
+        _seekToStart = [seekToStart boolValue];
+    } else {
+        _seekToStart = NO;
+    }
+    
+    [_dorisUI.input limitSeekableRangeWithStart:_start end:_end seekToStart:_seekToStart];
 }
 
 
