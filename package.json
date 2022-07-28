@@ -1,7 +1,7 @@
 {
     "name": "react-native-video",
     "version": "5.28.3",
-    "exoDorisVersion": "1.2.6",
+    "exoDorisVersion": "c36abc7b",
     "description": "A <Video /> element for react-native",
     "main": "Video.tsx",
     "license": "MIT",
