@@ -244,7 +244,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             currentSrcUrls.put(uriHash, uriString);
         }
 
-        if (videoView.isUnderBackground()) {
+        if (videoView.isInBackground()) {
             return;
         }
 

@@ -480,7 +480,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         stopPlayback();
     }
 
-    protected boolean isUnderBackground() {
+    protected boolean isInBackground() {
         return isInBackground;
     }
 
