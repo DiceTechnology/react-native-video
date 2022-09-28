@@ -763,7 +763,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private void handleDrmSessionManagerError(Exception exception) {
         final int errorStringId = R.string.error_drm_session_manager;
         final String errorString = getContext().getString(errorStringId);
-        eventEmitter.error(errorString, exception);
+        eventEmitter.error("DRM exception: " + errorString, exception);
     }
 
     private void releasePlayer() {
@@ -1241,7 +1241,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (errorString != null) {
             resetSourceUrl();
             watchFromWidget.hide();
-            eventEmitter.error(errorString, ex);
+            eventEmitter.error("Playback exception: " + errorString, ex);
         }
         playerNeedsSource = true;
         if (!DorisExceptionUtil.isBehindLiveWindow(error)) {
@@ -2049,19 +2049,22 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     }
                     break;
                 case ERROR:
+                    boolean reloadCurrentSource = false;
                     if (adEvent.details.adType.equals(AdType.IMA_DAI.name())) {
                         Exception error = adEvent.details.error;
 
                         if (!hasReloadedCurrentSource && isUnauthorizedAdError(error)) {
                             hasReloadedCurrentSource = true;
+                            reloadCurrentSource = true;
                             eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
-                        } else {
-                            eventEmitter.error(error.getMessage(), error);
                         }
 
                         // Reset imaDaiSrc and isImaDaiStream to allow a new source to be loaded
                         imaDaiSrc = null;
                         isImaDaiStream = false;
+                    }
+                    if (!reloadCurrentSource) {
+                        eventEmitter.error("Ad exception", adEvent.details.error);
                     }
                     break;
                 default:
