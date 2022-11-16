@@ -27,7 +27,7 @@ public final class ReactTVExoDorisFactory {
             int loadBufferMs,
             long forwardIncrementMs,
             long rewindIncrementMs,
-            @Nullable DefaultTrackSelector.ParametersBuilder parametersBuilder,
+            @Nullable DefaultTrackSelector.Parameters.Builder parametersBuilder,
             @Nullable AdViewProvider adViewProvider) {
         return createPlayer(
                 context,
@@ -53,7 +53,7 @@ public final class ReactTVExoDorisFactory {
             long rewindIncrementMs,
             @Nullable List<Plugin> plugins,
             @Nullable SurfaceView surfaceView,
-            @Nullable DefaultTrackSelector.ParametersBuilder parametersBuilder,
+            @Nullable DefaultTrackSelector.Parameters.Builder parametersBuilder,
             @Nullable AdViewProvider adViewProvider) {
         final ExoDorisBuilder builder;
         if (adType == AdType.IMA_DAI) {
