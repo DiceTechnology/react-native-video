@@ -92,6 +92,7 @@ import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.text.CueGroup;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.Parameters;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.exoplayer2.util.Log;
@@ -492,8 +493,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
         if (player == null) {
             AdType adType = (isImaDaiStream ? AdType.IMA_DAI : (isImaCsaiStream ? AdType.IMA_CSAI : null));
-            DefaultTrackSelector.Parameters.Builder parametersBuilder =
-                    new DefaultTrackSelector.Parameters.Builder(getContext())
+            Parameters.Builder parametersBuilder =
+                    new Parameters.Builder(getContext())
                     .setMaxVideoSize(viewWidth, viewHeight);
             player = exoDorisFactory.createPlayer(
                     getContext(),
@@ -1409,7 +1410,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             type = "default";
         }
 
-        DefaultTrackSelector.Parameters disableParameters = trackSelector.getParameters()
+        Parameters disableParameters = trackSelector.getParameters()
                 .buildUpon()
                 .setRendererDisabled(rendererIndex, true)
                 .build();
@@ -1455,7 +1456,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             return;
         }
 
-        DefaultTrackSelector.Parameters selectionParameters = trackSelector.getParameters()
+        Parameters selectionParameters = trackSelector.getParameters()
                 .buildUpon()
                 .setRendererDisabled(rendererIndex, false)
                 .setOverrideForType(new TrackSelectionOverride(groups.get(trackIndex), 0))
@@ -2000,6 +2001,14 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     @Override
     public void onStatsButtonClicked() {
         eventEmitter.statsIconClick();
+    }
+
+    @Override
+    public void onSubtitleSelected(String language) {
+    }
+
+    @Override
+    public void onAudioSelected(String language) {
     }
 
     public void replaceAdTagParameters(Map<String, Object> replaceAdTagParametersMap) {

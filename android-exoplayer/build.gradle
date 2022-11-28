@@ -36,21 +36,15 @@ dependencies {
     implementation project(":AmazonFireTVAdsSDK-release")
 
     // ExoDoris
-    implementation("com.github.DiceTechnology.doris-android:doris:$exoDorisVersion") {
-        exclude group: "com.github.DiceTechnology", module: "dice-shield-android"
+    api ("com.github.DiceTechnology.doris-android:doris-ui:$exoDorisVersion"){
+        exclude group: 'com.github.DiceTechnology', module: 'dice-shield-android'
     }
-    implementation("com.github.DiceTechnology.doris-android:doris-ui:$exoDorisVersion") {
-        exclude group: "com.github.DiceTechnology", module: "dice-shield-android"
+    api ("com.github.DiceTechnology.doris-android:doris-custom-ui:$exoDorisVersion"){
+        exclude group: 'com.github.DiceTechnology', module: 'dice-shield-android'
     }
-    implementation("com.github.DiceTechnology.doris-android:extension-audio-only:$exoDorisVersion") {
-        exclude group: "com.github.DiceTechnology", module: "dice-shield-android"
-    }
-    implementation("com.github.DiceTechnology.doris-android:extension-ima-dai:$exoDorisVersion") {
-        exclude group: "com.github.DiceTechnology", module: "dice-shield-android"
-    }
-    implementation("com.github.DiceTechnology.doris-android:extension-ima-csai:$exoDorisVersion") {
-        exclude group: "com.github.DiceTechnology", module: "dice-shield-android"
-    }
+
+    // Stetho
+    api 'com.facebook.stetho:stetho-okhttp3:1.6.0'
 
     // Google Guava
     implementation "com.google.guava:guava:30.1-android"

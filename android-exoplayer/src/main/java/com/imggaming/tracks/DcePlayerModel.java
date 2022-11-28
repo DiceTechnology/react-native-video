@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.Parameters;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.common.collect.ImmutableList;
@@ -210,7 +211,7 @@ public class DcePlayerModel {
         final int index = findTrackTypeAvailable(trackType);
 
         if (index >= 0) {
-            DefaultTrackSelector.Parameters.Builder parametersBuilder = trackSelector.buildUponParameters();
+            Parameters.Builder parametersBuilder = trackSelector.buildUponParameters();
 
             ImmutableList<Tracks.Group> groups = player.getCurrentTracks().getGroups();
 
