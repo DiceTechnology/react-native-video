@@ -527,7 +527,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         boolean showEpgButton = (buttons != null && buttons.hasKey(PROP_EPG_BUTTON)) && buttons.getBoolean(PROP_EPG_BUTTON);
         boolean showStatsButton = (buttons != null && buttons.hasKey(PROP_STATS_BUTTON)) && buttons.getBoolean(PROP_STATS_BUTTON);
         boolean showAnnotationsButton = (buttons != null && buttons.hasKey(PROP_ANNOTATIONS_BUTTON)) && buttons.getBoolean(PROP_ANNOTATIONS_BUTTON);
-        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton, true);
+        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton, showAnnotationsButton);
     }
 
     @ReactProp(name = PROP_IS_FAVOURITE)
