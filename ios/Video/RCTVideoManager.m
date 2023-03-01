@@ -115,11 +115,7 @@ RCT_EXPORT_METHOD(seekToPosition:(nonnull NSNumber *)node position:(double)posit
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         if ([viewRegistry[node] isKindOfClass:[RCTVideo class]]) {
             RCTVideo *view = (RCTVideo *)viewRegistry[node];
-            NSDictionary *info = @{
-                @"time": [NSNumber numberWithFloat:position],
-                @"tolerance": [NSNumber numberWithInt:100]
-            };
-            [view setSeek:info];
+            [view.dorisUI.input seekTo:position];
         }
     }];
 };
@@ -128,7 +124,11 @@ RCT_EXPORT_METHOD(seekToResumePosition:(nonnull NSNumber *)node position:(double
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         if ([viewRegistry[node] isKindOfClass:[RCTVideo class]]) {
             RCTVideo *view = (RCTVideo *)viewRegistry[node];
-            [view.dorisUI.input seekTo:position];
+            NSDictionary *info = @{
+                @"time": [NSNumber numberWithFloat:position],
+                @"tolerance": [NSNumber numberWithInt:100]
+            };
+            [view setSeek:info];
         }
     }];
 };
