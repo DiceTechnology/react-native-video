@@ -1,7 +1,7 @@
-import { IVideoPlayerOnRequireAdParametersPayload } from './ima';
+import { IVideoPlayerOnRequireAdParametersPayload } from "./ima";
 
 export interface IVideoPlayerCallbacks {
-  onAnnotationsClick?: (e: any) => void;
+  onAnnotationsButtonClick?: (e: any) => void;
   onBuffer?: (e: any) => void;
   onEnd?: (e: any) => void;
   onEpgIconClick?: (e: any) => void;
