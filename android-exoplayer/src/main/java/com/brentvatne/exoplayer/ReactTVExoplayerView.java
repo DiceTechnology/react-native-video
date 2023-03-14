@@ -1324,7 +1324,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean isOriginalSourceNull = srcUrl == null;
             boolean isSourceEqual = url.equals(srcUrl);
 
-            this.correlationId = UUID.randomUUID();
             this.isImaDaiStream = false;
             this.isImaDaiStreamLoaded = false;
             this.isImaCsaiStream = false;
