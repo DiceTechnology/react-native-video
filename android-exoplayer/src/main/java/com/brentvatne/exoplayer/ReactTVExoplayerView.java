@@ -190,7 +190,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private int viewHeight = 0;
     private boolean hasReloadedCurrentSource = false;
     private boolean isMuted = false;
-    private UUID correlationId;
 
     // Props from React
     private RNSource src;
@@ -555,9 +554,14 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             SourceBuilder sourceBuilder = new SourceBuilder()
                     .setMediaItemBuilder(mediaItemBuilder)
                     .setId(src.getId())
-                    .setMuxProperties(src.getMuxData(), String.valueOf(correlationId), exoDorisPlayerView.getVideoSurfaceView())
                     .setTextTracks(src.getTextTracks())
                     .setDrmParams(actionToken);
+
+            Map<String, Object> muxData = src.getMuxData();
+            if (muxData != null) {
+                String correlationId = (String) muxData.get("correlationId");
+                sourceBuilder.setMuxProperties(muxData, correlationId, exoDorisPlayerView.getVideoSurfaceView());
+            }
 
             if (isImaDaiStream) {
                 ImaDaiProperties imaDaiProperties = new ImaDaiPropertiesBuilder()
