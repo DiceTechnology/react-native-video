@@ -142,20 +142,22 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
   }
 
   /**
-   * seekTo jumps to a certain position for vod and live content
+   * seekToResume jumps to a certain position for vod and live content
    * time parameter can be the following:
    * string: unix timestamp (used for live annotation)
    * number: seconds elapsed (used for vod annotation)
    * now: for DVR content to jump back to current live time
    */
-  seekTo = (time: 'now' | string | number) => {
+  seekToResume = (time: 'now' | string | number) => {
     let command = SeekToCommand.SEEK_TO_NOW;
     const args: Array<string | number> = [];
 
     if (time !== 'now') {
       command =
-        typeof time === 'string' ? SeekToCommand.SEEK_TO_TIMESTAMP : SeekToCommand.SEEK_TO_POSITION;
-        args.push(time);
+        typeof time === 'string'
+          ? SeekToCommand.SEEK_TO_TIMESTAMP
+          : SeekToCommand.SEEK_TO_RESUME_POSITION;
+      args.push(time);
     }
 
     if (this.refPlayer) {
@@ -167,20 +169,35 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
     }
   };
 
-  // getNativeResizeMode = () => {
-  //   const { resizeMode } = this.props;
-  //   let nativeResizeMode;
-  //   if (resizeMode === 'stretch') {
-  //     nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleToFill;
-  //   } else if (resizeMode === 'contain') {
-  //     nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleAspectFit;
-  //   } else if (resizeMode === 'cover') {
-  //     nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleAspectFill;
-  //   } else {
-  //     nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleNone;
-  //   }
-  //   return nativeResizeMode;
-  // };
+  /**
+   * @description seeks to a specified time in the video
+   * @param time video time in seconds
+   */
+  seekTo = (time: number) => {
+    const command = SeekToCommand.SEEK_TO_POSITION;
+    if (this.refPlayer) {
+      NativeModules.UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.refPlayer.current),
+        NativeModules.UIManager.RCTVideo.Commands[command],
+        [time]
+      );
+    }
+  };
+
+  getNativeResizeMode = () => {
+    const { resizeMode } = this.props;
+    let nativeResizeMode;
+    if (resizeMode === 'stretch') {
+      nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleToFill;
+    } else if (resizeMode === 'contain') {
+      nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleAspectFit;
+    } else if (resizeMode === 'cover') {
+      nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleAspectFill;
+    } else {
+      nativeResizeMode = NativeModules.UIManager.RCTVideo.Constants.ScaleNone;
+    }
+    return nativeResizeMode;
+  };
 
   getVideoPlayerProps = () => {
     return {

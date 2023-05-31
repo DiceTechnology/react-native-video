@@ -3,11 +3,13 @@ package com.brentvatne.exoplayer;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
+import android.util.LruCache;
 import android.view.ContextThemeWrapper;
 
 import com.brentvatne.entity.RNMetadata;
 import com.brentvatne.entity.RelatedVideo;
+import com.brentvatne.entity.Watermark;
+import com.brentvatne.react.BuildConfig;
 import com.brentvatne.react.R;
 import com.dice.shield.drm.entity.ActionToken;
 import com.facebook.react.bridge.Dynamic;
@@ -20,10 +22,11 @@ import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.endeavor.DebugUtil;
 import com.google.android.exoplayer2.endeavor.ExoConfig;
+import com.google.android.exoplayer2.endeavor.LimitedSeekRange;
 import com.google.android.exoplayer2.endeavor.WebUtil;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
+import com.google.android.exoplayer2.util.Log;
 import com.google.gson.Gson;
 import com.imggaming.translations.DiceLocalizedStrings;
 
@@ -58,6 +61,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_HEADERS = "requestHeaders";
     private static final String PROP_SRC_APS = "aps";
     private static final String PROP_SRC_APS_TEST_MODE = "testMode";
+    private static final String PROP_SRC_METADATA = "metadata";
+    private static final String PROP_SRC_LIMIT_RANGE = "limitedSeekableRange";
+    private static final String PROP_SRC_SAVE_SUBTITLE_SELECTION = "shouldSaveSubtitleSelection";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -76,6 +82,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_FAVOURITE_BUTTON = "favourite";
     private static final String PROP_EPG_BUTTON = "epg";
     private static final String PROP_STATS_BUTTON = "stats";
+    private static final String PROP_ANNOTATIONS_BUTTON = "annotations";
 
     private static final String PROP_RESIZE_MODE = "resizeMode";
     private static final String PROP_REPEAT = "repeat";
@@ -122,33 +129,29 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     private static final int COMMAND_SEEK_TO_NOW = 1;
     private static final int COMMAND_SEEK_TO_TIMESTAMP = 2;
-    private static final int COMMAND_SEEK_TO_POSITION = 3;
-    private static final int COMMAND_REPLACE_AD_TAG_PARAMETERS = 4;
-
-    private static final boolean IS_DEBUG = false;
+    private static final int COMMAND_SEEK_TO_RESUME_POSITION = 3;
+    private static final int COMMAND_SEEK_TO_POSITION = 4;
+    private static final int COMMAND_REPLACE_AD_TAG_PARAMETERS = 5;
+    private static final int COMMAND_LIMIT_SEEKABLE_RANGE = 6;
 
     private final ReactApplicationContext reactApplicationContext;
+    private LruCache<Integer, String> currentSrcUrls;
 
     public ReactTVExoplayerViewManager(ReactApplicationContext reactApplicationContext) {
         this.reactApplicationContext = reactApplicationContext;
+        this.currentSrcUrls = new LruCache<>(3);
+        if (BuildConfig.DEBUG) {
+            Log.setLogLevel(Log.LOG_LEVEL_ALL);
+        }
         setPlayerConfig();
     }
 
     private void setPlayerConfig() {
-        if (IS_DEBUG) {
-            DebugUtil.debug_drm = true;
-            DebugUtil.debug_media = true;
-            DebugUtil.debug_manifest = true;
-            // Change the ip and port to your file upload server.
-            DebugUtil.upload_server = "http://172.16.2.142:4660/file/manifest/";
-        }
-        ExoConfig.getInstance().setHttpTimeoutMs(6000);
         ExoConfig.getInstance().setObtainKeyIdsFromManifest(true);
 
-        Log.d(WebUtil.DEBUG, String.format("config player - httpTimeoutMs %d, keyIdsMode %s, debug %b",
-                ExoConfig.getInstance().getHttpTimeoutMs(),
+        Log.i(WebUtil.DEBUG, String.format("config player - keyIdsMode %s, debug %b",
                 ExoConfig.getInstance().isObtainKeyIdsFromManifest() ? "manifest" : "stream",
-                IS_DEBUG));
+                BuildConfig.DEBUG));
     }
 
     @Override
@@ -158,10 +161,11 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     @Override
     protected ReactTVExoplayerView createViewInstance(ThemedReactContext themedReactContext) {
-
+        currentSrcUrls.evictAll();
         ThemedReactContext context = new ThemedReactContext(reactApplicationContext, new ContextThemeWrapper(themedReactContext, R.style.DceTVPlayerTheme));
-
-        return new ReactTVExoplayerView(context);
+        ReactTVExoplayerView reactTVExoplayerView = new ReactTVExoplayerView(context);
+        reactTVExoplayerView.setKeepScreenOn(true);
+        return reactTVExoplayerView;
     }
 
     @Override
@@ -212,13 +216,29 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
         ReadableMap config = src.hasKey(PROP_SRC_CONFIG) ? src.getMap(PROP_SRC_CONFIG) : null;
         ReadableMap muxData = (config != null && config.hasKey(PROP_SRC_MUX_DATA)) ? config.getMap(PROP_SRC_MUX_DATA) : null;
+        ReadableMap metadata = src.hasKey(PROP_SRC_METADATA) ? src.getMap(PROP_SRC_METADATA) : null;
 
         Map<String, String> headers = src.hasKey(PROP_SRC_HEADERS) ? toStringMap(src.getMap(PROP_SRC_HEADERS)) : null;
 
         ReadableMap aps = src.hasKey(PROP_SRC_APS) ? src.getMap(PROP_SRC_APS) : null;
         boolean apsTestMode = (aps != null && aps.hasKey(PROP_SRC_APS_TEST_MODE)) && aps.getBoolean(PROP_SRC_APS_TEST_MODE);
 
+        LimitedSeekRange limitedSeekRange = generateRange(src.hasKey(PROP_SRC_LIMIT_RANGE) ? src.getMap(PROP_SRC_LIMIT_RANGE) : null);
+        boolean shouldSaveSubtitleSelection = src.hasKey(PROP_SRC_SAVE_SUBTITLE_SELECTION) && src.getBoolean(PROP_SRC_SAVE_SUBTITLE_SELECTION);
+
         if (TextUtils.isEmpty(uriString)) {
+            return;
+        }
+
+        int uriHash = uriString.hashCode();
+        if (currentSrcUrls.get(uriHash) != null) {
+            Log.d(WebUtil.DEBUG, "Same source URL, skip initialization, url " + uriString);
+            return;
+        } else {
+            currentSrcUrls.put(uriHash, uriString);
+        }
+
+        if (videoView.isInBackground()) {
             return;
         }
 
@@ -255,7 +275,10 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     duration != null ? Integer.parseInt(duration) : 0,
                     channelName,
                     apsTestMode,
-                    adTagUrl);
+                    adTagUrl,
+                    Watermark.fromMap(metadata),
+                    limitedSeekRange,
+                    shouldSaveSubtitleSelection);
         } else {
             int identifier = context.getResources().getIdentifier(
                     uriString,
@@ -505,7 +528,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         boolean showFavouriteButton = (buttons != null && buttons.hasKey(PROP_FAVOURITE_BUTTON)) && buttons.getBoolean(PROP_FAVOURITE_BUTTON);
         boolean showEpgButton = (buttons != null && buttons.hasKey(PROP_EPG_BUTTON)) && buttons.getBoolean(PROP_EPG_BUTTON);
         boolean showStatsButton = (buttons != null && buttons.hasKey(PROP_STATS_BUTTON)) && buttons.getBoolean(PROP_STATS_BUTTON);
-        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton);
+        boolean showAnnotationsButton = (buttons != null && buttons.hasKey(PROP_ANNOTATIONS_BUTTON)) && buttons.getBoolean(PROP_ANNOTATIONS_BUTTON);
+        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton, showAnnotationsButton);
     }
 
     @ReactProp(name = PROP_IS_FAVOURITE)
@@ -566,10 +590,14 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                 COMMAND_SEEK_TO_NOW,
                 "seekToTimestamp",
                 COMMAND_SEEK_TO_TIMESTAMP,
+                "seekToResumePosition",
+                COMMAND_SEEK_TO_RESUME_POSITION,
                 "seekToPosition",
                 COMMAND_SEEK_TO_POSITION,
                 "replaceAdTagParameters",
-                COMMAND_REPLACE_AD_TAG_PARAMETERS
+                COMMAND_REPLACE_AD_TAG_PARAMETERS,
+                "limitSeekableRange",
+                COMMAND_LIMIT_SEEKABLE_RANGE
         );
     }
 
@@ -589,14 +617,32 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     root.resumeTo(positionMs);
                 }
                 break;
-            case COMMAND_SEEK_TO_POSITION:
+            case COMMAND_SEEK_TO_RESUME_POSITION:
                 long resumeMs = args.getInt(0) * 1000;
                 Log.d(WebUtil.DEBUG, "resumeToPosition " + resumeMs);
                 root.resumeTo(resumeMs);
                 break;
+            case COMMAND_SEEK_TO_POSITION:
+                long seekToMs = args.getInt(0) * 1000;
+                root.seekTo(seekToMs);
+                break;
             case COMMAND_REPLACE_AD_TAG_PARAMETERS:
                 root.replaceAdTagParameters(args.getMap(0) != null ? args.getMap(0).toHashMap() : null);
                 break;
+            case COMMAND_LIMIT_SEEKABLE_RANGE:
+                root.setLimitedSeekRange(generateRange(args.getMap(0)));
+                break;
         }
+    }
+
+    private LimitedSeekRange generateRange(ReadableMap map) {
+        LimitedSeekRange limitedSeekRange = null;
+        if (map != null) {
+            long start = (map.hasKey("start") ? Math.round(map.getDouble("start")) : C.TIME_UNSET);
+            long end = (map.hasKey("end") ? Math.round(map.getDouble("end")) : C.TIME_UNSET);
+            boolean seekToStart = (map.hasKey("seekToStart") && map.getBoolean("seekToStart"));
+            limitedSeekRange = LimitedSeekRange.from(start, end, seekToStart);
+        }
+        return limitedSeekRange;
     }
 }

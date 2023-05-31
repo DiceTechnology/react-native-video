@@ -59,6 +59,7 @@ class VideoEventEmitter {
     private static final String EVENT_RELATED_VIDEO_CLICKED = "onRelatedVideoClicked";
     private static final String EVENT_RELATED_VIDEOS_ICON_CLICKED = "onRelatedVideosIconClicked";
     private static final String EVENT_FAVOURITE_BUTTON_CLICK = "onFavouriteButtonClick";
+    private static final String EVENT_ANNOTATIONS_BUTTON_CLICK = "onAnnotationsButtonClick";
 
     static final String[] Events = {
             EVENT_LOAD_START,
@@ -90,6 +91,7 @@ class VideoEventEmitter {
             EVENT_RELATED_VIDEOS_ICON_CLICKED,
             EVENT_VIDEO_ABOUT_TO_END,
             EVENT_FAVOURITE_BUTTON_CLICK,
+            EVENT_ANNOTATIONS_BUTTON_CLICK,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
             EVENT_BEHIND_LIVE_WINDOW_ERROR
@@ -126,6 +128,7 @@ class VideoEventEmitter {
             EVENT_RELATED_VIDEOS_ICON_CLICKED,
             EVENT_VIDEO_ABOUT_TO_END,
             EVENT_FAVOURITE_BUTTON_CLICK,
+            EVENT_ANNOTATIONS_BUTTON_CLICK,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
             EVENT_BEHIND_LIVE_WINDOW_ERROR
@@ -242,6 +245,12 @@ class VideoEventEmitter {
         receiveEvent(EVENT_END, null);
     }
 
+    void endLiveChannelAsVod() {
+        WritableMap map = Arguments.createMap();
+        map.putString(EVENT_PROP_TYPE, "VOD");
+        receiveEvent(EVENT_END, map);
+    }
+
     void fullscreenWillPresent() {
         receiveEvent(EVENT_FULLSCREEN_WILL_PRESENT, null);
     }
@@ -261,7 +270,7 @@ class VideoEventEmitter {
     void error(String errorString, Exception exception) {
         WritableMap error = Arguments.createMap();
         error.putString(EVENT_PROP_ERROR_STRING, errorString);
-        error.putString(EVENT_PROP_ERROR_EXCEPTION, exception.getMessage());
+        error.putString(EVENT_PROP_ERROR_EXCEPTION, android.util.Log.getStackTraceString(exception));
         WritableMap event = Arguments.createMap();
         event.putMap(EVENT_PROP_ERROR, error);
         receiveEvent(EVENT_ERROR, event);
@@ -314,30 +323,32 @@ class VideoEventEmitter {
     }
 
     void timedMetadata(Metadata metadata) {
-        WritableArray metadataArray = Arguments.createArray();
-
+        WritableArray metadataArray = null;
         for (int i = 0; i < metadata.length(); i++) {
+            Metadata.Entry entry = metadata.get(i);
+            if (!(entry instanceof Id3Frame)) {
+                continue;
+            }
 
-
-            Id3Frame frame = (Id3Frame) metadata.get(i);
-
+            if (metadataArray == null) {
+                metadataArray = Arguments.createArray();
+            }
             String value = "";
-
+            Id3Frame frame = (Id3Frame) entry;
             if (frame instanceof TextInformationFrame) {
                 TextInformationFrame txxxFrame = (TextInformationFrame) frame;
                 value = txxxFrame.value;
             }
-
             String identifier = frame.id;
-
             WritableMap map = Arguments.createMap();
             map.putString("identifier", identifier);
             map.putString("value", value);
-
             metadataArray.pushMap(map);
-
         }
 
+        if (metadataArray == null) {
+            return;
+        }
         WritableMap event = Arguments.createMap();
         event.putArray(EVENT_PROP_TIMED_METADATA, metadataArray);
         receiveEvent(EVENT_TIMED_METADATA, event);
@@ -365,6 +376,10 @@ class VideoEventEmitter {
 
     void favouriteButtonClick() {
         receiveEvent(EVENT_FAVOURITE_BUTTON_CLICK, null);
+    }
+
+    void annotationsButtonClick() {
+        receiveEvent(EVENT_ANNOTATIONS_BUTTON_CLICK, null);
     }
 
     void requireAdParameters(double date, boolean isBlocking) {
