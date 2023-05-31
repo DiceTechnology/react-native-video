@@ -42,7 +42,8 @@ struct OverlayConfig: SuperCodable {
                                                     moduleName: bottomComponent.name,
                                                     initialProperties: bottomComponent.initialProps)
             return .rightAndBottom(rightView: sideJSComponentView,
-                                   bottomView: bottomJSComponentView)
+                                   bottomView: bottomJSComponentView,
+                                   closeAction: nil)
         case .side:
             guard
                 let sideComponent = components.first(where: {$0.type == .side})
@@ -53,7 +54,8 @@ struct OverlayConfig: SuperCodable {
             let sideJSComponentView = RCTRootView(bridge: bridge,
                                                   moduleName: sideComponent.name,
                                                   initialProperties: sideComponent.initialProps)
-            return .right(rightView: sideJSComponentView)
+            return .right(rightView: sideJSComponentView,
+                          closeAction: nil)
         default: return .none
         }
     }

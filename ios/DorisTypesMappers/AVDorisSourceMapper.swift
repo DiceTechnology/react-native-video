@@ -9,7 +9,7 @@ import AVDoris
 
 enum AVDorisSourceType {
     case ima(DAISource)
-    case regular(PlayerItemSource)
+    case regular(DorisSource)
     case unknown
 }
 
@@ -21,7 +21,7 @@ class AVDorisSourceMapper {
         
         var drmData: DorisDRMSource?
         if let drm = source.drm {
-            drmData = DorisDRMSource(croToken: drm.croToken, licensingServerUrl: drm.licensingServerUrl)
+            drmData = DorisDRMSource(contentUrl: source.uri.absoluteString, croToken: drm.croToken, licensingServerUrl: drm.licensingServerUrl)
         }
         
         if let ima = source.ima {
@@ -53,7 +53,7 @@ class AVDorisSourceMapper {
             }
             
         } else {
-            let source = PlayerItemSource(playerItem: .init(url: source.uri))
+            let source = DorisSource(playerItem: .init(url: source.uri))
             source.drm = drmData
             completion(.regular(source))
         }

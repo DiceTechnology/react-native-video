@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = "12.0"
   s.tvos.deployment_target = "12.0"
-  s.static_framework = true
+  # s.static_framework = true
   s.source_files = "ios/Video/*", "ios/JSProps/*", "ios/Helpers/*", "ios/DorisTypesMappers/*"
   
   s.dependency 'React'

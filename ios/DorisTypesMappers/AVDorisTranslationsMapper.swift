@@ -7,27 +7,99 @@
 
 import AVDoris
 
-class AVDorisTranslationsMapper {
-    func map(translations: Translations?) -> DorisUITranslations? {
-        guard let translations = translations else { return nil }
+//class AVDorisTranslationsMapper {
+//    func map(translations: Translations?) -> DorisTranslationsViewModel? {
+//        guard let translations = translations else { return nil }
+//
+//        let dorisTranslations = DorisUITranslations()
+//        dorisTranslations.playerStatsButton = translations.playerStatsButton
+//        dorisTranslations.playerPlayButton = translations.playerPlayButton
+//        dorisTranslations.playerPauseButton = translations.playerPauseButton
+//        dorisTranslations.playerAudioAndSubtitlesButton = translations.playerAudioAndSubtitlesButton
+//        dorisTranslations.live = translations.live
+//        dorisTranslations.favourite = translations.favourite
+//        dorisTranslations.watchlist = translations.watchlist
+//        dorisTranslations.moreVideos = translations.moreVideos
+//        dorisTranslations.captions = translations.captions
+//        dorisTranslations.rewind = translations.rewind
+//        dorisTranslations.fastForward = translations.fastForward
+//        dorisTranslations.audioTracks = translations.audioTracks
+//        dorisTranslations.info = translations.info
+//        dorisTranslations.adsCountdownAd = translations.adsCountdownAd
+//        dorisTranslations.adsCountdownOf = translations.adsCountdownOf
+//
+//        return dorisTranslations
+//    }
+//}
+
+
+extension DorisTranslationsViewModel {
+    init(translations: Translations) {
+        self.init()
+        self.stats = translations.playerStatsButton
+        self.play = translations.playerPlayButton
+        self.pause = translations.playerPauseButton
+//        self.playerAudioAndSubtitlesButton = translations.playerAudioAndSubtitlesButton
+        self.liveBadgeText = translations.live
+        self.favourites = translations.favourite
+//        self.watchlist = translations.watchlist
+        self.moreVideos = translations.moreVideos
+        self.captions = translations.captions
+        self.rewind = translations.rewind
+        self.fastForward = translations.fastForward
+        self.audio = translations.audioTracks
+        self.info = translations.info
+        self.adsCountdownAd = translations.adsCountdownAd
+        self.adsCountdownOf = translations.adsCountdownOf
+    }
+}
+
+extension DorisStyleViewModel {
+    init(theme: Theme?) {
+        if let theme = theme {
+            self.init(primaryColor: UIColor(named: theme.colors.primary) ?? .red,
+                      secondaryColor: UIColor(hexString: theme.colors.secondary) ?? .white,
+                      primaryFont: UIFont(name: theme.fonts.primary, size: 30) ?? .systemFont(ofSize: 30),
+                      secondaryFont: UIFont(name: theme.fonts.secondary, size: 20) ?? .systemFont(ofSize: 20),
+                      gradientBottomColor: .black)
+        } else {
+            self.init(primaryColor: .red,
+                      secondaryColor: .white,
+                      primaryFont: .systemFont(ofSize: 30),
+                      secondaryFont: .systemFont(ofSize: 20),
+                      gradientBottomColor: .black)
+        }
+    }
+}
+
+extension UIColor {
+    convenience init?(hexString: String?, alpha: CGFloat? = nil) {
+        guard let hexString = hexString else { return nil }
+
+        let hexStringTrimmed: String = hexString.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        let scanner = Scanner(string: hexString)
         
-        let dorisTranslations = DorisUITranslations()
-        dorisTranslations.playerStatsButton = translations.playerStatsButton
-        dorisTranslations.playerPlayButton = translations.playerPlayButton
-        dorisTranslations.playerPauseButton = translations.playerPauseButton
-        dorisTranslations.playerAudioAndSubtitlesButton = translations.playerAudioAndSubtitlesButton
-        dorisTranslations.live = translations.live
-        dorisTranslations.favourite = translations.favourite
-        dorisTranslations.watchlist = translations.watchlist
-        dorisTranslations.moreVideos = translations.moreVideos
-        dorisTranslations.captions = translations.captions
-        dorisTranslations.rewind = translations.rewind
-        dorisTranslations.fastForward = translations.fastForward
-        dorisTranslations.audioTracks = translations.audioTracks
-        dorisTranslations.info = translations.info
-        dorisTranslations.adsCountdownAd = translations.adsCountdownAd
-        dorisTranslations.adsCountdownOf = translations.adsCountdownOf
+        if (hexStringTrimmed.hasPrefix("#")) {
+            scanner.scanLocation = 1
+        }
+
+        let hasAlpha = hexStringTrimmed.count == 8 + scanner.scanLocation
         
-        return dorisTranslations
+        var color: UInt32 = 0
+        scanner.scanHexInt32(&color)
+        
+        let mask:Int64 = 0x000000FF
+
+        let a = hasAlpha ? Int64(color >> 24) & mask : 255
+        let r = Int64(color >> 16) & mask
+        let g = Int64(color >> 8) & mask
+        let b = Int64(color) & mask
+        
+        let red = CGFloat(r) / 255.0
+        let green = CGFloat(g) / 255.0
+        let blue = CGFloat(b) / 255.0
+        let theAlpha:CGFloat! = alpha != nil ? alpha : (CGFloat(a) / 255.0)
+        
+        self.init(red: red, green: green, blue: blue, alpha: theAlpha)
     }
 }
