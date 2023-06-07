@@ -9,7 +9,6 @@ import Foundation
 
 protocol JSInputProtocol: AnyObject {
     var onBackButton: RCTBubblingEventBlock? { get }
-    var onFavouriteButton: RCTBubblingEventBlock? { get }
     var onVideoLoadStart: RCTBubblingEventBlock? { get }
     var onVideoLoad: RCTBubblingEventBlock? { get }
     var onVideoBuffer: RCTBubblingEventBlock? { get }

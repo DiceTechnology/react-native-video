@@ -60,6 +60,7 @@ class JSDoris {
             self.doris?.viewModel.images.channelLogoViewModel.logoURL = URL(string: metadata?.channelLogoUrl ?? "")
             self.doris?.viewModel.labels.metadata.title = metadata?.title
             self.doris?.viewModel.labels.metadata.description = metadata?.description
+            self.doris?.viewModel.labels.metadata.episodeInfo = "S1 : E1 Episide title"
         }
         
         props.controls.bindAndFire { [weak self] isEnabled in
@@ -76,6 +77,7 @@ class JSDoris {
             guard let self = self else { return }
             guard let source = source else { return }
             
+            self.setupLimitedSeekableRange(with: source.limitedSeekableRange)
             self.setupMux(from: source)
             //FIXME: startAt
             self.setupPlayer(from: source, at: props.startAt.value)
@@ -89,6 +91,8 @@ class JSDoris {
         props.theme.bindAndFire { [weak self] theme in
             guard let self = self else { return }
             self.doris?.viewModel.rendering.styleViewModel = DorisStyleViewModel(theme: theme)
+            self.doris?.viewModel.seekBar.minimumDVRWindowToBeVisible = 120
+            self.doris?.viewModel.toggles.shouldHideLiveBadgeWhenOnLiveEdge = true
         }
     }
     
@@ -125,6 +129,20 @@ class JSDoris {
     private func setupMux(from source: Source) {
         guard let avDorisMuxData = muxDataMapper.map(muxData: source.config.muxData) else { return }
         doris?.player.startMuxMonitoring(playerData: avDorisMuxData.playerData, videoData: avDorisMuxData.videoData)
+    }
+    
+    func setupLimitedSeekableRange(with range: Source.LimitedSeekableRange?) {
+        let start = Date(timeIntervalSince1970InMilliseconds: range?.start)
+        let end = Date(timeIntervalSince1970InMilliseconds: range?.end)
+        
+        if let end = end, end > Date() {
+            //avoid finishing playback when ongoing live program reaches its end
+            doris?.player.setLimitedSeekableRange(range: (start: start, end: nil))
+        } else {
+            doris?.player.setLimitedSeekableRange(range: (start: start, end: end))
+        }
+        
+        self.doris?.viewModel.labels.metadata.programRanges = .init(start: Date().addingTimeInterval(-1000), end: Date().addingTimeInterval(-500))
     }
 }
 
@@ -166,7 +184,7 @@ extension JSDoris: DorisOutputProtocol {
             }
             
             if let duration = currentPlayingItemDuration {
-                let isAboutToEnd = seconds >= duration - 10
+                let isAboutToEnd = seconds >= duration - 5
                 output?.onVideoAboutToEnd?(["isAboutToEnd": isAboutToEnd]);
             }
         case .itemDurationChanged(duration: let duration):
@@ -189,7 +207,7 @@ extension JSDoris: DorisOutputProtocol {
     func onViewEvent(_ event: DorisViewEvent) {
         switch event {
         case .favouritesButtonTap:
-            output?.onFavouriteButton?(nil)
+            output?.onFavouriteButtonClick?(nil)
         case .statsButtonTap:
             output?.onStatsIconClick?(nil)
         case .scheduleButtonTap:

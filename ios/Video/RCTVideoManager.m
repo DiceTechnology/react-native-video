@@ -61,19 +61,7 @@ RCT_EXTERN_METHOD(seekToNow:(nonnull NSNumber *)node)
 RCT_EXTERN_METHOD(seekToTimestamp:(nonnull NSNumber *)node isoDate:(NSString *)isoDate)
 RCT_EXTERN_METHOD(seekToPosition:(nonnull NSNumber *)node position:(double)position)
 RCT_EXTERN_METHOD(replaceAdTagParameters:(nonnull NSNumber *)node payload:(NSDictionary)payload)
-
-//RCT_EXPORT_METHOD(seekToResumePosition:(nonnull NSNumber *)node position:(double)position) {
-//    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-//        if ([viewRegistry[node] isKindOfClass:[RCTVideo class]]) {
-//            RCTVideo *view = (RCTVideo *)viewRegistry[node];
-//            NSDictionary *info = @{
-//                @"time": [NSNumber numberWithFloat:position],
-//                @"tolerance": [NSNumber numberWithInt:100]
-//            };
-//            [view setSeek:info];
-//        }
-//    }];
-//};
+RCT_EXTERN_METHOD(seekToResumePosition:(nonnull NSNumber *)node position:(double)position)
 
 //RCT_EXPORT_METHOD(limitSeekableRange:(nonnull NSNumber *)node payload:(NSDictionary *)payload) {
 //    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {

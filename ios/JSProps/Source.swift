@@ -21,10 +21,17 @@ struct Source: SuperCodable {
     let config: Config
     let titleInfo: TitleInfo?
     let imageUri: URL?
+    let limitedSeekableRange: LimitedSeekableRange?
 }
 
 
 extension Source {
+    struct LimitedSeekableRange: SuperCodable {
+        let start: Double?
+        let end: Double?
+        let seekToStart: Bool?
+    }
+    
     struct Ima: SuperCodable {
         let videoId: String?
         let adTagParameters: [String: String]?

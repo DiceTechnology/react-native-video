@@ -7,42 +7,14 @@
 
 import AVDoris
 
-//class AVDorisTranslationsMapper {
-//    func map(translations: Translations?) -> DorisTranslationsViewModel? {
-//        guard let translations = translations else { return nil }
-//
-//        let dorisTranslations = DorisUITranslations()
-//        dorisTranslations.playerStatsButton = translations.playerStatsButton
-//        dorisTranslations.playerPlayButton = translations.playerPlayButton
-//        dorisTranslations.playerPauseButton = translations.playerPauseButton
-//        dorisTranslations.playerAudioAndSubtitlesButton = translations.playerAudioAndSubtitlesButton
-//        dorisTranslations.live = translations.live
-//        dorisTranslations.favourite = translations.favourite
-//        dorisTranslations.watchlist = translations.watchlist
-//        dorisTranslations.moreVideos = translations.moreVideos
-//        dorisTranslations.captions = translations.captions
-//        dorisTranslations.rewind = translations.rewind
-//        dorisTranslations.fastForward = translations.fastForward
-//        dorisTranslations.audioTracks = translations.audioTracks
-//        dorisTranslations.info = translations.info
-//        dorisTranslations.adsCountdownAd = translations.adsCountdownAd
-//        dorisTranslations.adsCountdownOf = translations.adsCountdownOf
-//
-//        return dorisTranslations
-//    }
-//}
-
-
 extension DorisTranslationsViewModel {
     init(translations: Translations) {
         self.init()
         self.stats = translations.playerStatsButton
         self.play = translations.playerPlayButton
         self.pause = translations.playerPauseButton
-//        self.playerAudioAndSubtitlesButton = translations.playerAudioAndSubtitlesButton
         self.liveBadgeText = translations.live
         self.favourites = translations.favourite
-//        self.watchlist = translations.watchlist
         self.moreVideos = translations.moreVideos
         self.captions = translations.captions
         self.rewind = translations.rewind
@@ -51,13 +23,14 @@ extension DorisTranslationsViewModel {
         self.info = translations.info
         self.adsCountdownAd = translations.adsCountdownAd
         self.adsCountdownOf = translations.adsCountdownOf
+        self.tracks = translations.tracks
     }
 }
 
 extension DorisStyleViewModel {
     init(theme: Theme?) {
         if let theme = theme {
-            self.init(primaryColor: UIColor(named: theme.colors.primary) ?? .red,
+            self.init(primaryColor: UIColor(hexString: theme.colors.primary) ?? .red,
                       secondaryColor: UIColor(hexString: theme.colors.secondary) ?? .white,
                       primaryFont: UIFont(name: theme.fonts.primary, size: 30) ?? .systemFont(ofSize: 30),
                       secondaryFont: UIFont(name: theme.fonts.secondary, size: 20) ?? .systemFont(ofSize: 20),

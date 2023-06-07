@@ -48,4 +48,5 @@ struct Translations: SuperCodable {
     var info: String?
     var adsCountdownAd: String?
     var adsCountdownOf: String?
+    var tracks: String?
 }

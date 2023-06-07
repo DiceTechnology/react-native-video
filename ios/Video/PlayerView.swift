@@ -12,7 +12,6 @@ class PlayerView: UIView, JSInputProtocol {
     var jsBridge: RCTBridge?
     //Events
     @objc var onBackButton: RCTBubblingEventBlock?
-    @objc var onFavouriteButton: RCTBubblingEventBlock?
     @objc var onVideoLoadStart: RCTBubblingEventBlock?
     @objc var onVideoLoad: RCTBubblingEventBlock?
     @objc var onVideoBuffer: RCTBubblingEventBlock?
@@ -41,7 +40,12 @@ class PlayerView: UIView, JSInputProtocol {
     //Props
     //MARK: Differs (source)
     @objc var src: NSDictionary? {
-        didSet { jsProps.source.value = try? Source(dict: src) } }
+        didSet {
+            if let source = try? Source(dict: src), source.uri.absoluteString != jsProps.source.value?.uri.absoluteString {                
+                jsProps.source.value = try? Source(dict: src)
+            }
+        }
+    }
     @objc var partialVideoInformation: NSDictionary? {
         didSet { jsProps.partialVideoInformation.value = try? PartialVideoInformation(dict: partialVideoInformation) } }
     @objc var translations: NSDictionary? {
@@ -83,16 +87,16 @@ class PlayerView: UIView, JSInputProtocol {
     @objc var isAnnotationsOn: Bool = false
     @objc var isStatsOpen: Bool = false
     @objc var isJSOverlayShown: Bool = false
-    @objc var isPaused: Bool = false
     @objc var canMinimise: Bool = false
     @objc var allowsExternalPlayback: Bool = false
-    @objc var paused: Bool = false
     @objc var muted: Bool = false
     @objc var playInBackground: Bool = true
     @objc var playWhenInactive: Bool = true
     @objc var fullscreen: Bool = false
     @objc var `repeat`: Bool = false
-    
+    @objc var paused: Bool = false {
+        didSet { paused ? jsDoris?.doris?.player.pause() : jsDoris?.doris?.player.play() }
+    }
     var jsDoris: JSDoris?
     var jsProps = JSProps()
     
@@ -106,7 +110,7 @@ class PlayerView: UIView, JSInputProtocol {
     
     //TODO: pass this value as part of source
     func seekToPosition(position: Double) {
-        jsProps.startAt.value = position
+        jsDoris?.doris?.player.seek(.position(position))
     }
     
     func replaceAdTagParameters(payload: NSDictionary) {
@@ -122,6 +126,14 @@ class PlayerView: UIView, JSInputProtocol {
                                        bridge: jsBridge)
         
         jsDoris?.setup(with: jsProps)
+    }
+    
+    func setInitialSeek(position: Double) {
+        jsProps.startAt.value = position
+    }
+    
+    func setupLimitedSeekableRange(with range: Source.LimitedSeekableRange?) {
+        jsDoris?.setupLimitedSeekableRange(with: range)
     }
     
     override func layoutSubviews() {

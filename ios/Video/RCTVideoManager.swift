@@ -13,6 +13,10 @@ class RCTVideoManager: RCTViewManager {
     override func view() -> UIView! {
         let view = PlayerView()
         view.jsBridge = bridge
+        
+        let weirdViewThatCausesFocusIssues = bridge.uiManager.view(forReactTag: NSNumber(integerLiteral: 25))
+        weirdViewThatCausesFocusIssues?.isHidden = true
+        
         return view
     }
     
@@ -46,6 +50,22 @@ class RCTVideoManager: RCTViewManager {
         }
     }
     
+    @objc public func seekToResumePosition(_ node: NSNumber, position: Double) {
+        DispatchQueue.main.async {
+            let component = self.bridge.uiManager.view(forReactTag: node) as? PlayerView
+            component?.setInitialSeek(position: position)
+        }
+    }
+    
+    @objc public func limitSeekableRange(_ node: NSNumber, payload: NSDictionary) {
+        DispatchQueue.main.async {
+            let component = self.bridge.uiManager.view(forReactTag: node) as? PlayerView
+            if let limitedSeekbleRange = try? Source.LimitedSeekableRange(dict: payload) {
+                component?.setupLimitedSeekableRange(with: limitedSeekbleRange)
+            }
+        }
+    }
+
     override static func requiresMainQueueSetup() -> Bool {
         return true
     }
