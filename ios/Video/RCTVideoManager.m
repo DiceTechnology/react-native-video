@@ -29,6 +29,7 @@ RCT_EXPORT_VIEW_PROPERTY(translations, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(relatedVideos, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(metadata, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(overlayConfig, NSDictionary);
+RCT_EXPORT_VIEW_PROPERTY(nowPlaying, NSDictionary);
 
 /* Should support: onLoadStart, onLoad, and onError to stay consistent with Image */
 RCT_EXPORT_VIEW_PROPERTY(onVideoLoadStart, RCTBubblingEventBlock);
@@ -62,14 +63,6 @@ RCT_EXTERN_METHOD(seekToTimestamp:(nonnull NSNumber *)node isoDate:(NSString *)i
 RCT_EXTERN_METHOD(seekToPosition:(nonnull NSNumber *)node position:(double)position)
 RCT_EXTERN_METHOD(replaceAdTagParameters:(nonnull NSNumber *)node payload:(NSDictionary)payload)
 RCT_EXTERN_METHOD(seekToResumePosition:(nonnull NSNumber *)node position:(double)position)
-
-//RCT_EXPORT_METHOD(limitSeekableRange:(nonnull NSNumber *)node payload:(NSDictionary *)payload) {
-//    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-//        if ([viewRegistry[node] isKindOfClass:[RCTVideo class]]) {
-//            RCTVideo *view = (RCTVideo *)viewRegistry[node];
-//            [view limitSeekableRanges:payload];
-//        }
-//    }];
-//};
+RCT_EXTERN_METHOD(limitSeekableRange:(nonnull NSNumber *)node payload:(NSDictionary)payload)
 
 @end

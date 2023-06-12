@@ -12,14 +12,14 @@ struct Buttons: SuperCodable {
     //tvOS only
     let watchlist: Bool?
     let epg: Bool?
+    let annotations: Bool?
     //both
-    let fullscreen: Bool?
     let stats: Bool
     let favourite: Bool
     let info: Bool?
     //ios only
+    let fullscreen: Bool?
     let zoom: Bool?//ios
     let back: Bool?//ios
     let settings: Bool?//ios
-    
 }

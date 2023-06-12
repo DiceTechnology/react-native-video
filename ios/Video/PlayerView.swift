@@ -36,6 +36,7 @@ class PlayerView: UIView, JSInputProtocol {
     @objc var onRelatedVideosIconClicked: RCTBubblingEventBlock?
     @objc var onStatsIconClick: RCTBubblingEventBlock?
     @objc var onEpgIconClick: RCTBubblingEventBlock?
+    @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
     
     //Props
     //MARK: Differs (source)
@@ -64,6 +65,8 @@ class PlayerView: UIView, JSInputProtocol {
         didSet { jsProps.isFavourite.value = isFavourite } }
     @objc var controls: Bool = false {
         didSet { jsProps.controls.value = controls } }
+    @objc var nowPlaying: NSDictionary? {
+        didSet { jsProps.nowPlaying.value = try? JSNowPlaying(dict: nowPlaying) } }
     
 
     //FIXME: review unused variables
@@ -115,8 +118,8 @@ class PlayerView: UIView, JSInputProtocol {
     
     func replaceAdTagParameters(payload: NSDictionary) {
         jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
-                                                extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
-                                                                                       viewHeight: frame.height))
+                                        extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
+                                                                               viewHeight: frame.height))
     }
     
     private func setupDoris() {

@@ -52,6 +52,7 @@ class JSDoris {
             self.doris?.viewModel.toggles.isFavouriteButtonHidden = !buttons.favourite
             self.doris?.viewModel.toggles.isScheduleButtonHidden = !(buttons.epg ?? false)
             self.doris?.viewModel.toggles.isStatsButtonHidden = !buttons.stats
+            self.doris?.viewModel.toggles.isAnnotationsButtonHidden = !(buttons.annotations ?? false)
         }
         
         props.metadata.bindAndFire { [weak self] metadata in
@@ -60,7 +61,8 @@ class JSDoris {
             self.doris?.viewModel.images.channelLogoViewModel.logoURL = URL(string: metadata?.channelLogoUrl ?? "")
             self.doris?.viewModel.labels.metadata.title = metadata?.title
             self.doris?.viewModel.labels.metadata.description = metadata?.description
-            self.doris?.viewModel.labels.metadata.episodeInfo = "S1 : E1 Episide title"
+            self.doris?.viewModel.labels.metadata.episodeInfo = metadata?.episodeInfo
+            self.doris?.viewModel.images.watermarkViewModel = metadata?.watermarkModel ?? WatermarkViewModel()
         }
         
         props.controls.bindAndFire { [weak self] isEnabled in
@@ -81,6 +83,8 @@ class JSDoris {
             self.setupMux(from: source)
             //FIXME: startAt
             self.setupPlayer(from: source, at: props.startAt.value)
+            self.setupNowPlaying(nowPlaying: source.nowPlaying)
+            self.doris?.viewModel.seekPreviews.bifsURL = source.thumbnailsPreview
         }
         
         props.translations.bindAndFire { [weak self] translations in
@@ -94,6 +98,11 @@ class JSDoris {
             self.doris?.viewModel.seekBar.minimumDVRWindowToBeVisible = 120
             self.doris?.viewModel.toggles.shouldHideLiveBadgeWhenOnLiveEdge = true
         }
+        
+        props.nowPlaying.bindAndFire { [weak self] nowPlaying in
+            guard let self = self else { return }
+            self.setupNowPlaying(nowPlaying: nowPlaying)
+        }
     }
     
     func replaceAdTagParameters(parameters: AdTagParameters, extraInfo: AdTagParametersModifierInfo) {
@@ -102,6 +111,19 @@ class JSDoris {
             guard let self = self else { return }
             guard let newAdTagParameters = newAdTagParameters else { return }
             self.doris?.player.replaceAdTagParameters(adTagParameters: newAdTagParameters, validFrom: parameters.startDate, validUntil: parameters.endDate)
+        }
+    }
+    
+    private func setupNowPlaying(nowPlaying: JSNowPlaying?) {
+        guard let nowPlaying = nowPlaying else { return }
+
+        doris?.viewModel.labels.metadata.title = nowPlaying.title
+        doris?.viewModel.images.channelLogoViewModel.logoURL = nowPlaying.channelLogoUrl
+        if let programStart = nowPlaying.startDate,
+           let programEnd = nowPlaying.endDate,
+           let programStartDate = Date(timeIntervalSince1970InMilliseconds: programStart),
+           let programEndDate = Date(timeIntervalSince1970InMilliseconds: programEnd) {
+            doris?.viewModel.labels.metadata.programRanges = DorisProgramRanges(start: programStartDate, end: programEndDate)
         }
     }
     
@@ -219,6 +241,8 @@ extension JSDoris: DorisOutputProtocol {
             output?.onRelatedVideosIconClicked?(nil)
         case .backButtonTap:
             output?.onBackButton?(nil)
+        case .annotationsButtonTap
+            output?.onAnnotationsButtonClick?(nil)
         default: break
         }
     }

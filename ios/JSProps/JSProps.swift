@@ -20,6 +20,7 @@ class JSProps {
     var source: Dynamic<Source?> = Dynamic(nil)
     var controls: Dynamic<Bool> = Dynamic(false)
     var isFavourite: Dynamic<Bool> = Dynamic(false)
+    var nowPlaying: Dynamic<JSNowPlaying?> = Dynamic(nil)
 }
 
 class Dynamic<T> {

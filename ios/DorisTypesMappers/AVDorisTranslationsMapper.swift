@@ -23,7 +23,8 @@ extension DorisTranslationsViewModel {
         self.info = translations.info
         self.adsCountdownAd = translations.adsCountdownAd
         self.adsCountdownOf = translations.adsCountdownOf
-        self.tracks = translations.tracks
+        self.tracks = translations.playerAudioAndSubtitlesButton
+        self.annotations = translations.annotations
     }
 }
 
