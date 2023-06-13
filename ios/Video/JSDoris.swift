@@ -18,12 +18,15 @@ class JSDoris {
     weak var output: JSInputProtocol?
     var doris: Doris?
     var jsBridge: RCTBridge?
+    var props: JSProps = JSProps()
     
     deinit {
         doris?.player.stopMuxMonitoring()
     }
     
     func setup(with props: JSProps) {
+        self.props = props
+        
         props.overlayConfig.bindAndFire { [weak self] config in
             guard let self = self else { return }
             guard let config = config else { return }
@@ -36,12 +39,12 @@ class JSDoris {
             guard let relatedVideos = relatedVideos else { return }
             
             let episodes = relatedVideos.items
-                .dropFirst(relatedVideos.headIndex + 1)
-                .prefix(3)
-                .map { EpisodeViewModel(url: URL(string: $0.thumbnailUrl),
-                                        title: $0.title,
+                .map { EpisodeViewModel(url: $0.thumbnailUrl,
+                                        title: $0.title ?? "",
                                         id: $0.id,
-                                        type: StreamType(stringValue: $0.type)) }
+                                        type: StreamType(stringValue: $0.type),
+                                        duration: $0.duration,
+                                        isSelected: String($0.id) == self.props.source.value?.id) }
             self.doris?.viewModel.moreEpisodes.episodes = episodes
         }
         
@@ -163,8 +166,6 @@ class JSDoris {
         } else {
             doris?.player.setLimitedSeekableRange(range: (start: start, end: end))
         }
-        
-        self.doris?.viewModel.labels.metadata.programRanges = .init(start: Date().addingTimeInterval(-1000), end: Date().addingTimeInterval(-500))
     }
 }
 
@@ -241,7 +242,7 @@ extension JSDoris: DorisOutputProtocol {
             output?.onRelatedVideosIconClicked?(nil)
         case .backButtonTap:
             output?.onBackButton?(nil)
-        case .annotationsButtonTap
+        case .annotationsButtonTap:
             output?.onAnnotationsButtonClick?(nil)
         default: break
         }

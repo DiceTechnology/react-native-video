@@ -10,8 +10,9 @@ import Foundation
 struct RelatedVideo: Codable {
     let id: Int
     let type: String
-    let thumbnailUrl: String
-    let title: String
+    let duration: Double?
+    let thumbnailUrl: URL?
+    let title: String?
 }
 
 struct RelatedVideos: SuperCodable {
