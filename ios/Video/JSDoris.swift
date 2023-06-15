@@ -136,8 +136,14 @@ class JSDoris {
             
             var initialSeek: DorisSeekType?
             
-            if let startAt = position {
-                initialSeek = .position(startAt)
+            if let resumePosition = position {
+                if source.live == true, let date = Date(timeIntervalSince1970InMilliseconds: resumePosition) {
+                    initialSeek = .date(date)
+                } else {
+                    initialSeek = .position(resumePosition)
+                }
+            } else if let seekableRange = source.limitedSeekableRange, seekableRange.seekToStart == true, let startDate = Date(timeIntervalSince1970InMilliseconds: seekableRange.start) {
+                initialSeek = .date(startDate)
             }
             
             switch avDorisSource {
