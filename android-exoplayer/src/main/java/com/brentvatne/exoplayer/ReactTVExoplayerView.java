@@ -1,14 +1,7 @@
 package com.brentvatne.exoplayer;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -18,14 +11,13 @@ import android.os.PowerManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.view.Choreographer;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -49,6 +41,7 @@ import com.brentvatne.util.ImdbGenreMap;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
+import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.AdTagParameters;
 import com.diceplatform.doris.entity.DorisAdEvent;
 import com.diceplatform.doris.entity.DorisAdEvent.AdType;
@@ -102,7 +95,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.imggaming.tracks.TrackPreferenceStorage;
-import com.imggaming.widgets.DceWatchFromWidget;
 import com.imggaming.widgets.DceWatermarkWidget;
 import com.previewseekbar.base.PreviewView;
 
@@ -111,6 +103,7 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -118,7 +111,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
 
 @SuppressLint("ViewConstructor")
 class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener,
@@ -167,7 +159,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private ReactTVExoDorisFactory exoDorisFactory;
     private ExoDorisPlayerView exoDorisPlayerView;
     private DceWatermarkWidget watermarkWidget;
-    private DceWatchFromWidget watchFromWidget;
     private ExoDoris player;
     private DefaultTrackSelector trackSelector;
     private Source source;
@@ -208,7 +199,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private float jsProgressUpdateInterval = 250.0f;
     private boolean useTextureView = false;
     private Map<String, String> requestHeaders;
-    private int accentColor;
     // \ End props
 
     // IMA DAI
@@ -376,16 +366,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             watermarkWidget = new DceWatermarkWidget(themedReactContext);
             exoDorisPlayerView.addView(watermarkWidget, 1);
         }
-
-        // Watch from beginning/live.
-        watchFromWidget = new DceWatchFromWidget(themedReactContext);
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
-        layoutParams.leftMargin = 30;
-        layoutParams.bottomMargin = 40;
-        layoutParams.gravity = Gravity.BOTTOM | Gravity.LEFT;
-        exoDorisPlayerView.addView(watchFromWidget, layoutParams);
-        watchFromWidget.setOnClickListener(v -> performWatchFrom());
-        watchFromWidget.setVisibility(GONE);
 
         setEpg(false); // default value
         setStats(false);
@@ -602,7 +582,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 player.load(source, !haveResumePosition);
             }
 
-            watchFromWidget.setLimitedSeekRange(player.getLimitedSeekRange());
             exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
 
             playerNeedsSource = false;
@@ -897,7 +876,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private void onStopPlayback() {
         setKeepScreenOn(false);
-        keyPressTime = null;
         audioManager.abandonAudioFocus(this);
     }
 
@@ -975,8 +953,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (state == Player.STATE_BUFFERING || state == Player.STATE_READY) {
             trySeekToResumePosition();
         }
-        updateWatchFrom();
-
         String text = "onStateChanged: playbackState = " + state;
         switch (state) {
             case Player.STATE_IDLE:
@@ -1263,7 +1239,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
         if (errorString != null) {
             resetSourceUrl();
-            watchFromWidget.hide();
             eventEmitter.error("Playback exception: " + errorString, ex);
         }
         playerNeedsSource = true;
@@ -1366,16 +1341,22 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         this.metadata = metadata;
 
         if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setTitle(metadata.getTitle());
+            exoDorisPlayerView.setEpisodeTitle(metadata.getEpisodeTitle());
             exoDorisPlayerView.setDescription(metadata.getDescription());
-            exoDorisPlayerView.setChannelLogo(metadata.getChannelLogoUrl());
+        }
+    }
+
+    public void setProgramInfo(ProgramInfo programInfo) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setTitle(programInfo.getTitle());
+            exoDorisPlayerView.setProgramDateRange(programInfo.getStartDate(), programInfo.getEndDate());
+            exoDorisPlayerView.setChannelLogo(programInfo.getChannelLogoUrl());
         }
     }
 
     public void setLimitedSeekRange(LimitedSeekRange limitedSeekRange) {
         if (isLive) {
             player.limitSeekRange(limitedSeekRange);
-            watchFromWidget.setLimitedSeekRange(player.getLimitedSeekRange());
             exoDorisPlayerView.setLimitedSeekRange(player.getLimitedSeekRange());
         }
     }
@@ -1679,18 +1660,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         initializePlayer(false);
     }
 
-    public void setColorProgressBar(String color) {
-        try {
-            accentColor = Color.parseColor(color);
-        } catch (IllegalArgumentException e) {
-            Log.e(getClass().getSimpleName(), e.getMessage(), e);
-        }
-    }
-
-    public void setLabelFont(final String fontName) {
-        Typeface typeface = Typeface.createFromAsset(getResources().getAssets(), "fonts/" + fontName + ".ttf");
-    }
-
     public void setLive(final boolean live) {
         this.isLive = live;
 
@@ -1718,7 +1687,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             if (!exoDorisPlayerView.getUseController()) {
                 exoDorisPlayerView.setUseController(true);
             }
-            exoDorisPlayerView.showController();
             exoDorisPlayerView.requestFocus();
         } else {
             exoDorisPlayerView.hideController();
@@ -1727,18 +1695,18 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setRelatedVideos(List<RelatedVideo> relatedVideos, int playlistHeadIndex, boolean hasMore) {
         if (exoDorisPlayerView != null) {
-            VideoTile[] videoTiles = new VideoTile[relatedVideos.size()];
-
+            List<VideoTile> videoTiles = new ArrayList<>();
             for (int i = 0; i < relatedVideos.size(); i++) {
                 String thumbnailUrl = relatedVideos.get(i).getThumbnailUrl();
                 String title = relatedVideos.get(i).getTitle();
                 String subtitle = relatedVideos.get(i).getSubtitle();
+                long duration = relatedVideos.get(i).getDuration();
                 Map<String, Object> relatedVideoMap = relatedVideos.get(i).getRelatedVideoMap();
-
-                videoTiles[i] = new VideoTile(thumbnailUrl, title, subtitle, relatedVideoMap);
+                videoTiles.add(new VideoTile(thumbnailUrl, title, subtitle, duration, relatedVideoMap));
             }
-
-            exoDorisPlayerView.setMoreVideosTiles(videoTiles);
+            if (exoDorisPlayerView != null) {
+                exoDorisPlayerView.setMoreVideosTiles(videoTiles);
+            }
         }
     }
 
@@ -1823,9 +1791,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    private Long keyPressTime;
-    private boolean keyNotHandled;
-
     private Long controlsAutoHideTimeout;
     private Runnable hideRunnable = new Runnable() {
         @Override
@@ -1843,14 +1808,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 event.getKeyCode() != KeyEvent.KEYCODE_BACK) {
             return true;
         }
-
-        if (watchFromWidget.isFocused() &&
-                (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER ||
-                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-            performWatchFrom();
-            return true;
-        }
-
         return (exoDorisPlayerView.getPlayer() != null && exoDorisPlayerView.dispatchKeyEvent(event)) || super.dispatchKeyEvent(event);
     }
 
@@ -1864,21 +1821,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (watermarkWidget != null) {
             watermarkWidget.hide();
         }
-    }
-
-    private void updateWatchFrom() {
-        if (player != null && player.getPlaybackState() == Player.STATE_READY) {
-            watchFromWidget.show();
-        }
-    }
-
-    public void performWatchFrom() {
-        if (watchFromWidget.isWatchFromBeginning()) {
-            player.seekTo(0);
-        } else {
-            player.seekTo(C.TIME_UNSET);
-        }
-        watchFromWidget.hide();
     }
 
     public void showOverlay() {
@@ -1904,65 +1846,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         controlsAutoHideTimeout = hideTimeout;
     }
 
-    private void setupButton(final ImageButton btn) {
-        btn.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                setButtonState(btn);
-            }
-        });
-        setButtonState(btn);
-    }
-
-    private void setButtonState(final ImageButton button) {
-        if (button.hasFocus()) {
-            ObjectAnimator anim = ObjectAnimator.ofFloat(button, "scaleX", 1.1f);
-            anim.setDuration(100);
-            anim.start();
-
-            ObjectAnimator anim2 = ObjectAnimator.ofFloat(button, "scaleY", 1.1f);
-            anim2.setDuration(100);
-            anim2.start();
-        } else {
-            ObjectAnimator anim = ObjectAnimator.ofFloat(button, "scaleX", 1f);
-            anim.setDuration(100);
-            anim.start();
-
-            ObjectAnimator anim2 = ObjectAnimator.ofFloat(button, "scaleY", 1f);
-            anim2.setDuration(100);
-            anim2.start();
-        }
-    }
-
-    public void animateHideView(final View view, int duration) {
-        view.animate()
-                .alpha(0.0f)
-                .setDuration(duration)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        view.setVisibility(View.GONE);
-                    }
-                });
-    }
-
-    public void animateShowView(final View view, int duration) {
-        view.animate()
-                .alpha(1.0f)
-                .setDuration(duration)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        super.onAnimationStart(animation);
-                        view.setVisibility(View.VISIBLE);
-                    }
-                });
-    }
-
     public void applyTranslations(Map<String, Object> translations) {
         this.translations = new RNTranslations(translations);
         setLabelsOnPLayerUi();
+    }
+
+    public void applyPrimaryColor(@ColorInt int primaryColor) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setPrimaryColor(primaryColor);
+        }
     }
 
     private void setLabelsOnPLayerUi() {
@@ -1984,6 +1876,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setAnnotationsLabel(translations.getAnnotationsLabel())
                     .setAdsCountdownAdLabel(translations.getAdsCountdownAdLabel())
                     .setAdsCountdownOfLabel(translations.getAdsCountdownOfLabel())
+                    .setPlayingLiveLabel(translations.getPlayingLiveLabel())
+                    .setNowPlayingLabel(translations.getNowPlayingLabel())
+                    .setAudioAndSubtitlesLabel(translations.getAudioAndSubtitlesLabel())
                     .build();
 
             exoDorisPlayerView.setLabels(labels);
@@ -1998,6 +1893,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void onVideoTileClicked(VideoTile videoTile) {
         RelatedVideo relatedVideo = new RelatedVideo(videoTile.getTitle(),
                 videoTile.getSubtitle(),
+                videoTile.getDuration(),
                 videoTile.getThumbnailUrl(),
                 videoTile.getRelatedVideo());
         eventEmitter.relatedVideoClick(relatedVideo.getId(), relatedVideo.getType());

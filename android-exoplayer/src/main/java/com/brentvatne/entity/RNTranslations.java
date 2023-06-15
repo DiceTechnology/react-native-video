@@ -22,6 +22,9 @@ public class RNTranslations {
     private static final String KEY_ANNOTATIONS_LABEL = "annotations";
     private static final String KEY_ADS_COUNTDOWN_AD_LABEL = "adsCountdownAd";
     private static final String KEY_ADS_COUNTDOWN_OF_LABEL = "adsCountdownOf";
+    private static final String KEY_PLAYING_LIVE = "playingLive";
+    private static final String KEY_NOW_PLAYING = "nowPlaying";
+    private static final String KEY_AUDIO_AND_SUBTITLES_LABEL = "player_audio_and_subtitles_button";
 
     private static final String DEFAULT_EPG_LABEL = "Schedule";
     private static final String DEFAULT_STATS_LABEL = "Stats";
@@ -39,6 +42,9 @@ public class RNTranslations {
     private static final String DEFAULT_ANNOTATIONS_LABEL = "Annotations";
     private static final String DEFAULT_ADS_COUNTDOWN_AD_LABEL = "Ad";
     private static final String DEFAULT_ADS_COUNTDOWN_OF_LABEL = "Of";
+    private static final String DEFAULT_PLAYING_LIVE = "Playing Live";
+    private static final String DEFAULT_NOW_PLAYING = "Now Playing";
+    private static final String DEFAULT_AUDIO_AND_SUBTITLES = "Audio & Subtitles";
 
     private final Map<String, Object> translations;
     private final String epgLabel;
@@ -57,6 +63,9 @@ public class RNTranslations {
     private final String annotationsLabel;
     private final String adsCountdownAdLabel;
     private final String adsCountdownOfLabel;
+    private final String playingLiveLabel;
+    private final String nowPlayingLabel;
+    private final String audioAndSubtitlesLabel;
 
     public RNTranslations(@NonNull Map<String, Object> translations) {
         this.translations = translations;
@@ -77,6 +86,9 @@ public class RNTranslations {
         this.annotationsLabel = getStringFromMap(KEY_ANNOTATIONS_LABEL, DEFAULT_ANNOTATIONS_LABEL);
         this.adsCountdownAdLabel = getStringFromMap(KEY_ADS_COUNTDOWN_AD_LABEL, DEFAULT_ADS_COUNTDOWN_AD_LABEL);
         this.adsCountdownOfLabel = getStringFromMap(KEY_ADS_COUNTDOWN_OF_LABEL, DEFAULT_ADS_COUNTDOWN_OF_LABEL);
+        this.playingLiveLabel = getStringFromMap(KEY_PLAYING_LIVE, DEFAULT_PLAYING_LIVE);
+        this.nowPlayingLabel = getStringFromMap(KEY_NOW_PLAYING, DEFAULT_NOW_PLAYING);
+        this.audioAndSubtitlesLabel = getStringFromMap(KEY_AUDIO_AND_SUBTITLES_LABEL, DEFAULT_AUDIO_AND_SUBTITLES);
     }
 
     private String getStringFromMap(String key, String defaultValue) {
@@ -145,5 +157,17 @@ public class RNTranslations {
 
     public String getAdsCountdownOfLabel() {
         return adsCountdownOfLabel;
+    }
+
+    public String getPlayingLiveLabel() {
+        return playingLiveLabel;
+    }
+
+    public String getNowPlayingLabel() {
+        return nowPlayingLabel;
+    }
+
+    public String getAudioAndSubtitlesLabel() {
+        return audioAndSubtitlesLabel;
     }
 }
