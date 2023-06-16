@@ -355,7 +355,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     @ReactProp(name = PROP_RESIZE_MODE)
     public void setResizeMode(final ReactTVExoplayerView videoView, final String resizeModeOrdinalString) {
-        videoView.setResizeModeModifier(convertToIntDef(resizeModeOrdinalString));
+        // TODO crashing with NumberFormatException, check if we are using this prop at all
+        //videoView.setResizeModeModifier(convertToIntDef(resizeModeOrdinalString));
     }
 
     @ReactProp(name = PROP_REPEAT, defaultBoolean = false)
