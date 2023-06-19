@@ -10,7 +10,7 @@ public class RNTranslations {
     private static final String KEY_STATS_LABEL = "player_stats_button";
     private static final String KEY_PLAY_LABEL = "player_play_button";
     private static final String KEY_PAUSE_LABEL = "player_pause_button";
-    private static final String KEY_LIVE_LABEL = "live";
+    private static final String KEY_LIVE_LABEL = "goLive";
     private static final String KEY_FAVORITE_LABEL = "favourite";
     private static final String KEY_WATCHLIST_LABEL = "watchlist";
     private static final String KEY_MORE_VIDEOS_LABEL = "moreVideos";
@@ -30,7 +30,7 @@ public class RNTranslations {
     private static final String DEFAULT_STATS_LABEL = "Stats";
     private static final String DEFAULT_PLAY_LABEL = "Play";
     private static final String DEFAULT_PAUSE_LABEL = "Pause";
-    private static final String DEFAULT_LIVE_LABEL = "Live";
+    private static final String DEFAULT_LIVE_LABEL = "Go Live";
     private static final String DEFAULT_FAVORITE_LABEL = "Favourite";
     private static final String DEFAULT_MORE_VIDEOS_LABEL = "More Videos";
     private static final String DEFAULT_WATCHLIST_LABEL = "Watchlist";

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.CaptioningManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -38,6 +39,7 @@ import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
 import com.brentvatne.util.AdTagParametersHelper;
 import com.brentvatne.util.ImdbGenreMap;
+import com.bumptech.glide.Glide;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
@@ -996,53 +998,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         Log.d(TAG, text);
     }
 
-    private boolean isPlaying() {
-        ExoPlayer exoPlayer = (player == null ? null : player.getExoPlayer());
-        return exoPlayer != null
-                && exoPlayer.getPlaybackState() != Player.STATE_ENDED
-                && exoPlayer.getPlaybackState() != Player.STATE_IDLE
-                && exoPlayer.getPlayWhenReady();
-    }
-
     private void startProgressHandler() {
         jsProgressHandler.sendEmptyMessage(SHOW_JS_PROGRESS);
         nativeProgressHandler.sendEmptyMessage(SHOW_NATIVE_PROGRESS);
-    }
-
-    private String getSeekBarPositionString(long currentMillis, long duration) {
-        String durationString = null;
-
-        if (duration != C.TIME_UNSET) {
-            int secs = (int) (duration / 1000) % 60;
-            int mins = (int) ((duration / (1000 * 60)) % 60);
-            int hours = (int) ((duration / (1000 * 60 * 60)) % 24);
-
-            if (hours > 0) {
-                durationString = String.format(Locale.UK, "%02d:%02d:%02d", hours, mins, secs);
-            } else {
-                durationString = String.format(Locale.UK, "%02d:%02d", mins, secs);
-            }
-        }
-
-        if (currentMillis != C.TIME_UNSET && durationString != null) {
-            int secs = (int) (currentMillis / 1000) % 60;
-            int mins = (int) ((currentMillis / (1000 * 60)) % 60);
-            int hours = (int) ((currentMillis / (1000 * 60 * 60)) % 24);
-            boolean showHours = false;
-            if (duration != C.TIME_UNSET) {
-                showHours = ((int) ((duration / (1000 * 60 * 60)) % 24)) > 0;
-            }
-            String currentString;
-            if (hours > 0 || showHours) {
-                currentString = String.format(Locale.UK, "%02d:%02d:%02d", hours, mins, secs);
-            } else {
-                currentString = String.format(Locale.UK, "%02d:%02d", mins, secs);
-            }
-
-            return String.format(Locale.UK, "%s / %s", currentString, durationString);
-        }
-
-        return null;
     }
 
     private void videoLoaded() {
@@ -1343,6 +1301,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setEpisodeTitle(metadata.getEpisodeTitle());
             exoDorisPlayerView.setDescription(metadata.getDescription());
+        }
+    }
+
+    public void setThumbnailsPreviewUrl(@Nullable String thumbnailsPreviewUrl) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setThumbnailsPreviewUrl(thumbnailsPreviewUrl);
         }
     }
 

@@ -67,6 +67,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_LIMIT_RANGE = "limitedSeekableRange";
     private static final String PROP_SRC_SAVE_SUBTITLE_SELECTION = "shouldSaveSubtitleSelection";
     private static final String PROP_SRC_NOW_PLAYING = "nowPlaying";
+    private static final String PROP_SRC_BIF_URL = "thumbnailsPreview";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -236,6 +237,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
         if (src.hasKey(PROP_SRC_NOW_PLAYING)) {
             videoView.setProgramInfo(parseProgramInfo(src.getMap(PROP_SRC_NOW_PLAYING)));
+        }
+        if (src.hasKey(PROP_SRC_BIF_URL)) {
+            videoView.setThumbnailsPreviewUrl(src.getString(PROP_SRC_BIF_URL));
         }
 
         if (TextUtils.isEmpty(uriString)) {
