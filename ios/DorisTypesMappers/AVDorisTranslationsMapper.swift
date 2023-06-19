@@ -13,7 +13,7 @@ extension DorisTranslationsViewModel {
         self.stats = translations.playerStatsButton
         self.play = translations.playerPlayButton
         self.pause = translations.playerPauseButton
-        self.liveBadgeText = translations.live
+        self.liveBadgeText = translations.goLive
         self.favourites = translations.favourite
         self.moreVideos = translations.moreVideos
         self.captions = translations.captions

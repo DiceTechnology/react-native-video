@@ -21,7 +21,9 @@ class AVDorisSourceMapper {
         
         var drmData: DorisDRMSource?
         if let drm = source.drm {
-            drmData = DorisDRMSource(contentUrl: source.uri.absoluteString, croToken: drm.croToken, licensingServerUrl: drm.licensingServerUrl)
+            drmData = DorisDRMSource(contentUrl: source.uri.absoluteString,
+                                     croToken: drm.croToken,
+                                     licensingServerUrl: drm.licensingServerUrl)
         }
         
         if let ima = source.ima {
@@ -53,9 +55,23 @@ class AVDorisSourceMapper {
             }
             
         } else {
-            let source = DorisSource(playerItem: .init(url: source.uri))
+            let source = DorisSource(url: source.uri, textTracks: sideloadedSubtitles(from: source))
             source.drm = drmData
             completion(.regular(source))
         }
+    }
+    
+    private func sideloadedSubtitles(from source: Source) -> [DorisTextTrack] {
+        var textTracks = [DorisTextTrack]()
+        if let subtitles = source.subtitles, source.live == false {
+            textTracks = subtitles
+                .compactMap{$0}
+                .filter{$0.isVtt}
+                .map {DorisTextTrack(name: $0.name,
+                                     isoCode: $0.language,
+                                     url: $0.uri)}
+        }
+        
+        return textTracks
     }
 }

@@ -13,6 +13,7 @@ struct Translations: SuperCodable {
     var playerPauseButton: String?
     var playerAudioAndSubtitlesButton: String?
     var live: String?
+    var goLive: String?
     var favourite: String?
     var watchlist: String?
     var moreVideos: String?

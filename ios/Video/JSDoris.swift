@@ -65,6 +65,7 @@ class JSDoris {
             self.doris?.viewModel.labels.metadata.title = metadata?.title
             self.doris?.viewModel.labels.metadata.description = metadata?.description
             self.doris?.viewModel.labels.metadata.episodeInfo = metadata?.episodeInfo
+            self.doris?.viewModel.images.backgroundImageURL = metadata?.thumbnailUrl
             self.doris?.viewModel.images.watermarkViewModel = metadata?.watermarkModel ?? WatermarkViewModel()
         }
         

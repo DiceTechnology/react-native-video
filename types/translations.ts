@@ -5,6 +5,7 @@ export interface IVideoPlayerTranslations {
   player_pause_button: string;
   // new labels
   live: string;
+  goLive: string;
   favourite: string;
   watchlist: string;
   moreVideos: string;

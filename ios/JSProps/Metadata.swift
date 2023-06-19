@@ -11,7 +11,7 @@ struct Metadata: SuperCodable {
     let type: String
     let title: String?
     let description: String?
-    let thumbnailUrl: String
+    let thumbnailUrl: URL
     let channelLogoUrl: String?
     let episodeInfo: String?
     let logoUrl: URL?

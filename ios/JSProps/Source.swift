@@ -21,6 +21,7 @@ struct Source: SuperCodable {
     let config: Config
     let titleInfo: TitleInfo?
     let imageUri: URL?
+    let subtitles: [JSSubtitles]?
     let thumbnailsPreview: URL?
     let limitedSeekableRange: LimitedSeekableRange?
     let nowPlaying: JSNowPlaying?
@@ -28,6 +29,18 @@ struct Source: SuperCodable {
 
 
 extension Source {
+    struct JSSubtitles: SuperCodable {
+        let language: String
+        let uri: URL
+        var name: String {
+            return NSLocale(localeIdentifier: NSLocale.current.identifier)
+                .displayName(forKey: .identifier, value: language) ?? "Unknown"
+        }
+        var isVtt: Bool {
+            uri.absoluteString.contains(".vtt")
+        }
+    }
+
     struct LimitedSeekableRange: SuperCodable {
         let start: Double?
         let end: Double?
