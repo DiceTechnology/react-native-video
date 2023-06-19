@@ -6,6 +6,8 @@ export interface IVideoPlayerTranslations {
   // new labels
   live: string;
   goLive: string;
+  nowPlaying: string;
+  playingLive: string;
   favourite: string;
   watchlist: string;
   moreVideos: string;

@@ -25,6 +25,8 @@ extension DorisTranslationsViewModel {
         self.adsCountdownOf = translations.adsCountdownOf
         self.tracks = translations.playerAudioAndSubtitlesButton
         self.annotations = translations.annotations
+        self.playingLive = translations.playingLive
+        self.nowPlaying = translations.nowPlaying
     }
 }
 
