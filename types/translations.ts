@@ -18,4 +18,5 @@ export interface IVideoPlayerTranslations {
   info: string;
   adsCountdownAd: string;
   adsCountdownOf: string;
+  tvPlayerEPG: string;
 }
