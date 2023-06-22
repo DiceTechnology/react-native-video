@@ -27,6 +27,7 @@ extension DorisTranslationsViewModel {
         self.annotations = translations.annotations
         self.playingLive = translations.playingLive
         self.nowPlaying = translations.nowPlaying
+        self.schedule = translations.tvPlayerEPG
     }
 }
 

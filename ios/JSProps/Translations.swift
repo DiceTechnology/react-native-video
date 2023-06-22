@@ -27,4 +27,5 @@ struct Translations: SuperCodable {
     var annotations: String?
     var playingLive: String?
     var nowPlaying: String?
+    var tvPlayerEPG: String?
 }
