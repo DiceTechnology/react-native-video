@@ -13,9 +13,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.media3.common.endeavor.LimitedSeekRange;
 
 import com.brentvatne.react.R;
-import com.google.android.exoplayer2.endeavor.LimitedSeekRange;
 import com.imggaming.translations.DiceLocalizedStrings;
 import com.imggaming.translations.DiceLocalizedStrings.StringId;
 
