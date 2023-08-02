@@ -20,7 +20,7 @@
         "eslint-plugin-react": "3.16.1"
     },
     "dependencies": {
-        "@dicetechnology/avdoris": "git+ssh://git@github.com/DiceTechnology/avdoris.git#semver:=1.12.3",
+        "@dicetechnology/avdoris": "git+ssh://git@github.com/DiceTechnology/avdoris.git#semver:=1.12.7",
         "@imggaming/dice-shield": "git+ssh://git@github.com:DiceTechnology/dice-shield.git#semver:=2.22.2",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
@@ -29,7 +29,7 @@
         "react-native": "0.61.5"
     },
     "scripts": {
-        "install": "./scripts/install-dependencies",
+        "install": "sh ./scripts/install-dependencies",
         "installpeers": "install-self-peers -- --ignore-scripts",
         "postinstall": "",
         "test": "node_modules/.bin/eslint *.js"
