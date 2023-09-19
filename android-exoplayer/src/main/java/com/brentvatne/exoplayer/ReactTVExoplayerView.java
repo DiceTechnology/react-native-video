@@ -509,7 +509,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             exoPlayer.setAudioAttributes(audioAttributes, false);
             exoPlayer.addListener(this);
             exoPlayer.addAnalyticsListener(this);
-            exoDorisPlayerView.setPlayer(exoPlayer);
+            exoDorisPlayerView.setPlayer(player.createForwardPlayer());
             audioBecomingNoisyReceiver.setListener(this);
             setPlayWhenReady(!isPaused);
             playerNeedsSource = true;
@@ -942,7 +942,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         } else if (player != null) {
             // When reach the endTime of limited seek range, we need to notify the JS side to show the restart layout.
             // We will seek to start position at first, and then play() when user click the restart button.
-            if (LimitedSeekRange.isUseAsVod(player.getLimitedSeekRange()) && player.getPlaybackState() == Player.STATE_ENDED) {
+            if (LimitedSeekRange.isUseLiveAsVod(player.getLimitedSeekRange()) && player.getPlaybackState() == Player.STATE_ENDED) {
                 player.seekTo(0);
                 eventEmitter.endLiveChannelAsVod();
             }
