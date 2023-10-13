@@ -91,6 +91,7 @@ import com.diceplatform.doris.ui.entity.Labels;
 import com.diceplatform.doris.ui.entity.LabelsBuilder;
 import com.diceplatform.doris.ui.entity.VideoTile;
 import com.diceplatform.doris.util.DorisExceptionUtil;
+import com.diceplatform.doris.util.LocalizationService;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -470,13 +471,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
         if (player == null) {
             Parameters.Builder parametersBuilder = new Parameters.Builder(getContext());
-            TrackPreferenceStorage trackPreferenceStorage = TrackPreferenceStorage.getInstance(getContext());
-            if (trackPreferenceStorage.isEnabled()) {
-                if (trackPreferenceStorage.isNoSubtitlePreferred()) {
-                    parametersBuilder.setDisabledTextTrackSelectionFlags(C.SELECTION_FLAG_DEFAULT);
-                } else {
-                    parametersBuilder.setPreferredTextLanguage(trackPreferenceStorage.getPreferredSubtitleLanguage());
-                }
+            String preferredSubtitleLang = getPreferredSubtitleLang();
+            if (preferredSubtitleLang != null) {
+                parametersBuilder.setPreferredTextLanguage(preferredSubtitleLang);
+            } else {
+                parametersBuilder.setDisabledTextTrackSelectionFlags(C.SELECTION_FLAG_DEFAULT);
             }
 
             AdViewProvider adViewProvider = adType == AdType.IMA_CSAI_LIVE ? secondaryPlayerView : exoDorisPlayerView;
@@ -572,6 +571,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             eventEmitter.loadStart();
             loadVideoStarted = true;
         }
+    }
+
+    private String getPreferredSubtitleLang() {
+        TrackPreferenceStorage trackPreferenceStorage = TrackPreferenceStorage.getInstance(getContext());
+        if (!trackPreferenceStorage.isEnabled()) {
+            return src.getSelectedSubtitleTrack();
+        }
+        return trackPreferenceStorage.isNoSubtitlePreferred() ?
+                null : trackPreferenceStorage.getPreferredSubtitleLanguage();
     }
 
     private void loadImaDaiStream() {
@@ -679,15 +687,20 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Nullable
     private TextTrack[] getTextTracks(ReadableArray textTracks) {
+        LocalizationService localizationService = new LocalizationService(Locale.getDefault());
         if (textTracks != null && textTracks.size() > 0) {
             TextTrack[] dorisTextTracks = new TextTrack[textTracks.size()];
             for (int i = 0; i < textTracks.size(); ++i) {
                 ReadableMap textTrack = textTracks.getMap(i);
                 String uri = textTrack.getString("uri");
-                String name = textTrack.getString("type");
                 String isoCode = textTrack.getString("language");
-
-                dorisTextTracks[i] = new TextTrack(Uri.parse(uri), name, isoCode);
+                String name = isoCode != null
+                        ? localizationService.getLocalizedLanguageLabel(isoCode, true)
+                        : null;
+                dorisTextTracks[i] = new TextTrack(
+                        Uri.parse(uri),
+                        name,
+                        isoCode);
             }
             return dorisTextTracks;
         }
@@ -1220,7 +1233,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean apsTestFlag,
             Watermark watermark,
             LimitedSeekRange limitedSeekRange,
-            boolean shouldSaveSubtitleSelection) {
+            boolean shouldSaveSubtitleSelection,
+            String selectedSubtitleTrack) {
         if (url != null) {
             String srcUrl = src != null ? src.getUrl() : null;
             boolean isOriginalSourceNull = srcUrl == null;
@@ -1249,6 +1263,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     headers,
                     muxData,
                     null,
+                    selectedSubtitleTrack,
                     null,
                     channelId,
                     seriesId,
@@ -1813,6 +1828,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         storage.storePreferredSubtitleLanguage(language == null
                 ? TrackPreferenceStorage.NONE
                 : language);
+        eventEmitter.subtitleTrackChanged(language);
     }
 
     @Override
