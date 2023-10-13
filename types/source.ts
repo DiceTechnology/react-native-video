@@ -27,12 +27,8 @@ export interface IVideoPlayerSourceLimitedSeekableRange {
   seekToStart?: boolean;
 }
 
-export interface IAdsConfigurationExtended extends IAdsConfiguration {
-  provider?: string;
-}
-
 export interface IVideoPlayerSource {
-  ads?: IAdsConfigurationExtended;
+  ads?: IAdsConfiguration;
   contentType?: ContentTypes;
   uri: string;
   id?: string;
