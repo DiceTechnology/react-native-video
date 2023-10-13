@@ -68,11 +68,8 @@ public class ReactTVPropsParser {
             return Pair.create(imaCsai.normalize(), null);
         }
 
+        YoVideoType videoType = isLive ? YoVideoType.LIVE : YoVideoType.VOD;
         YoSsaiProperties.Builder yoSsaiBuilder = new YoSsaiProperties.Builder();
-        String provider = ReadableMapUtils.getString(adsMap, "provider");
-        if ("YOSPACE".equals(provider)) {
-            yoSsaiBuilder.setYoVideoType(isLive ? YoVideoType.LIVE : YoVideoType.VOD);
-        }
         ReadableArray adUnits = ReadableMapUtils.getArray(adsMap, "adUnits");
         int adUnitCount = adUnits == null ? 0 : adUnits.size();
         for (int i = 0; i < adUnitCount; i++) {
@@ -83,6 +80,7 @@ public class ReactTVPropsParser {
             } else if ("SSAI".equalsIgnoreCase(insertionType)) {
                 String adProvider = ReadableMapUtils.getString(adUnit, "adProvider");
                 if ("YOSPACE".equalsIgnoreCase(adProvider)) {
+                    yoSsaiBuilder.setYoVideoType(videoType);
                     parseYoSsaiProperties(yoSsaiBuilder, adUnit);
                 }
             }
@@ -116,9 +114,7 @@ public class ReactTVPropsParser {
         return TextUtils.isEmpty(adTagUrl) ? null : Uri.parse(adTagUrl);
     }
 
-    private static void parseYoSsaiProperties(
-            YoSsaiProperties.Builder yoSsaiBuilder,
-            ReadableMap adUnit) {
+    private static void parseYoSsaiProperties(YoSsaiProperties.Builder yoSsaiBuilder, ReadableMap adUnit) {
         ReadableArray adParams = ReadableMapUtils.getArray(adUnit, "adManifestParams");
         int adParamCount = adParams == null ? 0 : adParams.size();
         if (adParamCount == 0) {

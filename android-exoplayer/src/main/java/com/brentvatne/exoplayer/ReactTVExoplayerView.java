@@ -1678,14 +1678,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!areControlsVisible &&
+        boolean isPlayingAd = player != null && player.isPlayingAd();
+        if (!areControlsVisible && !isPlayingAd &&
                 event.getKeyCode() != KeyEvent.KEYCODE_MEDIA_PLAY &&
                 event.getKeyCode() != KeyEvent.KEYCODE_MEDIA_PAUSE &&
                 event.getKeyCode() != KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE &&
                 event.getKeyCode() != KeyEvent.KEYCODE_BACK) {
             return true;
         }
-        return (exoDorisPlayerView.getPlayer() != null && exoDorisPlayerView.dispatchKeyEvent(event)) || super.dispatchKeyEvent(event);
+        return (exoDorisPlayerView != null && exoDorisPlayerView.dispatchKeyEvent(event)) || super.dispatchKeyEvent(event);
     }
 
     public void showWatermark(){
