@@ -1241,6 +1241,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean isSourceEqual = url.equals(srcUrl);
 
             this.adType = null;
+            this.imaDaiSrc = null;
             this.isImaDaiStreamLoaded = false;
             if (yoSsai != null) {
                 this.adType = AdType.YO_SSAI;
@@ -1927,16 +1928,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     boolean ignoreAdError = adEvent.details.adType == AdType.IMA_CSAI || adEvent.details.adType == AdType.IMA_CSAI_LIVE;
                     if (adEvent.details.adType == AdType.IMA_DAI) {
                         Exception error = adEvent.details.error;
-
                         if (!hasReloadedCurrentSource && isUnauthorizedAdError(error)) {
                             hasReloadedCurrentSource = true;
                             ignoreAdError = true;
                             eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
                         }
-
-                        // Reset imaDaiSrc and adType to allow a new source to be loaded
-                        imaDaiSrc = null;
-                        adType = null;
                     }
                     if (!ignoreAdError) {
                         eventEmitter.error("Ad exception", adEvent.details.error);
