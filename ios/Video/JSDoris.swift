@@ -209,10 +209,14 @@ extension JSDoris: DorisOutputProtocol {
     func onPlayerEvent(_ event: DorisPlayerEvent) {
         switch event {
         case .readyToPlay:
-            if let selectedAudioTrack = props.source.value?.selectedAudioTrack, !selectedAudioTrack.isEmpty {
-                doris?.player.selectAudioTrack(code: selectedAudioTrack)
-                //if selectedAudioTrack is NAME of the track and it matches one of the tracks in the stream it will be reset
-                doris?.player.selectAudioTrack(title: selectedAudioTrack)
+            if let doris = doris,
+               let preferredAudioTracks = props.source.value?.preferredAudioTracks,
+               !preferredAudioTracks.isEmpty {
+                for track in preferredAudioTracks {
+                    if doris.player.selectAudioTrack(code: track) || doris.player.selectAudioTrack(title: track) {
+                        break
+                    }
+                }
             }
             
             if let selectedSubtitleTrack = props.source.value?.selectedSubtitleTrack {

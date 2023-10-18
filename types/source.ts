@@ -56,5 +56,5 @@ export interface IVideoPlayerSource {
   nowPlaying: INowPlaying;
   thumbnailsPreview?: string;
   selectedSubtitleTrack?: string;
-  selectedAudioTrack?: string;
+  preferredAudioTracks?: string[];
 }
