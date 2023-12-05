@@ -244,6 +244,9 @@ extension JSDoris: DorisOutputProtocol {
             currentPlayingItemDuration = duration
         case .playerItemFailed:
             output?.onVideoError?(nil)
+        case .willLoadNow:
+            guard let config = DorisConvivaData(data: props.source.value?.config.convivaData) else { break }
+            doris?.player.startConvivaMonitoring(data: config)
         default: break
         }
     }

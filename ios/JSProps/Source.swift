@@ -5,7 +5,7 @@
 //  Created by Yaroslav Lvov on 05.03.2021.
 //
 
-import Foundation
+import AVDoris
 
 struct Source: SuperCodable {
     let id: String?
@@ -77,6 +77,7 @@ extension Source {
     struct Config: SuperCodable {
         let muxData: MuxData
         let beacon: Beacon?
+        let convivaData: JSConvivaData?
     }
     
     struct TitleInfo: SuperCodable {
@@ -103,5 +104,33 @@ extension Source.Config {
         let subPropertyId: String
         let videoIsLive: Bool
         let experimentName: String?
+    }
+    
+    struct JSConvivaData: SuperCodable {
+        let url: String
+        let customerKey: String?
+        let title: String?
+        let playerName: String?
+        let playerVersion: String?
+        let viewerId: String
+        let isLive: Bool
+        let debug: Bool
+        let debugProxyUrl: String?
+    }
+}
+
+
+extension DorisConvivaData {
+    init?(data: Source.Config.JSConvivaData?) {
+        guard let data = data, let customerKey = data.customerKey else { return nil }
+        self.init(url: data.url,
+                  customerKey: customerKey,
+                  title: data.title.isEmptyOrNil ? "NA" : data.title ?? "NA",
+                  playerName: data.playerName,
+                  playerVersion: data.playerVersion,
+                  viewerId: data.viewerId,
+                  isLive: data.isLive,
+                  debug: data.debug,
+                  debugProxyUrl: data.debugProxyUrl ?? "")
     }
 }
