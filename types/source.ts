@@ -3,6 +3,7 @@ import { IAdsConfiguration } from '@dicetechnology/dice-unity/lib/types/content'
 import { IVideoPlayerDRM } from './drm';
 import { IVideoPlayerIMA } from './ima';
 import { IMuxData } from './mux';
+import { IConvivaData } from './conviva';
 import { IVideoPlayerSubtitles } from './subtitles';
 import { IVideoPlayerAPS } from './aps';
 import { INowPlaying } from "./nowPlaying";
@@ -48,6 +49,7 @@ export interface IVideoPlayerSource {
   ima?: IVideoPlayerIMA;
   config?: {
     muxData: IMuxData;
+    convivaData?: IConvivaData;
   };
   limitedSeekableRange?: IVideoPlayerSourceLimitedSeekableRange;
   mainVer?: number;
