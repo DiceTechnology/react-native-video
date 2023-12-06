@@ -66,6 +66,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_CHANNEL_NAME = "channelName";
     private static final String PROP_SRC_CONFIG = "config";
     private static final String PROP_SRC_MUX_DATA = "muxData";
+    private static final String PROP_SRC_CONVIVA_DATA = "convivaData";
     private static final String PROP_SRC_HEADERS = "requestHeaders";
     private static final String PROP_SRC_APS = "aps";
     private static final String PROP_SRC_APS_TEST_MODE = "testMode";
@@ -233,6 +234,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
         ReadableMap config = src.hasKey(PROP_SRC_CONFIG) ? src.getMap(PROP_SRC_CONFIG) : null;
         ReadableMap muxData = (config != null && config.hasKey(PROP_SRC_MUX_DATA)) ? config.getMap(PROP_SRC_MUX_DATA) : null;
+        ReadableMap convivaData = (config != null && config.hasKey(PROP_SRC_CONVIVA_DATA)) ? config.getMap(PROP_SRC_CONVIVA_DATA) : null;
         ReadableMap metadata = src.hasKey(PROP_SRC_METADATA) ? src.getMap(PROP_SRC_METADATA) : null;
 
         Map<String, String> headers = src.hasKey(PROP_SRC_HEADERS) ? toStringMap(src.getMap(PROP_SRC_HEADERS)) : null;
@@ -309,6 +311,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     actionToken,
                     headers,
                     muxData != null ? muxData.toHashMap() : null,
+                    convivaData != null ? convivaData.toHashMap() : null,
                     adProperties.first,
                     ima != null ? ima.toHashMap() : null,
                     adProperties.second,

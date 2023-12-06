@@ -546,6 +546,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 sourceBuilder.setMuxProperties(muxData, correlationId, exoDorisPlayerView.getVideoSurfaceView());
             }
 
+            Map<String, Object> convivaData = src.getConvivaData();
+            if (convivaData != null) {
+                sourceBuilder.setConvivaProperties(convivaData);
+            }
+
             LimitedSeekRange limitedSeekRange = isLive ? src.getLimitedSeekRange() : null;
             if (limitedSeekRange != null) {
                 sourceBuilder.setLimitedSeekRange(limitedSeekRange);
@@ -1220,6 +1225,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             ActionToken actionToken,
             Map<String, String> headers,
             Map<String, Object> muxData,
+            Map<String, Object> convivaData,
             ImaCsaiProperties imaCsai,
             Map<String, Object> imaDai,
             YoSsaiProperties yoSsai,
@@ -1265,6 +1271,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     getTextTracks(textTracks),
                     headers,
                     muxData,
+                    convivaData,
                     preferredAudioTracks,
                     selectedSubtitleTrack,
                     null,

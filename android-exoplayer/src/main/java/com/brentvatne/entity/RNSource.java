@@ -25,6 +25,7 @@ public class RNSource {
     private final TextTrack[] textTracks;
     private final Map<String, String> headers;
     private final Map<String, Object> muxData;
+    private final Map<String, Object> convivaData;
     private final List<String> preferredAudioTracks;
     private final String selectedSubtitleTrack;
     private final String locale;
@@ -49,6 +50,7 @@ public class RNSource {
             @Nullable TextTrack[] textTracks,
             @Nullable Map<String, String> headers,
             @Nullable Map<String, Object> muxData,
+            @Nullable Map<String, Object> convivaData,
             @Nullable List<String> preferredAudioTracks,
             @Nullable String selectedSubtitleTrack,
             @Nullable String locale,
@@ -72,6 +74,7 @@ public class RNSource {
         this.textTracks = textTracks;
         this.headers = headers;
         this.muxData = muxData;
+        this.convivaData = convivaData;
         this.preferredAudioTracks = preferredAudioTracks;
         this.selectedSubtitleTrack = selectedSubtitleTrack;
         this.locale = locale;
@@ -139,6 +142,11 @@ public class RNSource {
     @Nullable
     public Map<String, Object> getMuxData() {
         return muxData;
+    }
+
+    @Nullable
+    public Map<String, Object> getConvivaData() {
+        return convivaData;
     }
 
     @Nullable
