@@ -273,7 +273,7 @@ extension JSDoris: DorisOutputProtocol {
             }
         case .favouritesButtonTap:
             output?.onFavouriteButtonClick?(nil)
-        case .watchListButtonTap:
+        case .watchlistButtonTap:
             output?.onWatchlistButtonClick?(nil)
         case .statsButtonTap:
             output?.onStatsIconClick?(nil)
