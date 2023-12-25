@@ -200,6 +200,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     // AD relative
     private AdType adType;
     private ExoDorisTvPlayerView secondaryPlayerView;
+    private boolean isPostRollSkipped;
 
     // IMA DAI
     private RNImaDaiSource imaDaiSrc;
@@ -234,7 +235,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         boolean isAboutToEnd = duration - position <= VIDEO_ABOUT_TO_END_TIME_MS;
                         if (isAboutToEnd) {
                             // Handles some ad situations that are different from the seekbar and timeline.
-                            long timelineDuration = exoPlayer.getDuration();
+                            long timelineDuration = player.getDurationInTimeline(true);
                             if (timelineDuration != duration) {
                                 isAboutToEnd = timelineDuration - exoPlayer.getCurrentPosition() <= VIDEO_ABOUT_TO_END_TIME_MS;
                             }
@@ -970,7 +971,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 break;
             case Player.STATE_ENDED:
                 text += "ended";
-                eventEmitter.end();
+                if (!isPostRollSkipped) {
+                    eventEmitter.end();
+                }
+                isPostRollSkipped = false;
                 onStopPlayback();
                 if (player.getExoPlayer().getRepeatMode() == Player.REPEAT_MODE_ONE
                         || player.getExoPlayer().getRepeatMode() == Player.REPEAT_MODE_ALL
@@ -1460,9 +1464,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void seekTo(long positionMs) {
         if (player != null) {
-            ExoPlayer exoPlayer = player.getExoPlayer();
-            eventEmitter.seek(exoPlayer.getCurrentPosition(), positionMs);
-            exoPlayer.seekTo(exoPlayer.getCurrentMediaItemIndex(), positionMs);
+            eventEmitter.seek(player.getExoPlayer().getCurrentPosition(), positionMs);
+            player.seekTo(positionMs);
         } else {
             resumePosition = positionMs;
         }
@@ -1881,6 +1884,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         exoDorisPlayerView.setExtraAdGroupMarkers(adMarkers.adGroupTimesMs, adMarkers.playedAdGroups);
                         Log.d(TAG, adEvent.details.adType + " Ad Stream ID = " + adEvent.details.streamId);
                     }
+                    break;
+                case AD_POST_ROLL_SKIPPED:
+                    Log.i(TAG, adEvent.details.adType + " post roll skipped");
+                    isPostRollSkipped = true;
+                    eventEmitter.end();
                     break;
                 case REQUIRE_AD_TAG_PARAMETERS:
                     if (adEvent.details.adType == AdType.IMA_DAI) {
