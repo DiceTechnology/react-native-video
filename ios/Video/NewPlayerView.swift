@@ -102,10 +102,11 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var fullscreen: Bool = false
     @objc var `repeat`: Bool = false
     @objc var paused: Bool = false {
-        didSet { paused ? jsDoris?.doris?.player.pause() : jsDoris?.doris?.player.play() }
+        didSet { paused ? jsPlayerView?.dorisGlue?.doris?.player.pause() : jsPlayerView?.dorisGlue?.doris?.player.play() }
     }
-    var jsDoris: JSDoris?
+//    var jsDoris: JSDoris?
     var jsProps = JSProps()
+    var jsPlayerView: RNDReactNativeDiceVideo.JSPlayerView?
     
     func seekToNow() {
         //TODO
@@ -117,13 +118,15 @@ class NewPlayerView: UIView, JSInputProtocol {
     
     //TODO: pass this value as part of source
     func seekToPosition(position: Double) {
-        jsDoris?.doris?.player.seek(.position(position))
+        jsPlayerView?.dorisGlue?.doris?.player.seek(.position(position))
+//        jsDoris?.doris?.player.seek(.position(position))
     }
     
     func replaceAdTagParameters(payload: NSDictionary) {
-        jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
-                                        extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
-                                                                               viewHeight: frame.height))
+//        jsPlayerView?.replaceAdTagParameters(adTagParameters: AdTagParameters(payload: payload), validFrom: nil, validUntil: nil)
+//        jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
+//                                        extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
+//                                                                               viewHeight: frame.height))
     }
     
     func convertRNVideoJSPropsToRNDV() -> RNDReactNativeDiceVideo.JSProps {
@@ -329,10 +332,13 @@ class NewPlayerView: UIView, JSInputProtocol {
         return rndvJsProps
     }
     
+
     private func setupDoris() {
         if let jsBridge = self.jsBridge {
-            var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: self.convertRNVideoJSPropsToRNDV())
+            let jsProbs = self.convertRNVideoJSPropsToRNDV()
+            var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
+//            jsPlayerView.onBackButton = self.onBackButton
             
             jsPlayerView.translatesAutoresizingMaskIntoConstraints = false
             let leading = jsPlayerView.leadingAnchor.constraint(equalTo: self.leadingAnchor)
@@ -347,13 +353,14 @@ class NewPlayerView: UIView, JSInputProtocol {
         jsProps.startAt.value = position
     }
     
-    func setupLimitedSeekableRange(with range: Source.LimitedSeekableRange?) {
-        jsDoris?.setupLimitedSeekableRange(with: range)
+    func setupLimitedSeekableRange(with range: JSLimitedSeekableRange?) {
+        jsPlayerView?.dorisGlue?.setupLimitedSeekableRange(with: range)
+//        jsDoris?.setupLimitedSeekableRange(with: range)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if jsDoris == nil {
+        if jsPlayerView == nil {
             setupDoris()
         }
     }

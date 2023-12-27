@@ -6,6 +6,7 @@
 //
 
 import AVDoris
+import RNDReactNativeDiceVideo
 
 struct JSAds: SuperCodable {
     let adUnits: [AdUnit]
