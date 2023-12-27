@@ -11,7 +11,7 @@ import Foundation
 @objc(RCTVideoManager)
 class RCTVideoManager: RCTViewManager {
     override func view() -> UIView! {
-        let view = PlayerView()
+        let view = NewPlayerView()
         view.jsBridge = bridge
         
         let weirdViewThatCausesFocusIssues = bridge.uiManager.view(forReactTag: NSNumber(integerLiteral: 25))

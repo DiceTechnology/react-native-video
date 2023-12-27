@@ -20,7 +20,7 @@ struct Source: SuperCodable {
     let isAudioOnly: Bool?
     let config: Config
     let titleInfo: TitleInfo?
-    let imageUri: URL?
+    let imageUri: URL
     let subtitles: [JSSubtitles]?
     let ads: JSAds?
     let thumbnailsPreview: URL?
