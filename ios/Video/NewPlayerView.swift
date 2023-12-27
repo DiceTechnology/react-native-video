@@ -130,7 +130,7 @@ class NewPlayerView: UIView, JSInputProtocol {
     }
     
     func convertRNVideoJSPropsToRNDV() -> RNDReactNativeDiceVideo.JSProps {
-        var rndvJsProps = RNDReactNativeDiceVideo.JSProps()
+        let rndvJsProps = RNDReactNativeDiceVideo.JSProps()
         rndvJsProps.isFullScreen.value = true
         rndvJsProps.isMinimised.value = false
         rndvJsProps.highlightUrl.value = nil
@@ -338,7 +338,31 @@ class NewPlayerView: UIView, JSInputProtocol {
             let jsProbs = self.convertRNVideoJSPropsToRNDV()
             var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
-//            jsPlayerView.onBackButton = self.onBackButton
+            jsPlayerView.setRCTBubblingEventBlock(onVideoProgress: self.onVideoProgress,
+                                                  onBackButton: self.onBackButton,
+                                                  onVideoError: self.onVideoError,
+                                                  onRequestPlayNextSource: nil,
+                                                  onFullScreenButton: nil,
+                                                  onVideoStart: self.onVideoLoadStart,
+                                                  onVideoEnded: self.onVideoEnd,
+                                                  onVideoPaused: nil,
+                                                  onRequireAdParameters: self.onRequireAdParameters,
+                                                  onVideoLoad: self.onVideoLoad,
+                                                  onVideoStalled: nil,
+                                                  onAdBreakStarted: nil,
+                                                  onAdStarted: nil,
+                                                  onAdEnded: nil,
+                                                  onAdBreakEnded: nil,
+                                                  onSeekToLive: nil,
+                                                  onAdPause: nil,
+                                                  onAdResume: nil,
+                                                  onSubtitleTrackChanged: self.onSubtitleTrackChanged,
+                                                  onAudioTrackChanged: nil,
+                                                  onSeekEvent: nil,
+                                                  onPlaylistEvent: nil,
+                                                  onPlaybackQualityChanged: nil,
+                                                  onShareButton: nil,
+                                                  onRequestHighlightUrl: nil)
             
             jsPlayerView.translatesAutoresizingMaskIntoConstraints = false
             let leading = jsPlayerView.leadingAnchor.constraint(equalTo: self.leadingAnchor)
@@ -346,6 +370,8 @@ class NewPlayerView: UIView, JSInputProtocol {
             let top = jsPlayerView.topAnchor.constraint(equalTo: self.topAnchor)
             let bottom = jsPlayerView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
             self.addConstraints([leading, trailing, top, bottom])
+            
+            self.jsPlayerView = jsPlayerView
         }
     }
     
