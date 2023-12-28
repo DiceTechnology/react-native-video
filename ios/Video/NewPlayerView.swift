@@ -142,14 +142,17 @@ class NewPlayerView: UIView, JSInputProtocol {
                 channelLogoUrl: sourceValue.nowPlaying?.channelLogoUrl,
                 startDate: sourceValue.nowPlaying?.startDate,
                 endDate: sourceValue.nowPlaying?.endDate)
-            let rndvJSIma = RNDReactNativeDiceVideo.JSIma(
-                videoId: sourceValue.ima?.videoId,
-                adTagParameters: sourceValue.ima?.adTagParameters,
-                endDate: sourceValue.ima?.endDate,
-                startDate: sourceValue.ima?.startDate,
-                assetKey: sourceValue.ima?.assetKey,
-                contentSourceId: sourceValue.ima?.contentSourceId,
-                authToken: sourceValue.ima?.authToken)
+            var rndvJSIma: RNDReactNativeDiceVideo.JSIma?
+            if let sourceIma = sourceValue.ima {
+                rndvJSIma = RNDReactNativeDiceVideo.JSIma(
+                    videoId: sourceIma.videoId,
+                    adTagParameters: sourceIma.adTagParameters,
+                    endDate: sourceIma.endDate,
+                    startDate: sourceIma.startDate,
+                    assetKey: sourceIma.assetKey,
+                    contentSourceId: sourceIma.contentSourceId,
+                    authToken: sourceIma.authToken)
+            }
             var rndvJSDrm: RNDReactNativeDiceVideo.JSDrm?
             if let drm = sourceValue.drm {
                 rndvJSDrm = RNDReactNativeDiceVideo.JSDrm(
@@ -215,7 +218,7 @@ class NewPlayerView: UIView, JSInputProtocol {
                 ima: rndvJSIma,
                 uri: sourceValue.uri,
                 drm: rndvJSDrm,
-                progressUpdateInterval: sourceValue.progressUpdateInterval ?? 0,
+                progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
                 type: sourceValue.type,
                 title: sourceValue.title ?? "",
                 live: sourceValue.live,
