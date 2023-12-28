@@ -286,7 +286,7 @@ class NewPlayerView: UIView, JSInputProtocol {
             //need confirm
             let colors = JSTheme.JSColors(
                 accentColor: themeValue.colors.primary,
-                backgroundColor: themeValue.colors.secondary)
+                backgroundColor: nil)
             jsTheme = JSTheme(fonts: fonts, colors: colors)
         }
         
