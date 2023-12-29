@@ -119,14 +119,12 @@ class NewPlayerView: UIView, JSInputProtocol {
     //TODO: pass this value as part of source
     func seekToPosition(position: Double) {
         jsPlayerView?.dorisGlue?.doris?.player.seek(.position(position))
-//        jsDoris?.doris?.player.seek(.position(position))
     }
     
     func replaceAdTagParameters(payload: NSDictionary) {
-//        jsPlayerView?.replaceAdTagParameters(adTagParameters: AdTagParameters(payload: payload), validFrom: nil, validUntil: nil)
-//        jsDoris?.replaceAdTagParameters(parameters: AdTagParameters(payload: payload),
-//                                        extraInfo: AdTagParametersModifierInfo(viewWidth: frame.width,
-//                                                                               viewHeight: frame.height))
+        if let payload = payload as? Dictionary<String, Any> {
+            jsPlayerView?.replaceAdTagParameters(adTagParameters: payload, validFrom: nil, validUntil: nil)
+        }
     }
     
     func convertRNVideoJSPropsToRNDV() -> RNDReactNativeDiceVideo.JSProps {
@@ -384,7 +382,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     
     func setupLimitedSeekableRange(with range: JSLimitedSeekableRange?) {
         jsPlayerView?.dorisGlue?.setupLimitedSeekableRange(with: range)
-//        jsDoris?.setupLimitedSeekableRange(with: range)
     }
     
     override func layoutSubviews() {

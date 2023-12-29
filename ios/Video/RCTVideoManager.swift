@@ -65,9 +65,6 @@ class RCTVideoManager: RCTViewManager {
             if let limitedSeekbleRange = try? JSLimitedSeekableRange(start: payload["start"] as? Double, end: payload["end"] as? Double, seekToStart: payload["seekToStart"] as? Bool) {
                 component?.setupLimitedSeekableRange(with: limitedSeekbleRange)
             }
-//            if let limitedSeekbleRange = try? Source.LimitedSeekableRange(dict: payload) {
-//                component?.setupLimitedSeekableRange(with: limitedSeekbleRange)
-//            }
         }
     }
 
