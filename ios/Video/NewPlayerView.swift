@@ -126,227 +126,20 @@ class NewPlayerView: UIView, JSInputProtocol {
             jsPlayerView?.replaceAdTagParameters(adTagParameters: payload, validFrom: nil, validUntil: nil)
         }
     }
-    
-    func convertRNVideoJSPropsToRNDV() -> RNDReactNativeDiceVideo.JSProps {
-        let rndvJsProps = RNDReactNativeDiceVideo.JSProps()
-        rndvJsProps.isFullScreen.value = true
-        rndvJsProps.isMinimised.value = false
-        rndvJsProps.highlightUrl.value = nil
-        
-        var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
-        if let sourceValue = self.jsProps.source.value {
-            rndvJsProps.nowPlaying.value = RNDReactNativeDiceVideo.JSNowPlaying(
-                title: sourceValue.nowPlaying?.title,
-                channelLogoUrl: sourceValue.nowPlaying?.channelLogoUrl,
-                startDate: sourceValue.nowPlaying?.startDate,
-                endDate: sourceValue.nowPlaying?.endDate)
-            var rndvJSIma: RNDReactNativeDiceVideo.JSIma?
-            if let sourceIma = sourceValue.ima {
-                rndvJSIma = RNDReactNativeDiceVideo.JSIma(
-                    videoId: sourceIma.videoId,
-                    adTagParameters: sourceIma.adTagParameters,
-                    endDate: sourceIma.endDate,
-                    startDate: sourceIma.startDate,
-                    assetKey: sourceIma.assetKey,
-                    contentSourceId: sourceIma.contentSourceId,
-                    authToken: sourceIma.authToken)
-            }
-            var rndvJSDrm: RNDReactNativeDiceVideo.JSDrm?
-            if let drm = sourceValue.drm {
-                rndvJSDrm = RNDReactNativeDiceVideo.JSDrm(
-                    contentUrl: drm.contentUrl,
-                    drmScheme: drm.drmScheme,
-                    offlineLicense: nil,
-                    id: drm.id,
-                    croToken: drm.croToken,
-                    licensingServerUrl: drm.licensingServerUrl)
-            }
-            let jsPartialVideoInformation = JSPartialVideoInformation(
-                title: sourceValue.partialVideoInformation?.title,
-                imageUri: sourceValue.partialVideoInformation?.imageUri)
-            
-            let jsMuxData = JSConfig.JSMuxData(
-                envKey: sourceValue.config.muxData.envKey,
-                videoTitle: sourceValue.config.muxData.videoTitle,
-                viewerUserId: sourceValue.config.muxData.viewerUserId,
-                playerVersion: nil,
-                videoId: sourceValue.config.muxData.videoId,
-                playerName: sourceValue.config.muxData.playerName,
-                videoStreamType: sourceValue.config.muxData.videoStreamType,
-                subPropertyId: sourceValue.config.muxData.subPropertyId,
-                videoIsLive: sourceValue.config.muxData.videoIsLive,
-                experimentName: sourceValue.config.muxData.experimentName,
-                videoSeries: nil,
-                videoCdn: nil,
-                videoDuration: nil)
-            let jsBeacon = JSConfig.JSBeacon(
-                authUrl: sourceValue.config.beacon?.authUrl.absoluteString,
-                url: sourceValue.config.beacon?.url.absoluteString,
-                headers: nil)
-            var jsConfig = JSConfig(muxData: jsMuxData, beacon: jsBeacon, convivaData: nil)
-            
-            var jsAds: RNDReactNativeDiceVideo.JSAds?
-            if let adUnits = sourceValue.ads?.adUnits.map({ adUnit -> RNDReactNativeDiceVideo.JSAds.AdUnit in
-                let queryParams = adUnit.adManifestParams?.map { param -> RNDReactNativeDiceVideo.JSAds.AdUnit.QueryParam in
-                    return RNDReactNativeDiceVideo.JSAds.AdUnit.QueryParam(key: param.key, value: param.value)
-                }
-                return RNDReactNativeDiceVideo.JSAds.AdUnit(
-                    insertionType: RNDReactNativeDiceVideo.JSAds.AdUnit.AdInsertionType(rawValue: adUnit.insertionType.rawValue)!,
-                    adFormat: RNDReactNativeDiceVideo.JSAds.AdUnit.AdFormat(rawValue: adUnit.adFormat.rawValue)!,
-                    adProvider: RNDReactNativeDiceVideo.JSAds.AdUnit.AdProvider(rawValue: adUnit.adProvider?.rawValue ?? ""),
-                    adTagUrl: adUnit.adTagUrl,
-                    adManifestParams: queryParams)
-            }) {
-                jsAds = RNDReactNativeDiceVideo.JSAds(adUnits: adUnits)
-            }
-            
-            var jsSubtitles = [RNDReactNativeDiceVideo.JSSubtitles]()
-            if let subtitles = sourceValue.subtitles {
-                for subtitle in subtitles {
-                    jsSubtitles.append(RNDReactNativeDiceVideo.JSSubtitles(language: subtitle.language, uri: subtitle.uri))
-                }
-            }
-            
-            var jsLimitedSeekableRange = RNDReactNativeDiceVideo.JSLimitedSeekableRange(start: sourceValue.limitedSeekableRange?.start, end: sourceValue.limitedSeekableRange?.end, seekToStart: sourceValue.limitedSeekableRange?.seekToStart)
-            
-            var jsNowPlaying = RNDReactNativeDiceVideo.JSNowPlaying(title: sourceValue.nowPlaying?.title, channelLogoUrl: sourceValue.nowPlaying?.channelLogoUrl, startDate: sourceValue.nowPlaying?.startDate, endDate: sourceValue.nowPlaying?.endDate)
-           
-            rndvJSSource = RNDReactNativeDiceVideo.JSSource(
-                id: sourceValue.id ?? "",
-                ima: rndvJSIma,
-                uri: sourceValue.uri,
-                drm: rndvJSDrm,
-                progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
-                type: sourceValue.type,
-                title: sourceValue.title ?? "",
-                live: sourceValue.live,
-                partialVideoInformation: jsPartialVideoInformation,
-                isAudioOnly: sourceValue.isAudioOnly,
-                config: jsConfig,
-                imageUri: sourceValue.imageUri,
-                thumbnailsPreview: sourceValue.thumbnailsPreview,
-                resumePosition: nil,
-                delay: nil,
-                ads: jsAds,
-                subtitles: jsSubtitles,
-                limitedSeekableRange: jsLimitedSeekableRange,
-                selectedAudioTrack: nil,
-                selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
-                selectedPlaybackQuality: nil,
-                nowPlaying: jsNowPlaying)
-        }
-        
-        var jsTranslations: RNDReactNativeDiceVideo.JSTranslations?
-        if let translationsValue = self.jsProps.translations.value {
-            var dorisTranslationsViewModel = DorisTranslationsViewModel()
-            dorisTranslationsViewModel.play = translationsValue.playerPlayButton
-            dorisTranslationsViewModel.pause = translationsValue.playerPauseButton
-            dorisTranslationsViewModel.stats = translationsValue.playerStatsButton
-            dorisTranslationsViewModel.audioAndSubtitles = translationsValue.playerAudioAndSubtitlesButton
-            dorisTranslationsViewModel.live = translationsValue.live
-//            dorisTranslationsViewModel.goLive = translationsValue.goLive
-            dorisTranslationsViewModel.favourites = translationsValue.favourite
-//            dorisTranslationsViewModel.watchlist = translationsValue.watchlist
-            dorisTranslationsViewModel.moreVideos = translationsValue.moreVideos
-//            dorisTranslationsViewModel.captions = translationsValue.captions
-            dorisTranslationsViewModel.rewind = translationsValue.rewind
-            dorisTranslationsViewModel.fastForward = translationsValue.fastForward
-            dorisTranslationsViewModel.audio = translationsValue.audioTracks
-            dorisTranslationsViewModel.info = translationsValue.info
-            dorisTranslationsViewModel.adsCountdownAd = translationsValue.adsCountdownAd
-            dorisTranslationsViewModel.adsCountdownOf = translationsValue.adsCountdownOf
-            dorisTranslationsViewModel.annotations = translationsValue.annotations
-            dorisTranslationsViewModel.playingLive = translationsValue.playingLive
-            dorisTranslationsViewModel.nowPlaying = translationsValue.nowPlaying
-//            dorisTranslationsViewModel.tvPlayerEPG = translationsValue.tvPlayerEPG
-            jsTranslations = RNDReactNativeDiceVideo.JSTranslations(beaconTranslations: nil, dorisTranslations: dorisTranslationsViewModel)
-        }
-        
-        let jsButtons = JSButtons(
-            fullscreen: self.jsProps.buttons.value?.fullscreen,
-            stats: self.jsProps.buttons.value?.stats,
-            favourite: self.jsProps.buttons.value?.favourite,
-            zoom: self.jsProps.buttons.value?.zoom,
-            back: self.jsProps.buttons.value?.back,
-            settings: self.jsProps.buttons.value?.settings,
-            info: self.jsProps.buttons.value?.info,
-            share: nil,
-            watchlist: self.jsProps.buttons.value?.watchlist,
-            epg: self.jsProps.buttons.value?.epg,
-            annotations: self.jsProps.buttons.value?.annotations)
-        
-        var jsTheme: JSTheme?
-        if let themeValue = self.jsProps.theme.value {
-            let fonts = JSTheme.JSFonts(
-                secondaryFontName: themeValue.fonts.secondary,
-                primaryFontName: themeValue.fonts.primary,
-                tertiaryFontName: "")
-            //need confirm
-            let colors = JSTheme.JSColors(
-                accentColor: themeValue.colors.primary,
-                backgroundColor: nil)
-            jsTheme = JSTheme(fonts: fonts, colors: colors)
-        }
-        
-        var jsOverlayConfig: JSOverlayConfig?
-        if let overlayConfigValue = self.jsProps.overlayConfig.value {
-            let overlayType = JSOverlayConfig.JSOverlayConfigType(rawValue: overlayConfigValue.type.rawValue)
-            let buttonIconUrl = overlayConfigValue.button
-            let componentsArray = overlayConfigValue.components
-            let components: [JSOverlayConfig.JSOverlayComponent] = componentsArray.map { component in
-                let componentType = JSOverlayConfig.JSOverlayConfigType(rawValue: component.type.rawValue)
-                let name = component.name
-                let initialProps = component.initialProps
-                return JSOverlayConfig.JSOverlayComponent(type: componentType ?? .side, name: name, initialProps: initialProps)
-            }
-            jsOverlayConfig = JSOverlayConfig(type: overlayType ?? .side, buttonIconUrl: buttonIconUrl, components: components)
-        }
-        
-        var jsTracksPolicy: RNDReactNativeDiceVideo.JSTracksPolicy?
-        if let items = self.jsProps.source.value?.tracksPolicy?.items.map({ trackPolicyPair -> RNDReactNativeDiceVideo.JSTrackPolicyPair in
-            return RNDReactNativeDiceVideo.JSTrackPolicyPair(audio: trackPolicyPair.audio, subtitle: trackPolicyPair.subtitle)
-        }) {
-            jsTracksPolicy = RNDReactNativeDiceVideo.JSTracksPolicy(items: items)
-        }
-        
-        let rndvJSVideoDataConfig = RNDReactNativeDiceVideo.JSVideoData.JSVideoDataConfig(
-            translations: jsTranslations,
-            buttons: jsButtons,
-            theme: jsTheme,
-            playlist: nil,
-            testIdentifiers: nil,
-            annotations: nil,
-            overlayConfig: jsOverlayConfig,
-            tracksPolicy: jsTracksPolicy,
-            isFullScreen: self.isFullScreen,
-            allowAirplay: self.allowAirplay,
-            canMinimise: self.canMinimise,
-            isPipEnabled: nil,
-            canShareplay: nil, 
-            isPlaybackQualityChangeAllowed: nil,
-            isAutoPlayNextEnabled: false)
-        
-        if let rndvJSSource = rndvJSSource {
-            let jsVideoData = RNDReactNativeDiceVideo.JSVideoData(source: rndvJSSource, config: rndvJSVideoDataConfig)
-            rndvJsProps.videoData.value = jsVideoData
-        }
-        return rndvJsProps
-    }
-    
 
     private func setupDoris() {
         if let jsBridge = self.jsBridge {
-            let jsProbs = self.convertRNVideoJSPropsToRNDV()
+            let jsProbs = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
             var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
             jsPlayerView.setRCTBubblingEventBlock(onVideoProgress: self.onVideoProgress,
                                                   onBackButton: self.onBackButton,
                                                   onVideoError: self.onVideoError,
-                                                  onRequestPlayNextSource: nil,
+                                                  onRequestPlayNextSource: self.onRelatedVideoClicked,
                                                   onFullScreenButton: nil,
                                                   onVideoStart: self.onVideoLoadStart,
                                                   onVideoEnded: self.onVideoEnd,
-                                                  onVideoPaused: nil,
+                                                  onVideoPaused: self.onPlaybackRateChange,
                                                   onRequireAdParameters: self.onRequireAdParameters,
                                                   onVideoLoad: self.onVideoLoad,
                                                   onVideoStalled: nil,
@@ -381,7 +174,14 @@ class NewPlayerView: UIView, JSInputProtocol {
     }
     
     func setupLimitedSeekableRange(with range: JSLimitedSeekableRange?) {
-        jsPlayerView?.dorisGlue?.setupLimitedSeekableRange(with: range)
+        let start = Date(timeIntervalSince1970InMilliseconds: range?.start)
+        let end = Date(timeIntervalSince1970InMilliseconds: range?.end)
+        if let end = end, end > Date() {
+            //avoid finishing playback when ongoing live program reaches its end
+            jsPlayerView?.dorisGlue?.doris?.player.setLimitedSeekableRange(range: (start: start, end: nil))
+        } else {
+            jsPlayerView?.dorisGlue?.doris?.player.setLimitedSeekableRange(range: (start: start, end: end))
+        }
     }
     
     override func layoutSubviews() {
