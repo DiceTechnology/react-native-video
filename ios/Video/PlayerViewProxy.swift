@@ -238,7 +238,8 @@ class PlayerViewProxy {
                 selectedAudioTrack: nil,
                 selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
                 selectedPlaybackQuality: nil,
-                nowPlaying: jsNowPlaying)
+                nowPlaying: jsNowPlaying,
+                preferredAudioTracks: sourceValue.preferredAudioTracks)
         }
 
         let jsTranslations = PlayerViewProxy.convertRNVideoTranslationsToRNDV(translations: jsProps.translations.value)

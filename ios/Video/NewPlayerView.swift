@@ -66,11 +66,11 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var overlayConfig: NSDictionary? {
         didSet { jsProps.overlayConfig.value = try? OverlayConfig(dict: overlayConfig) } }
     @objc var isFavourite: Bool = false {
-        didSet { jsProps.isFavourite.value = isFavourite } }
+        didSet { jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isFavourite = isFavourite } }
     @objc var controls: Bool = false {
-        didSet { jsProps.controls.value = controls } }
+        didSet { jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isUIEnabled = controls } }
     @objc var nowPlaying: NSDictionary? {
-        didSet { jsProps.nowPlaying.value = try? JSNowPlaying(dict: nowPlaying) } }
+        didSet { jsPlayerView?.nowPlaying = nowPlaying } }
     
 
     //FIXME: review unused variables
