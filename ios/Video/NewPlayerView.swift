@@ -13,14 +13,21 @@ import RNDReactNativeDiceVideo
 class NewPlayerView: UIView, JSInputProtocol {
     var jsBridge: RCTBridge?
     //Events
+    //used
     @objc var onBackButton: RCTBubblingEventBlock?
     @objc var onVideoLoadStart: RCTBubblingEventBlock?
     @objc var onVideoLoad: RCTBubblingEventBlock?
-    @objc var onVideoBuffer: RCTBubblingEventBlock?
     @objc var onVideoError: RCTBubblingEventBlock?
     @objc var onVideoProgress: RCTBubblingEventBlock?
-    @objc var onVideoSeek: RCTBubblingEventBlock?
     @objc var onVideoEnd: RCTBubblingEventBlock?
+    @objc var onPlaybackRateChange: RCTBubblingEventBlock?
+    @objc var onRequireAdParameters: RCTBubblingEventBlock?
+    @objc var onRelatedVideoClicked: RCTBubblingEventBlock?
+    @objc var onSubtitleTrackChanged: RCTBubblingEventBlock?
+    
+    //not used
+    @objc var onVideoBuffer: RCTBubblingEventBlock?
+    @objc var onVideoSeek: RCTBubblingEventBlock?
     @objc var onTimedMetadata: RCTBubblingEventBlock?
     @objc var onVideoAudioBecomingNoisy: RCTBubblingEventBlock?
     @objc var onVideoFullscreenPlayerWillPresent: RCTBubblingEventBlock?
@@ -30,16 +37,13 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var onReadyForDisplay: RCTBubblingEventBlock?
     @objc var onPlaybackStalled: RCTBubblingEventBlock?
     @objc var onPlaybackResume: RCTBubblingEventBlock?
-    @objc var onPlaybackRateChange: RCTBubblingEventBlock?
-    @objc var onRequireAdParameters: RCTBubblingEventBlock?
     @objc var onVideoAboutToEnd: RCTBubblingEventBlock?
     @objc var onFavouriteButtonClick: RCTBubblingEventBlock?
-    @objc var onRelatedVideoClicked: RCTBubblingEventBlock?
     @objc var onRelatedVideosIconClicked: RCTBubblingEventBlock?
     @objc var onStatsIconClick: RCTBubblingEventBlock?
     @objc var onEpgIconClick: RCTBubblingEventBlock?
     @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
-    @objc var onSubtitleTrackChanged: RCTBubblingEventBlock?
+    
     
     
     //Props
@@ -66,13 +70,24 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var overlayConfig: NSDictionary? {
         didSet { jsProps.overlayConfig.value = try? OverlayConfig(dict: overlayConfig) } }
     @objc var isFavourite: Bool = false {
-        didSet { jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isFavourite = isFavourite } }
+        didSet {
+            jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isFavourite = isFavourite
+            jsProps.isFavourite.value = isFavourite
+        }
+    }
     @objc var controls: Bool = false {
-        didSet { jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isUIEnabled = controls } }
+        didSet {
+            jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isUIEnabled = controls
+            jsProps.controls.value = controls
+        }
+    }
     @objc var nowPlaying: NSDictionary? {
-        didSet { jsPlayerView?.nowPlaying = nowPlaying } }
+        didSet {
+            jsPlayerView?.nowPlaying = nowPlaying
+            jsProps.nowPlaying.value = try? JSNowPlaying(dict: nowPlaying)
+        }
+    }
     
-
     //FIXME: review unused variables
     @objc var selectedTextTrack: NSDictionary?
     @objc var selectedAudioTrack: NSDictionary?
