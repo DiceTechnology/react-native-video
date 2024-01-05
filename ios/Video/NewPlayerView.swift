@@ -15,7 +15,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     //Events
     //used
     @objc var onBackButton: RCTBubblingEventBlock?
-    @objc var onVideoLoadStart: RCTBubblingEventBlock?
     @objc var onVideoLoad: RCTBubblingEventBlock?
     @objc var onVideoError: RCTBubblingEventBlock?
     @objc var onVideoProgress: RCTBubblingEventBlock?
@@ -24,9 +23,16 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var onRequireAdParameters: RCTBubblingEventBlock?
     @objc var onRelatedVideoClicked: RCTBubblingEventBlock?
     @objc var onSubtitleTrackChanged: RCTBubblingEventBlock?
+    @objc var onVideoBuffer: RCTBubblingEventBlock?
+    @objc var onVideoAboutToEnd: RCTBubblingEventBlock?
+    @objc var onFavouriteButtonClick: RCTBubblingEventBlock?
+    @objc var onRelatedVideosIconClicked: RCTBubblingEventBlock?
+    @objc var onStatsIconClick: RCTBubblingEventBlock?
+    @objc var onEpgIconClick: RCTBubblingEventBlock?
+    @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
     
     //not used
-    @objc var onVideoBuffer: RCTBubblingEventBlock?
+    @objc var onVideoLoadStart: RCTBubblingEventBlock?
     @objc var onVideoSeek: RCTBubblingEventBlock?
     @objc var onTimedMetadata: RCTBubblingEventBlock?
     @objc var onVideoAudioBecomingNoisy: RCTBubblingEventBlock?
@@ -37,14 +43,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var onReadyForDisplay: RCTBubblingEventBlock?
     @objc var onPlaybackStalled: RCTBubblingEventBlock?
     @objc var onPlaybackResume: RCTBubblingEventBlock?
-    @objc var onVideoAboutToEnd: RCTBubblingEventBlock?
-    @objc var onFavouriteButtonClick: RCTBubblingEventBlock?
-    @objc var onRelatedVideosIconClicked: RCTBubblingEventBlock?
-    @objc var onStatsIconClick: RCTBubblingEventBlock?
-    @objc var onEpgIconClick: RCTBubblingEventBlock?
-    @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
-    
-    
     
     //Props
     //MARK: Differs (source)
@@ -119,7 +117,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var paused: Bool = false {
         didSet { paused ? jsPlayerView?.dorisGlue?.doris?.player.pause() : jsPlayerView?.dorisGlue?.doris?.player.play() }
     }
-//    var jsDoris: JSDoris?
     var jsProps = JSProps()
     var jsPlayerView: RNDReactNativeDiceVideo.JSPlayerView?
     
@@ -147,39 +144,57 @@ class NewPlayerView: UIView, JSInputProtocol {
             let jsProbs = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
             var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
-            jsPlayerView.setRCTBubblingEventBlock(onVideoProgress: self.onVideoProgress,
-                                                  onBackButton: self.onBackButton,
-                                                  onVideoError: self.onVideoError,
-                                                  onRequestPlayNextSource: self.onRelatedVideoClicked,
-                                                  onFullScreenButton: nil,
-                                                  onVideoStart: self.onVideoLoadStart,
-                                                  onVideoEnded: self.onVideoEnd,
-                                                  onVideoPaused: self.onPlaybackRateChange,
-                                                  onRequireAdParameters: self.onRequireAdParameters,
-                                                  onVideoLoad: self.onVideoLoad,
-                                                  onVideoStalled: nil,
-                                                  onAdBreakStarted: nil,
-                                                  onAdStarted: nil,
-                                                  onAdEnded: nil,
-                                                  onAdBreakEnded: nil,
-                                                  onSeekToLive: nil,
-                                                  onAdPause: nil,
-                                                  onAdResume: nil,
-                                                  onSubtitleTrackChanged: self.onSubtitleTrackChanged,
-                                                  onAudioTrackChanged: nil,
-                                                  onSeekEvent: nil,
-                                                  onPlaylistEvent: nil,
-                                                  onPlaybackQualityChanged: nil,
-                                                  onShareButton: nil,
-                                                  onRequestHighlightUrl: nil)
-            
+            jsPlayerView.setRCTBubblingEventBlock(
+                onVideoProgress: {value in
+                    if let currentTime = value?["currentTime"] as? Double {
+                        self.onVideoProgress?(["currentTime": currentTime])
+                   }
+               },
+                onBackButton: self.onBackButton,
+                onVideoError: self.onVideoError,
+                onRequestPlayNextSource: {value in
+                    if let id = value?["id"] as? String, let type = value?["type"] as? String {
+                        self.onRelatedVideoClicked?(["id": id, "type": type])
+                   }
+               },
+                onFullScreenButton: nil,
+                onVideoStart: nil,
+                onVideoEnded: self.onVideoEnd,
+                onVideoPaused: {value in
+                     if let isPaused = value?["isPaused"] as? Bool {
+                         self.onPlaybackRateChange?(["playbackRate": isPaused ? 0.0 : 1.0])
+                    }
+                },
+                onRequireAdParameters: self.onRequireAdParameters,
+                onVideoLoad: self.onVideoLoad,
+                onVideoStalled: nil,
+                onAdBreakStarted: nil,
+                onAdStarted: nil,
+                onAdEnded: nil,
+                onAdBreakEnded: nil,
+                onSeekToLive: nil,
+                onAdPause: nil,
+                onAdResume: nil,
+                onSubtitleTrackChanged: self.onSubtitleTrackChanged,
+                onAudioTrackChanged: nil,
+                onSeekEvent: nil,
+                onPlaylistEvent: nil,
+                onPlaybackQualityChanged: nil,
+                onShareButton: nil,
+                onRequestHighlightUrl: nil,
+                onVideoBuffer: self.onVideoBuffer,
+                onVideoAboutToEnd: self.onVideoAboutToEnd,
+                onFavouritesButton: self.onFavouriteButtonClick,
+                onRelatedVideosIcon: self.onRelatedVideosIconClicked,
+                onStatsIcon: self.onStatsIconClick,
+                onEpgIcon: self.onEpgIconClick,
+                onAnnotationsButton: self.onAnnotationsButtonClick
+            )
             jsPlayerView.translatesAutoresizingMaskIntoConstraints = false
-            let leading = jsPlayerView.leadingAnchor.constraint(equalTo: self.leadingAnchor)
-            let trailing = jsPlayerView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
-            let top = jsPlayerView.topAnchor.constraint(equalTo: self.topAnchor)
-            let bottom = jsPlayerView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
-            self.addConstraints([leading, trailing, top, bottom])
-            
+            jsPlayerView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
+            jsPlayerView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
+            jsPlayerView.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+            jsPlayerView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
             self.jsPlayerView = jsPlayerView
         }
     }

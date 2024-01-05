@@ -10,7 +10,7 @@ import AVDoris
 import RNDReactNativeDiceVideo
 
 class PlayerViewProxy {
-    static func convertRNVideoImaToRNDV(sourceIma: Source.Ima?) -> JSIma? {
+    private static func convertRNVideoImaToRNDV(sourceIma: Source.Ima?) -> JSIma? {
         var jsIma: JSIma?
         if let ima = sourceIma {
             jsIma = JSIma(
@@ -25,7 +25,7 @@ class PlayerViewProxy {
         return jsIma
     }
     
-    static func convertRNVideoDrmToRNDV(sourceDrm: Source.Drm?) -> JSDrm? {
+    private static func convertRNVideoDrmToRNDV(sourceDrm: Source.Drm?) -> JSDrm? {
         var jsDrm: JSDrm?
         if let drm = sourceDrm {
             jsDrm = JSDrm(
@@ -39,7 +39,7 @@ class PlayerViewProxy {
         return jsDrm
     }
     
-    static func convertRNVideoConfigToRNDV(sourceConfig: Source.Config?) -> JSConfig? {
+    private static func convertRNVideoConfigToRNDV(sourceConfig: Source.Config?) -> JSConfig? {
         var jsConfig: JSConfig?
         if let config = sourceConfig {
             let jsMuxData = JSConfig.JSMuxData(
@@ -61,7 +61,7 @@ class PlayerViewProxy {
         return jsConfig
     }
     
-    static func convertRNVideoAdsToRNDV(sourceAds: react_native_video.JSAds?) -> RNDReactNativeDiceVideo.JSAds? {
+    private static func convertRNVideoAdsToRNDV(sourceAds: react_native_video.JSAds?) -> RNDReactNativeDiceVideo.JSAds? {
         var jsAds: RNDReactNativeDiceVideo.JSAds?
         if let adUnits = sourceAds?.adUnits.map({ adUnit -> RNDReactNativeDiceVideo.JSAds.AdUnit in
             let queryParams = adUnit.adManifestParams?.map { param -> RNDReactNativeDiceVideo.JSAds.AdUnit.QueryParam in
@@ -79,7 +79,7 @@ class PlayerViewProxy {
         return jsAds
     }
     
-    static func convertRNVideoTranslationsToRNDV(translations: Translations?) -> JSTranslations? {
+    private static func convertRNVideoTranslationsToRNDV(translations: Translations?) -> JSTranslations? {
         var jsTranslations: JSTranslations?
         if let translationsValue = translations {
             var dorisTranslationsViewModel = DorisTranslationsViewModel()
@@ -108,7 +108,7 @@ class PlayerViewProxy {
         return jsTranslations
     }
     
-    static func convertRNVideoButtonsToRNDV(buttons: Buttons?) -> JSButtons? {
+    private static func convertRNVideoButtonsToRNDV(buttons: Buttons?) -> JSButtons? {
         var jsButtons: JSButtons?
         if let buttonsValue = buttons {
             jsButtons = JSButtons(
@@ -127,7 +127,7 @@ class PlayerViewProxy {
         return jsButtons
     }
     
-    static func convertRNVideoThemeToRNDV(theme: Theme?) -> JSTheme? {
+    private static func convertRNVideoThemeToRNDV(theme: Theme?) -> JSTheme? {
         var jsTheme: JSTheme?
         if let themeValue = theme {
             let fonts = JSTheme.JSFonts(
@@ -142,7 +142,7 @@ class PlayerViewProxy {
         return jsTheme
     }
     
-    static func convertRNVideoOverlayConfigToRNDV(overlayConfig: OverlayConfig?) -> JSOverlayConfig? {
+    private static func convertRNVideoOverlayConfigToRNDV(overlayConfig: OverlayConfig?) -> JSOverlayConfig? {
         var jsOverlayConfig: JSOverlayConfig?
         if let overlayConfigValue = overlayConfig {
             let overlayType = JSOverlayConfig.JSOverlayConfigType(rawValue: overlayConfigValue.type.rawValue)
@@ -159,7 +159,7 @@ class PlayerViewProxy {
         return jsOverlayConfig
     }
     
-    static func convertRNVideoTracksPolicyToRNDV(tracksPolicy: react_native_video.JSTracksPolicy?) -> RNDReactNativeDiceVideo.JSTracksPolicy? {
+    private static func convertRNVideoTracksPolicyToRNDV(tracksPolicy: react_native_video.JSTracksPolicy?) -> RNDReactNativeDiceVideo.JSTracksPolicy? {
         var jsTracksPolicy: RNDReactNativeDiceVideo.JSTracksPolicy?
         if let items = tracksPolicy?.items.map({ trackPolicyPair -> RNDReactNativeDiceVideo.JSTrackPolicyPair in
             return RNDReactNativeDiceVideo.JSTrackPolicyPair(audio: trackPolicyPair.audio, subtitle: trackPolicyPair.subtitle)
@@ -169,7 +169,7 @@ class PlayerViewProxy {
         return jsTracksPolicy
     }
     
-    static func convertRNVideoReleatedVideosToRNDV(relatedVideos: RelatedVideos?) -> JSPlaylist? {
+    private static func convertRNVideoReleatedVideosToRNDV(relatedVideos: RelatedVideos?) -> JSPlaylist? {
         var jsPlaylist: JSPlaylist?
         if let playlist = relatedVideos {
             let jsPlaylistItems = playlist.items.map { relatedVideo -> JSPlaylist.JSPlaylistItem in
