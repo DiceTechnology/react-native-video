@@ -241,8 +241,8 @@ extension JSDoris: DorisOutputProtocol {
                 let isAboutToEnd = contentPosition >= duration - 5
                 output?.onVideoAboutToEnd?(["isAboutToEnd": isAboutToEnd]);
             }
-        case .itemDurationChanged(duration: let duration):
-            currentPlayingItemDuration = duration
+        case .itemDurationChanged(let contentDuration, _):
+            currentPlayingItemDuration = contentDuration
         case .playerItemFailed:
             output?.onVideoError?(nil)
         default: break
