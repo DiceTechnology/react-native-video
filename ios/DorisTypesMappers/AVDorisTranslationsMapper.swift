@@ -15,6 +15,7 @@ extension DorisTranslationsViewModel {
         self.pause = translations.playerPauseButton
         self.live = translations.goLive
         self.favourites = translations.favourite
+        self.addToWatchlist = translations.addToWatchlist
         self.moreVideos = translations.moreVideos
         self.subtitles = translations.captions
         self.rewind = translations.rewind

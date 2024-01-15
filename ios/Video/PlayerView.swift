@@ -33,6 +33,7 @@ class PlayerView: UIView, JSInputProtocol {
     @objc var onRequireAdParameters: RCTBubblingEventBlock?
     @objc var onVideoAboutToEnd: RCTBubblingEventBlock?
     @objc var onFavouriteButtonClick: RCTBubblingEventBlock?
+    @objc var onWatchlistButtonClick: RCTBubblingEventBlock?
     @objc var onRelatedVideoClicked: RCTBubblingEventBlock?
     @objc var onRelatedVideosIconClicked: RCTBubblingEventBlock?
     @objc var onStatsIconClick: RCTBubblingEventBlock?

@@ -54,6 +54,7 @@ class JSDoris {
             guard let buttons = buttons else { return }
             
             self.doris?.viewModel.toggles.isFavouriteButtonHidden = !buttons.favourite
+            self.doris?.viewModel.toggles.isWatchlistButtonHidden = !(buttons.watchlist ?? false)
             self.doris?.viewModel.toggles.isScheduleButtonHidden = !(buttons.epg ?? false)
             self.doris?.viewModel.toggles.isStatsButtonHidden = !buttons.stats
             self.doris?.viewModel.toggles.isAnnotationsButtonHidden = !(buttons.annotations ?? false)
@@ -232,17 +233,17 @@ extension JSDoris: DorisOutputProtocol {
             }
         case .finishedPlaying(endTime: _):
             output?.onVideoEnd?(nil)
-        case .currentTimeChanged(let seconds, _):
-            if seconds > 0 {
-                output?.onVideoProgress?(["currentTime": seconds])
+        case .currentTimeChanged(let contentPosition, _, _):
+            if contentPosition > 0 {
+                output?.onVideoProgress?(["currentTime": contentPosition])
             }
             
             if let duration = currentPlayingItemDuration {
-                let isAboutToEnd = seconds >= duration - 5
+                let isAboutToEnd = contentPosition >= duration - 5
                 output?.onVideoAboutToEnd?(["isAboutToEnd": isAboutToEnd]);
             }
-        case .itemDurationChanged(duration: let duration):
-            currentPlayingItemDuration = duration
+        case .itemDurationChanged(let contentDuration, _):
+            currentPlayingItemDuration = contentDuration
         case .playerItemFailed:
             output?.onVideoError?(nil)
         default: break
@@ -268,6 +269,8 @@ extension JSDoris: DorisOutputProtocol {
             }
         case .favouritesButtonTap:
             output?.onFavouriteButtonClick?(nil)
+        case .watchlistButtonTap:
+            output?.onWatchlistButtonClick?(nil)
         case .statsButtonTap:
             output?.onStatsIconClick?(nil)
         case .scheduleButtonTap:
