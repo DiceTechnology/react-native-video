@@ -141,29 +141,38 @@ class NewPlayerView: UIView, JSInputProtocol {
     }
 
     private func setupDoris() {
+        DorisLogger.logFilter = DorisLogType.allCases
         if let jsBridge = self.jsBridge {
             let jsProbs = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
-            var jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
+            let jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
+            
+            //set all other props directly here
+            jsPlayerView.onVideoProgress = { [weak self] value in
+                if let currentTime = value?["currentTime"] as? Double {
+                    self?.onVideoProgress?(["currentTime": currentTime])
+                }
+            }
+            
             jsPlayerView.setRCTBubblingEventBlock(
-                onVideoProgress: {value in
+                onVideoProgress: { [weak self] value in
                     if let currentTime = value?["currentTime"] as? Double {
-                        self.onVideoProgress?(["currentTime": currentTime])
+                        self?.onVideoProgress?(["currentTime": currentTime])
                    }
                },
                 onBackButton: self.onBackButton,
                 onVideoError: self.onVideoError,
-                onRequestPlayNextSource: {value in
+                onRequestPlayNextSource: { [weak self] value in
                     if let id = value?["id"] as? String, let type = value?["type"] as? String {
-                        self.onRelatedVideoClicked?(["id": id, "type": type])
+                        self?.onRelatedVideoClicked?(["id": id, "type": type])
                    }
                },
                 onFullScreenButton: nil,
                 onVideoStart: nil,
                 onVideoEnded: self.onVideoEnd,
-                onVideoPaused: {value in
+                onVideoPaused: { [weak self] value in
                      if let isPaused = value?["isPaused"] as? Bool {
-                         self.onPlaybackRateChange?(["playbackRate": isPaused ? 0.0 : 1.0])
+                         self?.onPlaybackRateChange?(["playbackRate": isPaused ? 0.0 : 1.0])
                     }
                 },
                 onRequireAdParameters: self.onRequireAdParameters,
@@ -205,9 +214,10 @@ class NewPlayerView: UIView, JSInputProtocol {
         jsProps.startAt.value = position
     }
     
-    func setupLimitedSeekableRange(with range: JSLimitedSeekableRange?) {
+    func setupLimitedSeekableRange(with range: Source.LimitedSeekableRange?) {
         let start = Date(timeIntervalSince1970InMilliseconds: range?.start)
         let end = Date(timeIntervalSince1970InMilliseconds: range?.end)
+        
         if let end = end, end > Date() {
             //avoid finishing playback when ongoing live program reaches its end
             jsPlayerView?.dorisGlue?.doris?.player.setLimitedSeekableRange(range: (start: start, end: nil))

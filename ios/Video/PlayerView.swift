@@ -5,9 +5,9 @@
 //  Created by Yaroslav Lvov on 05.03.2021.
 //
 
-import React
 import AVDoris
 import AVKit
+import React
 
 class PlayerView: UIView, JSInputProtocol {
     var jsBridge: RCTBridge?
