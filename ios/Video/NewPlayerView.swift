@@ -147,60 +147,36 @@ class NewPlayerView: UIView, JSInputProtocol {
             let jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
             
-            //set all other props directly here
             jsPlayerView.onVideoProgress = { [weak self] value in
                 if let currentTime = value?["currentTime"] as? Double {
                     self?.onVideoProgress?(["currentTime": currentTime])
                 }
             }
+            jsPlayerView.onBackButton = self.onBackButton
+            jsPlayerView.onVideoError = self.onVideoError
+            jsPlayerView.onRequestPlayNextSource = { [weak self] value in
+                if let id = value?["id"] as? String, let type = value?["type"] as? String {
+                    self?.onRelatedVideoClicked?(["id": id, "type": type])
+               }
+            }
+            jsPlayerView.onVideoEnded = self.onVideoEnd
+            jsPlayerView.onVideoPaused = { [weak self] value in
+                if let isPaused = value?["isPaused"] as? Bool {
+                    self?.onPlaybackRateChange?(["playbackRate": isPaused ? 0.0 : 1.0])
+               }
+            }
+            jsPlayerView.onRequireAdParameters = self.onRequireAdParameters
+            jsPlayerView.onVideoLoad = self.onVideoLoad
+            jsPlayerView.onSubtitleTrackChanged = self.onSubtitleTrackChanged
+            jsPlayerView.onVideoBuffer = self.onVideoBuffer
+            jsPlayerView.onVideoAboutToEnd = self.onVideoAboutToEnd
+            jsPlayerView.onFavouritesButton =  self.onFavouriteButtonClick
+            jsPlayerView.onRelatedVideosIcon =  self.onRelatedVideosIconClicked
+            jsPlayerView.onStatsIcon =  self.onStatsIconClick
+            jsPlayerView.onEpgIcon =  self.onEpgIconClick
+            jsPlayerView.onAnnotationsButton =  self.onAnnotationsButtonClick
+            jsPlayerView.onWatchlistButton =  self.onWatchlistButtonClick
             
-            jsPlayerView.setRCTBubblingEventBlock(
-                onVideoProgress: { [weak self] value in
-                    if let currentTime = value?["currentTime"] as? Double {
-                        self?.onVideoProgress?(["currentTime": currentTime])
-                   }
-               },
-                onBackButton: self.onBackButton,
-                onVideoError: self.onVideoError,
-                onRequestPlayNextSource: { [weak self] value in
-                    if let id = value?["id"] as? String, let type = value?["type"] as? String {
-                        self?.onRelatedVideoClicked?(["id": id, "type": type])
-                   }
-               },
-                onFullScreenButton: nil,
-                onVideoStart: nil,
-                onVideoEnded: self.onVideoEnd,
-                onVideoPaused: { [weak self] value in
-                     if let isPaused = value?["isPaused"] as? Bool {
-                         self?.onPlaybackRateChange?(["playbackRate": isPaused ? 0.0 : 1.0])
-                    }
-                },
-                onRequireAdParameters: self.onRequireAdParameters,
-                onVideoLoad: self.onVideoLoad,
-                onVideoStalled: nil,
-                onAdBreakStarted: nil,
-                onAdStarted: nil,
-                onAdEnded: nil,
-                onAdBreakEnded: nil,
-                onSeekToLive: nil,
-                onAdPause: nil,
-                onAdResume: nil,
-                onSubtitleTrackChanged: self.onSubtitleTrackChanged,
-                onAudioTrackChanged: nil,
-                onSeekEvent: nil,
-                onPlaylistEvent: nil,
-                onPlaybackQualityChanged: nil,
-                onShareButton: nil,
-                onRequestHighlightUrl: nil,
-                onVideoBuffer: self.onVideoBuffer,
-                onVideoAboutToEnd: self.onVideoAboutToEnd,
-                onFavouritesButton: self.onFavouriteButtonClick,
-                onRelatedVideosIcon: self.onRelatedVideosIconClicked,
-                onStatsIcon: self.onStatsIconClick,
-                onEpgIcon: self.onEpgIconClick,
-                onAnnotationsButton: self.onAnnotationsButtonClick,
-                onWatchlistButton: self.onWatchlistButtonClick
-            )
             jsPlayerView.translatesAutoresizingMaskIntoConstraints = false
             jsPlayerView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
             jsPlayerView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
