@@ -1,7 +1,7 @@
 {
     "name": "react-native-video",
-    "version": "6.5.11",
-    "dorisAndroidVersion": "c3c26d6a",
+    "version": "6.5.16",
+    "dorisAndroidVersion": "e3b00382",
     "description": "A <Video /> element for react-native",
     "main": "Video.tsx",
     "license": "MIT",
@@ -20,9 +20,9 @@
         "eslint-plugin-react": "3.16.1"
     },
     "dependencies": {
-        "@dicetechnology/avdoris": "git+ssh://git@github.com/DiceTechnology/avdoris.git#semver:=1.17.10",
+        "@dicetechnology/avdoris": "git+ssh://git@github.com/DiceTechnology/avdoris.git#semver:=1.17.14",
         "@dicetechnology/dice-unity": "^2.26.3",
-        "@imggaming/dice-shield": "git+ssh://git@github.com:DiceTechnology/dice-shield.git#60151a8bb97c55a6311792561f6f7ed77b07f7d4",
+        "@imggaming/dice-shield": "git+ssh://git@github.com:DiceTechnology/dice-shield.git#ca3b8592ea73f535953859390cca5c43a7533e95",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
     },
