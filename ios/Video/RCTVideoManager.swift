@@ -8,10 +8,10 @@
 
 import Foundation
 
-#if SharedPlayer
-typealias CurrentPlayerView = NewPlayerView
-#else
+#if OldPlayer
 typealias CurrentPlayerView = PlayerView
+#else
+typealias CurrentPlayerView = NewPlayerView
 #endif
 
 @objc(RCTVideoManager)
