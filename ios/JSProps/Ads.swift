@@ -56,7 +56,7 @@ struct JSAds: SuperCodable {
 }
 
 extension DorisSSAIProvider {
-    init?(adUnit: JSAds.AdUnit, isLive: Bool, playbackUrl: URL, drm: DorisDRMSource?) {
+    init?(adUnit: JSAds.AdUnit, isLive: Bool, playbackUrl: URL) {
         switch adUnit.adProvider {
         case .yospace:
             if var urlComps = URLComponents(url: playbackUrl, resolvingAgainstBaseURL: true) {
@@ -67,8 +67,7 @@ extension DorisSSAIProvider {
                 urlComps.queryItems = newQueryItems
                 
                 if let newURL = urlComps.url {
-                    self = .yospace(isLive ? .dvrLive(url: newURL.absoluteString) : .vod(url: newURL.absoluteString),
-                                    drm: drm)
+                    self = .yospace(isLive ? .dvrLive(url: newURL.absoluteString) : .vod(url: newURL.absoluteString))
                 } else {
                     return nil
                 }

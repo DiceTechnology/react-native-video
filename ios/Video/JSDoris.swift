@@ -134,8 +134,8 @@ class JSDoris {
     }
     
     private func setupPlayer(from source: Source, at position: Double?) {
-        sourceMapper.map(source: source, view: doris?.viewController.view) { [weak self] avDorisSource in
-            guard let self = self else { return }
+        sourceMapper.map(source: source, view: doris?.viewController.view) { [weak self] dorisSource in
+            guard let self = self, let dorisSource = dorisSource else { return }
             
             var initialSeek: DorisSeekType?
             
@@ -148,17 +148,8 @@ class JSDoris {
             } else if let seekableRange = source.limitedSeekableRange, seekableRange.seekToStart == true, let startDate = Date(timeIntervalSince1970InMilliseconds: seekableRange.start) {
                 initialSeek = .date(startDate)
             }
-            
-            switch avDorisSource {
-            case .csai(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .ssai(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .regular(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .unknown:
-                return
-            }
+                        
+            self.doris?.player.load(source: dorisSource, initialSeek: initialSeek)
         }
     }
     
