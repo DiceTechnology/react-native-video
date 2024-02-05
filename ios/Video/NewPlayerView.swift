@@ -144,7 +144,7 @@ class NewPlayerView: UIView, JSInputProtocol {
         DorisLogger.logFilter = DorisLogType.allCases
         if let jsBridge = self.jsBridge {
             let jsProbs = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
-            let jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
+            let jsPlayerView = RNDReactNativeDiceVideo.JSPlayerView(overlayBuilder: RNDReactNativeDiceVideo.JSOverlayBuilder(bridge: jsBridge), jsProps: jsProbs)
             self.addSubview(jsPlayerView)
             
             jsPlayerView.onVideoProgress = { [weak self] value in
