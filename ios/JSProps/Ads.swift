@@ -6,6 +6,7 @@
 //
 
 import AVDoris
+import RNDReactNativeDiceVideo
 
 struct JSAds: SuperCodable {
     let adUnits: [AdUnit]
@@ -40,22 +41,49 @@ struct JSAds: SuperCodable {
         enum AdInsertionType: String, Codable {
             case csai = "CSAI"
             case ssai = "SSAI"
+            case unknown
+
+            public init(from decoder: Decoder) throws {
+                guard let value = try? decoder.singleValueContainer().decode(String.self) else{
+                    self = .unknown
+                    return
+                }
+                self = AdInsertionType(rawValue: value) ?? .unknown
+            }
         }
 
         enum AdProvider: String, Codable {
             case yospace = "YOSPACE"
+            case unknown
+            
+            public init(from decoder: Decoder) throws {
+                guard let value = try? decoder.singleValueContainer().decode(String.self) else{
+                    self = .unknown
+                    return
+                }
+                self = AdProvider(rawValue: value) ?? .unknown
+            }
         }
 
         enum AdFormat: String, Codable {
             case vmap = "VOD_VMAP"
             case preroll = "PREROLL"
             case midroll = "MIDROLL"
+            case unknown
+            
+            public init(from decoder: Decoder) throws {
+                guard let value = try? decoder.singleValueContainer().decode(String.self) else{
+                    self = .unknown
+                    return
+                }
+                self = AdFormat(rawValue: value) ?? .unknown
+            }
         }
     }
 }
 
 extension DorisSSAIProvider {
-    init?(adUnit: JSAds.AdUnit, isLive: Bool, playbackUrl: URL, drm: DorisDRMSource?) {
+    init?(adUnit: JSAds.AdUnit, isLive: Bool, playbackUrl: URL) {
         switch adUnit.adProvider {
         case .yospace:
             if var urlComps = URLComponents(url: playbackUrl, resolvingAgainstBaseURL: true) {
@@ -66,8 +94,7 @@ extension DorisSSAIProvider {
                 urlComps.queryItems = newQueryItems
                 
                 if let newURL = urlComps.url {
-                    self = .yospace(isLive ? .dvrLive(url: newURL.absoluteString) : .vod(url: newURL.absoluteString),
-                                    drm: drm)
+                    self = .yospace(isLive ? .dvrLive(url: newURL.absoluteString) : .vod(url: newURL.absoluteString))
                 } else {
                     return nil
                 }

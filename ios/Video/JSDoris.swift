@@ -5,12 +5,12 @@
 //  Created by Yaroslav Lvov on 11.03.2022.
 //
 
+import React
 import AVDoris
 
 class JSDoris {
     private let muxDataMapper: AVDorisMuxDataMapper = AVDorisMuxDataMapper()
     private let sourceMapper: AVDorisSourceMapper = AVDorisSourceMapper()
-    private var adTagParametersModifier = AdTagParametersModifier()
     
     private var currentPlayerState: DorisPlayerState = .initialization
     private var currentPlayingItemDuration: Double?
@@ -110,15 +110,6 @@ class JSDoris {
         }
     }
     
-    func replaceAdTagParameters(parameters: AdTagParameters, extraInfo: AdTagParametersModifierInfo) {
-        adTagParametersModifier.prepareAdTagParameters(adTagParameters: parameters.adTagParameters,
-                                                       info: extraInfo) { [weak self] newAdTagParameters in
-            guard let self = self else { return }
-            guard let newAdTagParameters = newAdTagParameters else { return }
-            self.doris?.player.replaceAdTagParameters(adTagParameters: newAdTagParameters, validFrom: parameters.startDate, validUntil: parameters.endDate)
-        }
-    }
-    
     private func setupNowPlaying(nowPlaying: JSNowPlaying?) {
         guard let nowPlaying = nowPlaying else { return }
 
@@ -133,8 +124,8 @@ class JSDoris {
     }
     
     private func setupPlayer(from source: Source, at position: Double?) {
-        sourceMapper.map(source: source, view: doris?.viewController.view) { [weak self] avDorisSource in
-            guard let self = self else { return }
+        sourceMapper.map(source: source, view: doris?.viewController.view) { [weak self] dorisSource in
+            guard let self = self, let dorisSource = dorisSource else { return }
             
             var initialSeek: DorisSeekType?
             
@@ -147,17 +138,8 @@ class JSDoris {
             } else if let seekableRange = source.limitedSeekableRange, seekableRange.seekToStart == true, let startDate = Date(timeIntervalSince1970InMilliseconds: seekableRange.start) {
                 initialSeek = .date(startDate)
             }
-            
-            switch avDorisSource {
-            case .csai(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .ssai(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .regular(let source):
-                self.doris?.player.load(source: source, initialSeek: initialSeek)
-            case .unknown:
-                return
-            }
+                        
+            self.doris?.player.load(source: dorisSource, initialSeek: initialSeek)
         }
     }
     
