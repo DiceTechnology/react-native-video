@@ -81,6 +81,7 @@ import com.diceplatform.doris.entity.SourceBuilder;
 import com.diceplatform.doris.entity.TextTrack;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
+import com.diceplatform.doris.entity.skipMarkers;
 import com.diceplatform.doris.ext.imacsailive.ExoDorisImaCsaiLivePlayer;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
@@ -1743,6 +1744,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .build();
 
             exoDorisPlayerView.setLabels(labels);
+        }
+    }
+
+    public void setSkipMarkers(List<skipMarkers> skipMarkers) {
+        if(exoDorisPlayerView != null) {
+           exoDorisPlayerView.setSkipMarkers(skipMarkers);
         }
     }
 
