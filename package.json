@@ -1,7 +1,7 @@
 {
     "name": "react-native-video",
     "version": "7.3.0",
-    "dorisAndroidVersion": "3.7.0",
+    "dorisAndroidVersion": "1de48fd",
     "description": "A <Video /> element for react-native",
     "main": "Video.tsx",
     "license": "MIT",
