@@ -28,6 +28,7 @@ import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.entity.SkipMarker;
+import com.diceplatform.doris.entity.SkipMarker.Type;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -724,5 +725,17 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             }
         }
         return skipMarkers;
+    }
+
+    private static Type parseSkipMarkerType(String type) {
+        if (type == null || type.isEmpty()) return Type.INTRO;
+        switch (type.toLowerCase()) {
+            case "skip_intro":
+                return Type.INTRO;
+            case "skip_credits":
+                return Type.CREDITS;
+            default:
+                return null;
+        }
     }
 }

@@ -1749,7 +1749,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setSkipMarkers(List<SkipMarker> skipMarkers) {
         if(exoDorisPlayerView != null) {
-           exoDorisPlayerView.setSkipMarkerList(skipMarkers);
+           exoDorisPlayerView.setSkipMarkList(skipMarkers);
         }
     }
 
