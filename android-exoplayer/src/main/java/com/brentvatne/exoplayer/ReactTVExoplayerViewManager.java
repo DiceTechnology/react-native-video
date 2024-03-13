@@ -252,10 +252,12 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         if (src.hasKey(PROP_SRC_BIF_URL)) {
             videoView.setThumbnailsPreviewUrl(src.getString(PROP_SRC_BIF_URL));
         }
-        if(config !=null && config.hasKey(PROP_SKIP_MARKERS)) {
-            videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(config, PROP_SKIP_MARKERS)));
+        if(src !=null && src.hasKey(PROP_SKIP_MARKERS)) {
+            videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, PROP_SKIP_MARKERS)));
         }
-
+        if(src !=null && src.hasKey("skipMarkers2")) {
+            videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, "skipMarkers2")));
+        }
         String selectedSubtitleTrack = ReadableMapUtils.getString(src, PROP_SRC_SELECTED_SUBTITLE_TRACK);
         ReadableArray preferredAudioTracksArray = ReadableMapUtils.getArray(src, PROP_SRC_PREFERRED_AUDIO_TRACKS);
 
@@ -717,10 +719,10 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         List<SkipMarker> skipMarkers = new ArrayList<>();
         for (int i = 0; i < skipArray.size(); i++) {
             ReadableMap map = skipArray.getMap(i);
-            long startTime = ReadableMapUtils.getInt(map, "startTime") * 1000L;
-            long stopTime = ReadableMapUtils.getInt(map, "stopTime") * 1000L;
-            Type type = parseSkipMarkerType(ReadableMapUtils.getString(map, "type"));
-            if (type != null) {
+            long startTime = ReadableMapUtils.getInt(map, "startTimeMs");
+            long stopTime = ReadableMapUtils.getInt(map, "stopTimeMs");
+            Type type = parseSkipMarkerType(ReadableMapUtils.getString(map, "skipMarkerType"));
+            if (type != null && stopTime > startTime) {
                 skipMarkers.add(new SkipMarker(startTime, stopTime, type));
             }
         }
