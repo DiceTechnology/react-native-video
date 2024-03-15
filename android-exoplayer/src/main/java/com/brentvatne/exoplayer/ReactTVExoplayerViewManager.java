@@ -716,8 +716,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         List<SkipMarker> skipMarkers = new ArrayList<>();
         for (int i = 0; i < skipArray.size(); i++) {
             ReadableMap map = skipArray.getMap(i);
-            long startTime = map.hasKey('startTimeMs') ? ReadableMapUtils.getInt(map, "startTimeMs") : ReadableMapUtils.getInt(map, "startTime") * 1000;
-            long stopTime = map.hasKey('stopTimeMs') ? ReadableMapUtils.getInt(map, "stopTimeMs") : ReadableMapUtils.getInt(map, "stopTime" * 1000);
+            long startTime = map.hasKey('startTimeMs') ? ReadableMapUtils.getInt(map, "startTimeMs") : (ReadableMapUtils.getInt(map, "startTime") * 1000);
+            long stopTime = map.hasKey('stopTimeMs') ? ReadableMapUtils.getInt(map, "stopTimeMs") : (ReadableMapUtils.getInt(map, "stopTime") * 1000);
             Type type = parseSkipMarkerType(map.hasKey('skipMarkerType') ? ReadableMapUtils.getString(map, "skipMarkerType") : ReadableMapUtils.getString(map, "type"));
             if (type != null && stopTime > startTime) {
                 skipMarkers.add(new SkipMarker(startTime, stopTime, type));
