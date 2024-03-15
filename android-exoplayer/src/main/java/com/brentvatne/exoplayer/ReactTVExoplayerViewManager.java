@@ -255,9 +255,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         if(src !=null && src.hasKey(PROP_SKIP_MARKERS)) {
             videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, PROP_SKIP_MARKERS)));
         }
-        if(src !=null && src.hasKey("skipMarkers2")) {
-            videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, "skipMarkers2")));
-        }
         String selectedSubtitleTrack = ReadableMapUtils.getString(src, PROP_SRC_SELECTED_SUBTITLE_TRACK);
         ReadableArray preferredAudioTracksArray = ReadableMapUtils.getArray(src, PROP_SRC_PREFERRED_AUDIO_TRACKS);
 
@@ -719,9 +716,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         List<SkipMarker> skipMarkers = new ArrayList<>();
         for (int i = 0; i < skipArray.size(); i++) {
             ReadableMap map = skipArray.getMap(i);
-            long startTime = ReadableMapUtils.getInt(map, "startTimeMs");
-            long stopTime = ReadableMapUtils.getInt(map, "stopTimeMs");
-            Type type = parseSkipMarkerType(ReadableMapUtils.getString(map, "skipMarkerType"));
+            long startTime = map.hasKey('startTimeMs') ? ReadableMapUtils.getInt(map, "startTimeMs") : ReadableMapUtils.getInt(map, "startTime") * 1000;
+            long stopTime = map.hasKey('stopTimeMs') ? ReadableMapUtils.getInt(map, "stopTimeMs") : ReadableMapUtils.getInt(map, "stopTime" * 1000);
+            Type type = parseSkipMarkerType(map.hasKey('skipMarkerType') ? ReadableMapUtils.getString(map, "skipMarkerType") : ReadableMapUtils.getString(map, "type"));
             if (type != null && stopTime > startTime) {
                 skipMarkers.add(new SkipMarker(startTime, stopTime, type));
             }
@@ -730,7 +727,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     }
 
     private static Type parseSkipMarkerType(String type) {
-        if (type == null || type.isEmpty()) return Type.INTRO;
+        if (type == null || type.isEmpty()) return null;
         switch (type.toLowerCase()) {
             case "skip_intro":
                 return Type.INTRO;
