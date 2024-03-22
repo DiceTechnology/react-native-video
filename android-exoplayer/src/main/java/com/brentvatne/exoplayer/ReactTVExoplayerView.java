@@ -1741,7 +1741,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setPlayingLiveLabel(translations.getPlayingLiveLabel())
                     .setNowPlayingLabel(translations.getNowPlayingLabel())
                     .setAudioAndSubtitlesLabel(translations.getAudioAndSubtitlesLabel())
-                    .setSkipIntroLabel(translations.getSkipIntroLabel())\
+                    .setSkipIntroLabel(translations.getSkipIntroLabel())
                     .setSkipCreditsLabel(translations.getSkipCreditsLabel())
                     .build();
 
