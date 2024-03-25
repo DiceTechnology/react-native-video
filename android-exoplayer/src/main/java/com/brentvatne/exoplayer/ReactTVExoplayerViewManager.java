@@ -23,12 +23,12 @@ import com.brentvatne.react.BuildConfig;
 import com.brentvatne.react.R;
 import com.brentvatne.util.ReadableMapUtils;
 import com.dice.shield.drm.entity.ActionToken;
+import com.diceplatform.doris.custom.ui.entity.marker.SkipMarker;
+import com.diceplatform.doris.custom.ui.entity.marker.SkipMarker.Type;
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
-import com.diceplatform.doris.entity.SkipMarker;
-import com.diceplatform.doris.entity.SkipMarker.Type;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -718,7 +718,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             ReadableMap map = skipArray.getMap(i);
             long startTime = map.hasKey("startTimeMs") ? ReadableMapUtils.getInt(map, "startTimeMs") : (ReadableMapUtils.getInt(map, "startTime") * 1000);
             long stopTime = map.hasKey("stopTimeMs") ? ReadableMapUtils.getInt(map, "stopTimeMs") : (ReadableMapUtils.getInt(map, "stopTime") * 1000);
-            Type type = parseSkipMarkerType(map.hasKey("skipMarkerType") ? ReadableMapUtils.getString(map, "skipMarkerType") : ReadableMapUtils.getString(map, "type"));
+            SkipMarker.Type type = parseSkipMarkerType(map.hasKey("skipMarkerType") ? ReadableMapUtils.getString(map, "skipMarkerType") : ReadableMapUtils.getString(map, "type"));
             if (type != null && stopTime > startTime) {
                 skipMarkers.add(new SkipMarker(startTime, stopTime, type));
             }

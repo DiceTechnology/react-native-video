@@ -62,11 +62,13 @@ import com.brentvatne.entity.Watermark;
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
+import com.brentvatne.skipmarker.SkipMarkerTvCompat;
 import com.brentvatne.util.AdTagParametersHelper;
 import com.brentvatne.util.ImdbGenreMap;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
+import com.diceplatform.doris.custom.ui.entity.marker.SkipMarker;
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.AdTagParameters;
 import com.diceplatform.doris.entity.DorisAdEvent;
@@ -81,7 +83,6 @@ import com.diceplatform.doris.entity.SourceBuilder;
 import com.diceplatform.doris.entity.TextTrack;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
-import com.diceplatform.doris.entity.SkipMarker;
 import com.diceplatform.doris.ext.imacsailive.ExoDorisImaCsaiLivePlayer;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
@@ -113,6 +114,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -165,6 +167,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private final ReactTVExoDorisFactory exoDorisFactory;
     private ExoDorisTvPlayerView exoDorisPlayerView;
     private DceWatermarkWidget watermarkWidget;
+    private final SkipMarkerTvCompat skipMarkerTvCompat;
     private ExoDoris player;
     private DefaultTrackSelector trackSelector;
     private Source source;
@@ -325,6 +328,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         audioBecomingNoisyReceiver = new AudioBecomingNoisyReceiver(themedReactContext);
         isAmazonFireTv = isAmazonFireTv(context);
         exoDorisFactory = new ReactTVExoDorisFactory();
+        skipMarkerTvCompat = new SkipMarkerTvCompat(this);
 
         clearResumePosition();
         setPausedModifier(false);
@@ -333,6 +337,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
         localizationService = new LocalizationService(Locale.getDefault());
     }
+
 
     @Override
     public void setId(int id) {
@@ -501,7 +506,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             exoPlayer.setAudioAttributes(audioAttributes, false);
             exoPlayer.addListener(this);
             exoPlayer.addAnalyticsListener(this);
-            exoDorisPlayerView.setPlayer(player.createForwardPlayer());
+            Player realPlayer = player.createForwardPlayer();
+            exoDorisPlayerView.setPlayer(realPlayer);
+            skipMarkerTvCompat.setPlayer(realPlayer, exoDorisPlayerView.findViewById(R.id.exo_controller));
             audioBecomingNoisyReceiver.setListener(this);
             setPlayWhenReady(!isPaused);
             playerNeedsSource = true;
@@ -1741,18 +1748,18 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setPlayingLiveLabel(translations.getPlayingLiveLabel())
                     .setNowPlayingLabel(translations.getNowPlayingLabel())
                     .setAudioAndSubtitlesLabel(translations.getAudioAndSubtitlesLabel())
-                    .setSkipIntroLabel(translations.getSkipIntroLabel())
-                    .setSkipCreditsLabel(translations.getSkipCreditsLabel())
                     .build();
-
             exoDorisPlayerView.setLabels(labels);
+
+            Map<SkipMarker.Type,String> skipLabels = new HashMap<>();
+            skipLabels.put(SkipMarker.Type.INTRO, translations.getSkipIntroLabel());
+            skipLabels.put(SkipMarker.Type.CREDITS, translations.getSkipCreditsLabel());
+            skipMarkerTvCompat.setLabels(skipLabels);
         }
     }
 
     public void setSkipMarkers(List<SkipMarker> skipMarkers) {
-        if(exoDorisPlayerView != null) {
-           exoDorisPlayerView.setSkipMarkList(skipMarkers);
-        }
+        skipMarkerTvCompat.setSkipMarkList(skipMarkers);
     }
 
     private boolean isUnauthorizedAdError(Exception error) {
