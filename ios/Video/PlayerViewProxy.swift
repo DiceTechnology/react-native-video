@@ -69,7 +69,7 @@ class PlayerViewProxy {
             }
             return RNDReactNativeDiceVideo.JSAds.AdUnit(
                 insertionType: RNDReactNativeDiceVideo.JSAds.AdUnit.AdInsertionType(rawValue: adUnit.insertionType.rawValue)!,
-                adFormat: RNDReactNativeDiceVideo.JSAds.AdUnit.AdFormat(rawValue: adUnit.adFormat.rawValue)!,
+                adFormat: RNDReactNativeDiceVideo.JSAds.AdUnit.AdFormat(rawValue: adUnit.adFormat?.rawValue ?? ""),
                 adProvider: RNDReactNativeDiceVideo.JSAds.AdUnit.AdProvider(rawValue: adUnit.adProvider?.rawValue ?? ""),
                 adTagUrl: adUnit.adTagUrl,
                 adManifestParams: queryParams)
@@ -89,7 +89,7 @@ class PlayerViewProxy {
             dorisTranslationsViewModel.audioAndSubtitles = translationsValue.playerAudioAndSubtitlesButton
             dorisTranslationsViewModel.live = translationsValue.goLive
             dorisTranslationsViewModel.favourites = translationsValue.favourite
-            dorisTranslationsViewModel.addToWatchlist = translationsValue.watchlist
+            dorisTranslationsViewModel.addToWatchlist = translationsValue.addToWatchlist
             dorisTranslationsViewModel.moreVideos = translationsValue.moreVideos
             dorisTranslationsViewModel.rewind = translationsValue.rewind
             dorisTranslationsViewModel.fastForward = translationsValue.fastForward
