@@ -143,6 +143,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_RELATED_VIDEOS_HAS_MORE = "hasMore";
     private static final String PROP_RELATED_VIDEOS_SUBTITLE = "subtitle";
     private static final String PROP_IS_FAVOURITE = "isFavourite";
+    private static final String PROP_OVERLAY_COMPONENT = "overlayConfig";
 
     private static final int COMMAND_SEEK_TO_NOW = 1;
     private static final int COMMAND_SEEK_TO_TIMESTAMP = 2;
@@ -289,8 +290,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             Pair<ImaCsaiProperties, YoSsaiProperties> adProperties = ReactTVPropsParser.parseAdUnitsV2(videoView.isLive(), src);
             TracksPolicy tracksPolicy = ReactTVPropsParser.parseTracksPolicy(ReadableMapUtils.getMap(src, "tracksPolicy"));
 
-            Log.i(WebUtil.DEBUG, String.format("setSrc - id %s, title %s, mimeType %s, isYoSsai %b, isImaDai %b, adTag %s, midRoll %s, license %s, url %s",
-                    id,
+            Log.i(WebUtil.DEBUG, String.format("setSrc - title %s, mimeType %s, isYoSsai %b, isImaDai %b, adTag %s, midRoll %s, license %s, url %s",
                     channelName == null && muxData != null && muxData.hasKey("videoTitle") ? muxData.getString("videoTitle") : channelName,
                     mimeType,
                     adProperties.second != null,
@@ -581,6 +581,12 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     @ReactProp(name = PROP_IS_FAVOURITE)
     public void setIsFavourite(final ReactTVExoplayerView videoView, final boolean isFavourite) {
         videoView.setIsFavourite(isFavourite);
+    }
+
+    @ReactProp(name = PROP_OVERLAY_COMPONENT)
+    public void setOverlayComponent(final ReactTVExoplayerView videoView, @Nullable ReadableMap config) {
+        //TODO: test code
+        videoView.setOverlayComponent("CustomVideoOverlay");
     }
 
     private boolean startsWithValidScheme(String uriString) {

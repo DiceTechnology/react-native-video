@@ -1,5 +1,7 @@
 package com.brentvatne.exoplayer;
 
+import static com.diceplatform.doris.entity.DorisPlayerEvent.Event.TIMELINE_ADJUSTER_CHANGED;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
@@ -11,14 +13,18 @@ import android.os.PowerManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.view.Choreographer;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.media3.common.AdViewProvider;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
@@ -44,6 +50,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.Parameters;
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector;
 import androidx.media3.session.ext.MediaSessionConnector;
+import androidx.media3.ui.PlayerControlView;
 
 import com.amazon.device.ads.aftv.AdBreakPattern;
 import com.amazon.device.ads.aftv.AmazonFireTVAdCallback;
@@ -89,6 +96,9 @@ import com.diceplatform.doris.ui.entity.LabelsBuilder;
 import com.diceplatform.doris.ui.entity.VideoTile;
 import com.diceplatform.doris.util.DorisExceptionUtil;
 import com.diceplatform.doris.util.LocalizationService;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableArray;
@@ -161,6 +171,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private final ReactTVExoDorisFactory exoDorisFactory;
     private ExoDorisTvPlayerView exoDorisPlayerView;
+    private ReactRootView overlayComponentView;
     private DceWatermarkWidget watermarkWidget;
     private ExoDoris player;
     private DefaultTrackSelector trackSelector;
@@ -924,8 +935,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Override
     public void onDrmSessionManagerError(EventTime eventTime, Exception e) {
-        // Not need redundant error handle, we use dorisListener to handle all ERROR events of internal doris player.
-        // handleDrmSessionManagerError(e);
+        handleDrmSessionManagerError(e);
     }
 
     @Override
@@ -1136,22 +1146,19 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        // Not need redundant error handle, we use dorisListener to handle all ERROR events of internal doris player.
-        playerNeedsSource = true;
-        if (!DorisExceptionUtil.isBehindLiveWindow(error)) {
-            updateResumePosition();
-        }
-    }
-
-    private void handlePlaybackError(PlaybackException error) {
         String errorString = null;
         Exception ex = error;
         @ExoPlaybackException.Type int errorType = DorisExceptionUtil.getErrorType(error);
         if (DorisExceptionUtil.isBehindLiveWindow(error)) {
-          // We handle behind-live-window error in internal doris player.
+            ExoPlayer exoPlayer = (player == null ? null : player.getExoPlayer());
+            if (exoPlayer != null) {
+                clearResumePosition();
+                exoPlayer.seekToDefaultPosition();
+                exoPlayer.prepare();
+            }
         } else if (!hasReloadedCurrentSource && DorisExceptionUtil.isUnauthorizedException(error)) {
             hasReloadedCurrentSource = true;
-            reloadCurrentSource();
+            eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
             resetSourceUrl();
         } else if (errorType == ExoPlaybackException.TYPE_RENDERER) {
             Exception cause = (Exception) error.getCause();
@@ -1183,15 +1190,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             resetSourceUrl();
             eventEmitter.error("Playback exception: " + errorString, ex);
         }
-    }
-
-    private void reloadCurrentSource() {
-        if (src != null && metadata != null) {
-            Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + metadata.getType());
-            eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
-            return;
+        playerNeedsSource = true;
+        if (!DorisExceptionUtil.isBehindLiveWindow(error)) {
+            updateResumePosition();
         }
-        Log.i(TAG, "Reload current source, ignored for src or metadata is null");
     }
 
     private void resetSourceUrl() {
@@ -1365,10 +1367,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     private void selectTrack(int trackType, @Nullable List<String> preferredLanguages) {
-        // If we have tracks policy then do not select any initial subtitle.
-        if (trackType == C.TRACK_TYPE_TEXT && src.getTracksPolicy() != null) {
-            return;
-        }
         int rendererIndex = getTrackRendererIndex(trackType);
         if (rendererIndex == C.INDEX_UNSET) {
             return;
@@ -1612,6 +1610,47 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
+    public void setOverlayComponent(String component) {
+        if (overlayComponentView != null && overlayComponentView.getParent() != null) {
+            ((ViewGroup) overlayComponentView.getParent()).removeView(overlayComponentView);
+        }
+        overlayComponentView = new ReactRootView(getContext());
+        ReactInstanceManager reactInstanceManager = ((ReactApplication) getContext().getApplicationContext()).getReactNativeHost().getReactInstanceManager();
+        overlayComponentView.startReactApplication(reactInstanceManager, component, null);
+        FrameLayout.LayoutParams overlayLp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        overlayLp.gravity = Gravity.BOTTOM;
+        overlayComponentView.setLayoutParams(overlayLp);
+        ViewGroup parentView = (ViewGroup) exoDorisPlayerView.findViewById(R.id.bottomOverlayComponent);
+        parentView.setVisibility(View.VISIBLE);
+        parentView.addView(overlayComponentView);
+        PlayerControlView controlView = exoDorisPlayerView.findViewById(R.id.exo_controller);
+        controlView.addVisibilityListener(new PlayerControlView.VisibilityListener() {
+            @Override
+            public void onVisibilityChange(int v) {
+                if (v != View.VISIBLE) {
+                    View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
+                    ConstraintLayout.LayoutParams anchorViewLp = (ConstraintLayout.LayoutParams) anchorView.getLayoutParams();
+                    anchorViewLp.guideEnd = (int) (128 * getResources().getDisplayMetrics().density);
+                    anchorView.setLayoutParams(anchorViewLp);
+                }
+            }
+        });
+
+        getViewTreeObserver().addOnGlobalFocusChangeListener(new ViewTreeObserver.OnGlobalFocusChangeListener() {
+            @Override
+            public void onGlobalFocusChanged(View oldFocus, View newFocus) {
+                if (newFocus != null) {
+                    try {
+                        Log.i("onGlobalFocusChanged", newFocus.getClass().getSimpleName() + ": " + getResources().getResourceEntryName(newFocus.getId()));
+                    } catch (Exception e) {
+                    }
+                } else {
+                    Log.i("onGlobalFocusChanged", "null");
+                }
+            }
+        });
+    }
+
     public void setControlsOpacity(final float opacity) {
     }
 
@@ -1680,7 +1719,25 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 event.getKeyCode() != KeyEvent.KEYCODE_BACK) {
             return true;
         }
-        return (exoDorisPlayerView != null && exoDorisPlayerView.dispatchKeyEvent(event)) || super.dispatchKeyEvent(event);
+        boolean handled = exoDorisPlayerView != null && exoDorisPlayerView.dispatchKeyEvent(event);
+
+        if (handled) {
+            return true;
+        }
+
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
+            //getFocusedChild() != null && (getFocusedChild().getId() == R.id.exo_pause || getFocusedChild().getId() == R.id.exo_play)
+            if (hasFocus()) {
+                View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
+                ConstraintLayout.LayoutParams anchorViewLp = (ConstraintLayout.LayoutParams) anchorView.getLayoutParams();
+                anchorViewLp.guideEnd = 400;
+                anchorView.setLayoutParams(anchorViewLp);
+                overlayComponentView.getChildAt(0).requestFocus();
+                return true;
+            }
+        }
+
+        return super.dispatchKeyEvent(event);
     }
 
     public void showWatermark() {
@@ -1851,27 +1908,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     }
                     break;
             }
-
-            switch (playerEvent.event) {
-                case TIMELINE_ADJUSTER_CHANGED:
-                    if (exoDorisPlayerView != null) {
-                        exoDorisPlayerView.setExtraTimelineAdjuster(playerEvent.details.timelineAdjuster);
-                    }
-                    break;
-                case RELOAD_WITH_DRM_L3:
-                    reloadCurrentSource();
-                    break;
-                case ERROR:
-                    Exception error = playerEvent.details.error;
-                    if (error instanceof PlaybackException) {
-                        handlePlaybackError((PlaybackException) error);
-                    } else if (error != null) {
-                        resetSourceUrl();
-                        eventEmitter.error("Player exception", error);
-                    }
-                    break;
-                default:
-                    break;
+            if (playerEvent.event == TIMELINE_ADJUSTER_CHANGED && exoDorisPlayerView != null) {
+                exoDorisPlayerView.setExtraTimelineAdjuster(playerEvent.details.timelineAdjuster);
             }
         }
 
@@ -1933,7 +1971,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         if (!hasReloadedCurrentSource && isUnauthorizedAdError(error)) {
                             hasReloadedCurrentSource = true;
                             ignoreAdError = true;
-                            reloadCurrentSource();
+                            eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
                         }
                     }
                     if (!ignoreAdError) {
