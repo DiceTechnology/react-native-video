@@ -484,8 +484,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     getContext(),
                     adType,
                     MAX_LOAD_BUFFER_MS,
-                    this.seekForwardMs ?? exoDorisPlayerView.getFastForwardIncrementMs(),
-                    this.seekBackwardMs ?? exoDorisPlayerView.getRewindIncrementMs(),
+                    (this.seekForwardMs != null) ? this.seekForwardMs : exoDorisPlayerView.getFastForwardIncrementMs(),
+                    (this.seekBackwardMs != null) ? this.seekBackwardMs : exoDorisPlayerView.getRewindIncrementMs(),
                     adViewProvider,
                     src.getTracksPolicy());
 
