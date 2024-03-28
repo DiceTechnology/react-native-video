@@ -484,8 +484,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     getContext(),
                     adType,
                     MAX_LOAD_BUFFER_MS,
-                    (this.seekForwardMs != null) ? this.seekForwardMs : exoDorisPlayerView.getFastForwardIncrementMs(),
-                    (this.seekBackwardMs != null) ? this.seekBackwardMs : exoDorisPlayerView.getRewindIncrementMs(),
+                    (this.dvrSeekForwardInterval != null) ? this.dvrSeekForwardInterval : exoDorisPlayerView.getFastForwardIncrementMs(),
+                    (this.dvrSeekBackwardInterval != null) ? this.dvrSeekBackwardInterval : exoDorisPlayerView.getRewindIncrementMs(),
                     adViewProvider,
                     src.getTracksPolicy());
 
@@ -1529,19 +1529,19 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     public void setDVRSeekForward(long seekForwardMs) {
-        this.seekForwardMs = seekForwardMs;
+        this.dvrSeekForwardInterval = seekForwardMs;
     }
 
     public void setDVRSeekBackward(long seekBackwardMs) {
-        this.seekBackwardMs = seekBackwardMs;
+        this.dvrSeekBackwardInterval = seekBackwardMs;
     }
 
     public float getDVRSeekForward() {
-        return this.seekBackwardMs;
+        return this.dvrSeekForwardInterval;
     }
 
     public float getDVRSeekBackward() {
-        return this.seekBackwardMs;
+        return this.dvrSeekBackwardInterval;
     }
 
     public void setDisableFocus(boolean disableFocus) {
