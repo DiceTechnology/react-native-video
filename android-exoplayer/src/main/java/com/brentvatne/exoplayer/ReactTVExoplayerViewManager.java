@@ -363,18 +363,18 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     }
 
     @ReactProp(name = PROP_DVR_SEEK_FORWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekForward(final ReactVideoView videoView, final float dvrSeekForwardInterval) {
+    public void setDVRSeekForward(final ReactTVExoplayerView videoView, final float dvrSeekForwardInterval) {
         long forwardInterval = (long) dvrSeekForwardInterval;
         videoView.setDVRSeekForward(forwardInterval);
     }
     
     @ReactProp(name = PROP_DVR_SEEK_BACKWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekBackward(final ReactVideoView videoView, final float dvrSeekBackwardInterval) {
+    public void setDVRSeekBackward(final ReactTVExoplayerView videoView, final float dvrSeekBackwardInterval) {
         long backwardInterval = (long) dvrSeekBackwardInterval;
         videoView.setDVRSeekBackward(backwardInterval);
     }
     
-    
+
     @ReactProp(name = PROP_SRC_NOW_PLAYING)
     public void setNowPlaying(final ReactTVExoplayerView videoView, @Nullable ReadableMap nowPlayingMap) {
         if (nowPlayingMap == null) {
