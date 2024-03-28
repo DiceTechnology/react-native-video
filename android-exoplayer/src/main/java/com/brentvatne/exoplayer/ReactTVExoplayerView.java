@@ -301,8 +301,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private boolean playInBackground = false;
 
-    private float dvrSeekForwardInterval;
-    private float dvrSeekBackwardInterval;
+    private long dvrSeekForwardInterval;
+    private long dvrSeekBackwardInterval;
 
     //Drm
     private ActionToken actionToken;
@@ -1536,11 +1536,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         this.dvrSeekBackwardInterval = seekBackwardMs;
     }
 
-    public float getDVRSeekForward() {
+    public long getDVRSeekForward() {
         return this.dvrSeekForwardInterval;
     }
 
-    public float getDVRSeekBackward() {
+    public long getDVRSeekBackward() {
         return this.dvrSeekBackwardInterval;
     }
 

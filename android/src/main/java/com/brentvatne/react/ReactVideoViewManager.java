@@ -162,12 +162,12 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
     }
 
     @ReactProp(name = PROP_DVR_SEEK_FORWARD_INTERVAL)
-    public void setDVRSeekForward(final ReactVideoView videoView, final float dvrSeekForwardInterval) {
+    public void setDVRSeekForward(final ReactVideoView videoView, final long dvrSeekForwardInterval) {
         videoView.setDVRSeekForward(playInBackground);
     }
 
     @ReactProp(name = PROP_DVR_SEEK_BACKWARD_INTERVAL)
-    public void setDVRSeekBackward(final ReactVideoView videoView, final float dvrSeekBackwardInterval) {
+    public void setDVRSeekBackward(final ReactVideoView videoView, final long dvrSeekBackwardInterval) {
         videoView.setDVRSeekBackward(playInBackground);
     }
     
