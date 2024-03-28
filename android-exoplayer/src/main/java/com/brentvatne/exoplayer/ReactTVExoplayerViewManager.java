@@ -76,6 +76,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_BIF_URL = "thumbnailsPreview";
     private static final String PROP_SRC_SELECTED_SUBTITLE_TRACK = "selectedSubtitleTrack";
     private static final String PROP_SRC_PREFERRED_AUDIO_TRACKS = "preferredAudioTracks";
+    private static final String PROP_DVR_SEEK_BACKWARD_INTERVAL = "dvrSeekBackwardInterval";
+    private static final String PROP_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -360,6 +362,19 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         }
     }
 
+    @ReactProp(name = PROP_DVR_SEEK_FORWARD_INTERVAL, defaultFloat = 30_000.0f)
+    public void setDVRSeekForward(final ReactVideoView videoView, final float dvrSeekForwardInterval) {
+        long forwardInterval = (long) dvrSeekForwardInterval;
+        videoView.setDVRSeekForward(forwardInterval);
+    }
+    
+    @ReactProp(name = PROP_DVR_SEEK_BACKWARD_INTERVAL, defaultFloat = 30_000.0f)
+    public void setDVRSeekBackward(final ReactVideoView videoView, final float dvrSeekBackwardInterval) {
+        long backwardInterval = (long) dvrSeekBackwardInterval;
+        videoView.setDVRSeekBackward(backwardInterval);
+    }
+    
+    
     @ReactProp(name = PROP_SRC_NOW_PLAYING)
     public void setNowPlaying(final ReactTVExoplayerView videoView, @Nullable ReadableMap nowPlayingMap) {
         if (nowPlayingMap == null) {
