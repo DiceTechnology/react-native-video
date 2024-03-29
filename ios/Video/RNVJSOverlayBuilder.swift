@@ -16,12 +16,27 @@ class RNVJSOverlayBuilder: OverlayBuilderProtocol {
         self.bridge = bridge
     }
     
+    func buildOverlay(from config: RNDReactNativeDiceVideo.JSComponent?) -> (view: UIView?, button: String?, height: Double?, width: Double?)? {
+        guard let config = config else { return nil }
+
+        let componentView = RCTRootView(bridge: bridge,
+                                        moduleName: config.name,
+                                        initialProperties: config.initialProps)
+        
+        componentView.backgroundColor = .clear
+
+        return (view: componentView,
+                button: config.buttonIconUrl,
+                height: config.height,
+                width: config.width)
+    }
+    
     func buildOverlay(from config: JSOverlayConfig?, tvxManager: TvxManagerProtocol?) -> (type: OverlayType,
                                                                                           button: String?,
                                                                                           setupAction: (() -> Void)?,
                                                                                           cleanupAction: (() -> Void)?) {
         guard let config = config else { return (.none, nil, nil, nil) }
-        
+
         switch config.type {
         case .expanded:
             guard
