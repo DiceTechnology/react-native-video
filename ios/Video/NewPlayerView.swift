@@ -119,6 +119,8 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var volume: NSNumber?
     @objc var rate: NSNumber?
     @objc var currentTime: NSNumber?
+    @objc var dvrSeekBackwardInterval: NSNumber?
+    @objc var dvrSeekForwardInterval: NSNumber?
     @objc var progressUpdateInterval: NSNumber?
 
     @objc var isFullScreen: Bool = false
