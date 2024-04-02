@@ -32,6 +32,8 @@ struct Source: SuperCodable {
     let preferredAudioTracks: [String]?
     var tracksPolicy: JSTracksPolicy?
     var skipMarkers: [RNSkipMarker]?
+    let dvrSeekForwardInterval: Int?
+    let dvrSeekBackwardInterval: Int?
 }
 
 
