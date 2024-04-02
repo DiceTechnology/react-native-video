@@ -76,8 +76,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_BIF_URL = "thumbnailsPreview";
     private static final String PROP_SRC_SELECTED_SUBTITLE_TRACK = "selectedSubtitleTrack";
     private static final String PROP_SRC_PREFERRED_AUDIO_TRACKS = "preferredAudioTracks";
-    private static final String PROP_DVR_SEEK_BACKWARD_INTERVAL = "dvrSeekBackwardInterval";
-    private static final String PROP_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
+    private static final String PROP_SRC_DVR_SEEK_BACKWARD_INTERVAL = "dvrSeekBackwardInterval";
+    private static final String PROP_SRC_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -233,6 +233,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         String duration = src.hasKey(PROP_SRC_DURATION) ? src.getString(PROP_SRC_DURATION) : null;
         String channelName = src.hasKey(PROP_SRC_CHANNEL_NAME) ? src.getString(PROP_SRC_CHANNEL_NAME) : null;
 
+        long forwardInterval = src.hasKey(PROP_SRC_DVR_SEEK_FORWARD_INTERVAL) ? (long) src.getInt(PROP_SRC_DVR_SEEK_FORWARD_INTERVAL) : 0L;
+        long backwardInterval = src.hasKey(PROP_SRC_DVR_SEEK_BACKWARD_INTERVAL) ? (long) src.getInt(PROP_SRC_DVR_SEEK_BACKWARD_INTERVAL) : 0L;
+
         ReadableMap config = src.hasKey(PROP_SRC_CONFIG) ? src.getMap(PROP_SRC_CONFIG) : null;
         ReadableMap muxData = (config != null && config.hasKey(PROP_SRC_MUX_DATA)) ? config.getMap(PROP_SRC_MUX_DATA) : null;
         ReadableMap metadata = src.hasKey(PROP_SRC_METADATA) ? src.getMap(PROP_SRC_METADATA) : null;
@@ -327,7 +330,9 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     shouldSaveSubtitleSelection,
                     selectedSubtitleTrack,
                     preferredAudioTracks,
-                    tracksPolicy);
+                    tracksPolicy,
+                    forwardInterval,
+                    backwardInterval);
         } else {
             int identifier = context.getResources().getIdentifier(
                     uriString,
@@ -361,19 +366,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             videoView.setMetadata(new RNMetadata(description, thumbnailUrl, episodeTitle, type));
         }
     }
-
-    @ReactProp(name = PROP_DVR_SEEK_FORWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekForward(final ReactTVExoplayerView videoView, final float dvrSeekForwardInterval) {
-        long forwardInterval = (long) dvrSeekForwardInterval;
-        videoView.setDVRSeekForward(forwardInterval);
-    }
-    
-    @ReactProp(name = PROP_DVR_SEEK_BACKWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekBackward(final ReactTVExoplayerView videoView, final float dvrSeekBackwardInterval) {
-        long backwardInterval = (long) dvrSeekBackwardInterval;
-        videoView.setDVRSeekBackward(backwardInterval);
-    }
-    
 
     @ReactProp(name = PROP_SRC_NOW_PLAYING)
     public void setNowPlaying(final ReactTVExoplayerView videoView, @Nullable ReadableMap nowPlayingMap) {

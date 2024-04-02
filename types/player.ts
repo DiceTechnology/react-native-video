@@ -42,6 +42,4 @@ export interface IVideoPlayer extends IVideoPlayerCallbacks, ViewProps {
   stateMiddleCoreControls?: string;
   selectedAudioTrack?: any // TODO
   width?: number;
-  dvrSeekForwardInterval?: number;
-  dvrSeekBackwardInterval?: number;
 }

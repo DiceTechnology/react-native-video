@@ -37,8 +37,6 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
     public static final String PROP_RATE = "rate";
     public static final String PROP_FULLSCREEN = "fullscreen";
     public static final String PROP_PLAY_IN_BACKGROUND = "playInBackground";
-    public static final String PROP_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
-    public static final String PROP_DVR_SEEK_BACKWARD_INTERVAL = "dvrSeekBackwardInterval";
     public static final String PROP_CONTROLS = "controls";
 
     @Override
@@ -85,7 +83,7 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
         if(mainVer<0) { mainVer = 0; }
         if(patchVer<0) { patchVer = 0; }
         if(mainVer>0) {
-            videoView.setSrc(
+            videoView.(
                     src.getString(PROP_SRC_URI),
                     src.getString(PROP_SRC_TYPE),
                     src.getBoolean(PROP_SRC_IS_NETWORK),
@@ -159,18 +157,6 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
     @ReactProp(name = PROP_PLAY_IN_BACKGROUND, defaultBoolean = false)
     public void setPlayInBackground(final ReactVideoView videoView, final boolean playInBackground) {
         videoView.setPlayInBackground(playInBackground);
-    }
-
-    @ReactProp(name = PROP_DVR_SEEK_FORWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekForward(final ReactVideoView videoView, final float dvrSeekForwardInterval) {
-        long forwardInterval = (long) dvrSeekForwardInterval;
-        videoView.setDVRSeekForward(forwardInterval);
-    }
-    
-    @ReactProp(name = PROP_DVR_SEEK_BACKWARD_INTERVAL, defaultFloat = 30_000.0f)
-    public void setDVRSeekBackward(final ReactVideoView videoView, final float dvrSeekBackwardInterval) {
-        long backwardInterval = (long) dvrSeekBackwardInterval;
-        videoView.setDVRSeekBackward(backwardInterval);
     }
     
     @ReactProp(name = PROP_CONTROLS, defaultBoolean = false)

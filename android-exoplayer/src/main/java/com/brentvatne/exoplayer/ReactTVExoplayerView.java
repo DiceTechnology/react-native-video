@@ -484,8 +484,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     getContext(),
                     adType,
                     MAX_LOAD_BUFFER_MS,
-                    (this.dvrSeekForwardInterval != 0L) ? this.dvrSeekForwardInterval : exoDorisPlayerView.getFastForwardIncrementMs(),
-                    (this.dvrSeekBackwardInterval != 0L) ? this.dvrSeekBackwardInterval : exoDorisPlayerView.getRewindIncrementMs(),
+                    (src.getDvrSeekForwardInterval() != 0L) ? src.getDvrSeekForwardInterval() : exoDorisPlayerView.getFastForwardIncrementMs(),
+                    (src.getDvrSeekBackwardInterval() != 0L) ? src.getDvrSeekBackwardInterval() : exoDorisPlayerView.getRewindIncrementMs(),
                     adViewProvider,
                     src.getTracksPolicy());
 
@@ -1249,7 +1249,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean shouldSaveSubtitleSelection,
             String selectedSubtitleTrack,
             List<String> preferredAudioTracks,
-            TracksPolicy tracksPolicy) {
+            TracksPolicy tracksPolicy,
+            long dvrSeekForwardInterval,
+            long dvrSeekBackwardInterval) {
 
         if (url != null) {
             String srcUrl = src != null ? src.getUrl() : null;
@@ -1292,7 +1294,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     imaCsai,
                     yoSsai,
                     limitedSeekRange,
-                    tracksPolicy);
+                    tracksPolicy,
+                    dvrSeekForwardInterval,
+                    dvrSeekBackwardInterval);
             this.actionToken = actionToken;
             if (watermarkWidget != null) {
                 watermarkWidget.setWatermark(watermark);
@@ -1526,22 +1530,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setPlayInBackground(boolean playInBackground) {
         this.playInBackground = playInBackground;
-    }
-
-    public void setDVRSeekForward(long seekForwardMs) {
-        this.dvrSeekForwardInterval = seekForwardMs;
-    }
-
-    public void setDVRSeekBackward(long seekBackwardMs) {
-        this.dvrSeekBackwardInterval = seekBackwardMs;
-    }
-
-    public long getDVRSeekForward() {
-        return this.dvrSeekForwardInterval;
-    }
-
-    public long getDVRSeekBackward() {
-        return this.dvrSeekBackwardInterval;
     }
 
     public void setDisableFocus(boolean disableFocus) {

@@ -79,4 +79,6 @@ export interface IVideoPlayerSource {
   preferredAudioTracks?: string[];
   tracksPolicy?: ITracksPolicy;
   skipMarkers?: IVideoPlayerSkipMarker[];
+  dvrSeekForwardInterval?: number;
+  dvrSeekBackwardInterval?: number;
 }
