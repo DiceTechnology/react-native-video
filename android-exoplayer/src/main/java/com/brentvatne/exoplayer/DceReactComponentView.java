@@ -1,4 +1,4 @@
-package com.imggaming.widgets;
+package com.brentvatne.exoplayer;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -14,6 +14,7 @@ import com.facebook.react.ReactRootView;
 import com.facebook.react.views.view.ReactViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DceReactComponentView extends LinearLayout {
@@ -24,6 +25,7 @@ public class DceReactComponentView extends LinearLayout {
     }
 
     private final List<View> focusableChildList = new ArrayList<>();
+    private final List<View> nextFocusUpViewList = new ArrayList<>();
     private Callback callback;
     private boolean hasFocused = false;
     private final ViewTreeObserver.OnGlobalFocusChangeListener onGlobalFocusChangeListener = (oldFocus, newFocus) -> {
@@ -47,6 +49,11 @@ public class DceReactComponentView extends LinearLayout {
 
     public void setCallbackListener(Callback callback) {
         this.callback = callback;
+    }
+
+    public void setNextFocusUpViews(View... views) {
+        nextFocusUpViewList.clear();
+        nextFocusUpViewList.addAll(Arrays.asList(views));
     }
 
     public void addComponent(String component) {
@@ -102,6 +109,12 @@ public class DceReactComponentView extends LinearLayout {
                     return focused;
                 } else if (direction == View.FOCUS_LEFT && index == 0) {
                     return focused;
+                } else if (direction == View.FOCUS_UP) {
+                    for (View nextView : nextFocusUpViewList) {
+                        if (nextView.getVisibility() == View.VISIBLE) {
+                            return nextView;
+                        }
+                    }
                 }
             } else if (getOrientation() == LinearLayout.VERTICAL) {
                 if (direction == View.FOCUS_UP && index == 0) {

@@ -252,7 +252,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         if (src.hasKey(PROP_SRC_BIF_URL)) {
             videoView.setThumbnailsPreviewUrl(src.getString(PROP_SRC_BIF_URL));
         }
-        if(src !=null && src.hasKey(PROP_SKIP_MARKERS)) {
+        if (src.hasKey(PROP_SKIP_MARKERS)) {
             videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, PROP_SKIP_MARKERS)));
         }
         if (src.hasKey(PROP_SRC_PLUGINS)) {
@@ -417,7 +417,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     @ReactProp(name = PROP_SELECTED_AUDIO_TRACK)
     public void setSelectedAudioTrack(final ReactTVExoplayerView videoView,
                                       @Nullable ReadableMap selectedAudioTrack) {
-       // Deprecated, not used.
+        // Deprecated, not used.
     }
 
     @ReactProp(name = PROP_SELECTED_TEXT_TRACK)

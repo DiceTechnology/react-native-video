@@ -103,7 +103,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.imggaming.tracks.TrackPreferenceStorage;
-import com.imggaming.widgets.DceReactComponentView;
 import com.imggaming.widgets.DceWatermarkWidget;
 
 import java.net.CookieHandler;
@@ -1158,7 +1157,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         Exception ex = error;
         @ExoPlaybackException.Type int errorType = DorisExceptionUtil.getErrorType(error);
         if (DorisExceptionUtil.isBehindLiveWindow(error)) {
-          // We handle behind-live-window error in internal doris player.
+            // We handle behind-live-window error in internal doris player.
         } else if (!hasReloadedCurrentSource && DorisExceptionUtil.isUnauthorizedException(error)) {
             hasReloadedCurrentSource = true;
             reloadCurrentSource();
@@ -1658,6 +1657,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             }
         });
         bottomReactComponentView.addComponent(component);
+        bottomReactComponentView.setNextFocusUpViews(findViewById(R.id.exo_play), findViewById(R.id.exo_pause));
         ((ConstraintLayout) findViewById(R.id.controlsContainer)).addView(bottomReactComponentView);
 
         findViewById(R.id.exo_pause).setNextFocusDownId(R.id.bottomOverlayComponent);
@@ -1817,7 +1817,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .build();
             exoDorisPlayerView.setLabels(labels);
 
-            Map<SkipMarker.Type,String> skipLabels = new HashMap<>();
+            Map<SkipMarker.Type, String> skipLabels = new HashMap<>();
             skipLabels.put(SkipMarker.Type.INTRO, translations.getSkipIntroLabel());
             skipLabels.put(SkipMarker.Type.CREDITS, translations.getSkipCreditsLabel());
             skipMarkerTvCompat.setLabels(skipLabels);
