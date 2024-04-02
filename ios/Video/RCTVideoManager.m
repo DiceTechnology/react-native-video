@@ -30,8 +30,6 @@ RCT_EXPORT_VIEW_PROPERTY(relatedVideos, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(metadata, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(overlayConfig, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(nowPlaying, NSDictionary);
-RCT_EXPORT_VIEW_PROPERTY(dvrSeekBackwardInterval, float);
-RCT_EXPORT_VIEW_PROPERTY(dvrSeekForwardInterval, float);
 
 /* Should support: onLoadStart, onLoad, and onError to stay consistent with Image */
 RCT_EXPORT_VIEW_PROPERTY(onVideoLoadStart, RCTBubblingEventBlock);
