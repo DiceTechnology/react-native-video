@@ -1620,6 +1620,59 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
+    private int initGuideEnd = 0;
+
+    public void setBottomOverlayComponent(String component, int width, int height) {
+        if (component == null || component.isEmpty()) return;
+        View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
+        initGuideEnd = ((ConstraintLayout.LayoutParams) anchorView.getLayoutParams()).guideEnd;
+
+        DceReactComponentView bottomReactComponentView = new DceReactComponentView(getContext());
+        bottomReactComponentView.setId(R.id.bottomOverlayComponent);
+        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
+                width > 0 ? width : LayoutParams.WRAP_CONTENT,
+                height > 0 ? height : LayoutParams.WRAP_CONTENT);
+        layoutParams.endToEnd = 0; // parent
+        layoutParams.startToStart = 0; // parent
+        layoutParams.topToBottom = R.id.seekbar_guideline;
+        layoutParams.topMargin = (int) (114 * getResources().getDisplayMetrics().density);
+        bottomReactComponentView.setLayoutParams(layoutParams);
+        bottomReactComponentView.setFocusable(true);
+        bottomReactComponentView.setFocusableInTouchMode(true);
+        bottomReactComponentView.setCallbackListener(new DceReactComponentView.Callback() {
+            private boolean hasFocus = false;
+            private int height;
+
+            @Override
+            public void onSizeChanged(int width, int height) {
+                this.height = height;
+                resetOverlayComponentLayout(hasFocus ? height : height / 3);
+            }
+
+            @Override
+            public void onFocusChanged(boolean gainFocus) {
+                this.hasFocus = gainFocus;
+                resetOverlayComponentLayout(hasFocus ? height : height / 3);
+            }
+        });
+        bottomReactComponentView.addComponent(component);
+        ((ConstraintLayout) findViewById(R.id.controlsContainer)).addView(bottomReactComponentView);
+
+        findViewById(R.id.exo_pause).setNextFocusDownId(R.id.bottomOverlayComponent);
+        findViewById(R.id.exo_play).setNextFocusDownId(R.id.bottomOverlayComponent);
+        findViewById(R.id.exo_ffwd).setNextFocusDownId(R.id.bottomOverlayComponent);
+        findViewById(R.id.exo_rew).setNextFocusDownId(R.id.bottomOverlayComponent);
+    }
+
+    private void resetOverlayComponentLayout(int guideEndOffset) {
+        View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
+        if (anchorView != null) {
+            ConstraintLayout.LayoutParams anchorViewLp = (ConstraintLayout.LayoutParams) anchorView.getLayoutParams();
+            anchorViewLp.guideEnd = initGuideEnd + guideEndOffset;
+            anchorView.setLayoutParams(anchorViewLp);
+        }
+    }
+
     public void setControlsOpacity(final float opacity) {
     }
 
