@@ -78,7 +78,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_BIF_URL = "thumbnailsPreview";
     private static final String PROP_SRC_SELECTED_SUBTITLE_TRACK = "selectedSubtitleTrack";
     private static final String PROP_SRC_PREFERRED_AUDIO_TRACKS = "preferredAudioTracks";
-
+    private static final String PROP_SRC_PLUGINS = "plugins";
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
     private static final String PROP_METADATA_CHANNEL_LOGO_URL = "channelLogoUrl";
