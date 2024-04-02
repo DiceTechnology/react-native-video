@@ -301,9 +301,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private boolean playInBackground = false;
 
-    private long dvrSeekForwardInterval = 0L;
-    private long dvrSeekBackwardInterval = 0L;
-
     //Drm
     private ActionToken actionToken;
 
