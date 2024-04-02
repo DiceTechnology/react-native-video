@@ -83,7 +83,7 @@ public class ReactVideoViewManager extends SimpleViewManager<ReactVideoView> {
         if(mainVer<0) { mainVer = 0; }
         if(patchVer<0) { patchVer = 0; }
         if(mainVer>0) {
-            videoView.(
+            videoView.setSrc(
                     src.getString(PROP_SRC_URI),
                     src.getString(PROP_SRC_TYPE),
                     src.getBoolean(PROP_SRC_IS_NETWORK),
