@@ -256,9 +256,7 @@ class PlayerViewProxy {
                 selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
                 selectedPlaybackQuality: nil,
                 nowPlaying: jsNowPlaying,
-                preferredAudioTracks: sourceValue.preferredAudioTracks, //tvos new
-                seekForwardInterval: sourceValue.dvrSeekForwardInterval,
-                seekBackwardInterval: sourceValue.dvrSeekBackwardInterval)
+                preferredAudioTracks: sourceValue.preferredAudioTracks) //tvos new
         }
 
         let jsTranslations = PlayerViewProxy.convertRNVideoTranslationsToRNDV(translations: jsProps.translations.value)
