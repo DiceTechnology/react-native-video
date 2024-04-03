@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "@dicetechnology/dice-unity": "https://github.com/DiceTechnology/dice-unity.git#8a16345",
-        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com/DiceTechnology/react-native-dice-video.git#semver:6.47.0",
+        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com/DiceTechnology/react-native-dice-video.git#semver:6.43.6",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
     },
