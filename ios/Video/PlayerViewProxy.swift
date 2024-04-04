@@ -10,6 +10,10 @@ import AVDoris
 import RNDReactNativeDiceVideo
 
 class PlayerViewProxy {
+    private static func convertMsToSeconds(milliseconds: Int?) -> Int? {
+        return milliseconds != nil ? milliseconds! / 1000 : nil
+    }
+
     private static func convertRNVideoImaToRNDV(sourceIma: Source.Ima?) -> JSIma? {
         var jsIma: JSIma?
         if let ima = sourceIma {
@@ -91,8 +95,6 @@ class PlayerViewProxy {
             dorisTranslationsViewModel.favourites = translationsValue.favourite
             dorisTranslationsViewModel.addToWatchlist = translationsValue.addToWatchlist
             dorisTranslationsViewModel.moreVideos = translationsValue.moreVideos
-            dorisTranslationsViewModel.rewind = translationsValue.rewind
-            dorisTranslationsViewModel.fastForward = translationsValue.fastForward
             dorisTranslationsViewModel.audio = translationsValue.audioTracks
             dorisTranslationsViewModel.info = translationsValue.info
             dorisTranslationsViewModel.adsCountdownAd = translationsValue.adsCountdownAd
@@ -266,6 +268,8 @@ class PlayerViewProxy {
         let jsTracksPolicy = PlayerViewProxy.convertRNVideoTracksPolicyToRNDV(tracksPolicy: jsProps.source.value?.tracksPolicy)
         let jsPlaylist = PlayerViewProxy.convertRNVideoReleatedVideosToRNDV(relatedVideos: jsProps.relatedVideos.value)
         let skipMarkers = PlayerViewProxy.convertRNVideoSkipMarkersToRNDV(skipMarkers: jsProps.source.value?.skipMarkers)
+        let seekForwardInterval = convertMsToSeconds(milliseconds: jsProps.source.value?.dvrSeekForwardInterval) ?? 30
+        let seekBackwardInterval = convertMsToSeconds(milliseconds: jsProps.source.value?.dvrSeekBackwardInterval) ?? 30
         
         let rndvJSVideoDataConfig = RNDReactNativeDiceVideo.JSVideoData.JSVideoDataConfig(
             translations: jsTranslations,
@@ -283,7 +287,9 @@ class PlayerViewProxy {
             canShareplay: false,
             isPlaybackQualityChangeAllowed: false,
             isAutoPlayNextEnabled: false,
-            skipMarkers: skipMarkers)
+            skipMarkers: skipMarkers,
+            seekForwardInterval: seekForwardInterval,
+            seekBackwardInterval: seekBackwardInterval)
         
         if let rndvJSSource = rndvJSSource {
             let jsVideoData = RNDReactNativeDiceVideo.JSVideoData(source: rndvJSSource, config: rndvJSVideoDataConfig)
