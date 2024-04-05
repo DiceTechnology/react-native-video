@@ -94,8 +94,8 @@ public class RNSource {
         this.dvrSeekBackwardInterval = convertToMillis(dvrSeekBackwardInterval);
     }
 
-    public long convertToMillis(long? seconds) {
-        if (seconds == null || seconds == 0) {
+    public long convertToMillis(long seconds) {
+        if (seconds == 0) {
             return 0L;
         }
         return seconds * 1000;
