@@ -90,8 +90,15 @@ public class RNSource {
         this.yoSsai = yoSsai;
         this.limitedSeekRange = limitedSeekRange;
         this.tracksPolicy = tracksPolicy;
-        this.dvrSeekForwardInterval = dvrSeekForwardInterval;
-        this.dvrSeekBackwardInterval = dvrSeekBackwardInterval;
+        this.dvrSeekForwardInterval = convertToMillis(dvrSeekForwardInterval);
+        this.dvrSeekBackwardInterval = convertToMillis(dvrSeekBackwardInterval);
+    }
+
+    public long convertToMillis(long? seconds) {
+        if (seconds == null || seconds == 0) {
+            return 0L;
+        }
+        return seconds * 1000;
     }
 
     @NonNull
