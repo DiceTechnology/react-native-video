@@ -78,6 +78,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_SELECTED_SUBTITLE_TRACK = "selectedSubtitleTrack";
     private static final String PROP_SRC_PREFERRED_AUDIO_TRACKS = "preferredAudioTracks";
     private static final String PROP_SRC_PLUGINS = "plugins";
+
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
     private static final String PROP_METADATA_CHANNEL_LOGO_URL = "channelLogoUrl";
@@ -255,15 +256,14 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             videoView.setSkipMarkers(parseSkipMarkers(ReadableMapUtils.getArray(src, PROP_SKIP_MARKERS)));
         }
         if (src.hasKey(PROP_SRC_PLUGINS)) {
-            ReadableMap bottomPlugin = parseBottomPlugin(src.getMap(PROP_SRC_PLUGINS));
+            ReadableMap bottomPlugin = ReadableMapUtils.getMap(src.getMap(PROP_SRC_PLUGINS), "bottom");
             if (bottomPlugin != null) {
                 videoView.setBottomOverlayComponent(
-                        bottomPlugin.getString("name"),
+                        ReadableMapUtils.getString(bottomPlugin, "name"),
                         ReadableMapUtils.getInt(bottomPlugin, "width", -1),
                         ReadableMapUtils.getInt(bottomPlugin, "height", -1));
             }
         }
-
         String selectedSubtitleTrack = ReadableMapUtils.getString(src, PROP_SRC_SELECTED_SUBTITLE_TRACK);
         ReadableArray preferredAudioTracksArray = ReadableMapUtils.getArray(src, PROP_SRC_PREFERRED_AUDIO_TRACKS);
 
@@ -748,13 +748,4 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         }
     }
 
-    private ReadableMap parseBottomPlugin(ReadableMap plugins) {
-        if (plugins != null && plugins.hasKey("bottom")) {
-            ReadableMap bottom = plugins.getMap("bottom");
-            if (bottom != null && bottom.hasKey("name")) {
-                return bottom;
-            }
-        }
-        return null;
-    }
 }

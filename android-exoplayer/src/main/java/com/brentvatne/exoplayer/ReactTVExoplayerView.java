@@ -19,7 +19,6 @@ import android.widget.FrameLayout;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.media3.common.AdViewProvider;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
@@ -61,13 +60,11 @@ import com.brentvatne.entity.Watermark;
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
-
 import com.brentvatne.util.AdTagParametersHelper;
 import com.brentvatne.util.ImdbGenreMap;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
-
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.AdTagParameters;
 import com.diceplatform.doris.entity.DorisAdEvent;
@@ -93,6 +90,8 @@ import com.diceplatform.doris.ui.entity.VideoTile;
 import com.diceplatform.doris.ui.skipmarker.SkipMarker;
 import com.diceplatform.doris.util.DorisExceptionUtil;
 import com.diceplatform.doris.util.LocalizationService;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReadableArray;
@@ -114,7 +113,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1619,58 +1617,19 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    private int initGuideEnd = 0;
-
     public void setBottomOverlayComponent(String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
-        View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
-        initGuideEnd = ((ConstraintLayout.LayoutParams) anchorView.getLayoutParams()).guideEnd;
-
-        DceReactComponentView bottomReactComponentView = new DceReactComponentView(getContext());
-        bottomReactComponentView.setId(R.id.bottomOverlayComponent);
-        ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(
-                width > 0 ? width : LayoutParams.WRAP_CONTENT,
-                height > 0 ? height : LayoutParams.WRAP_CONTENT);
-        layoutParams.endToEnd = 0; // parent
-        layoutParams.startToStart = 0; // parent
-        layoutParams.topToBottom = R.id.seekbar_guideline;
-        layoutParams.topMargin = (int) (114 * getResources().getDisplayMetrics().density);
-        bottomReactComponentView.setLayoutParams(layoutParams);
-        bottomReactComponentView.setFocusable(true);
-        bottomReactComponentView.setFocusableInTouchMode(true);
-        bottomReactComponentView.setCallbackListener(new DceReactComponentView.Callback() {
-            private boolean hasFocus = false;
-            private int height;
-
-            @Override
-            public void onSizeChanged(int width, int height) {
-                this.height = height;
-                resetOverlayComponentLayout(hasFocus ? height : height / 3);
-            }
-
-            @Override
-            public void onFocusChanged(boolean gainFocus) {
-                this.hasFocus = gainFocus;
-                resetOverlayComponentLayout(hasFocus ? height : height / 3);
-            }
-        });
-        bottomReactComponentView.addComponent(component);
-        bottomReactComponentView.setNextFocusUpViews(findViewById(R.id.exo_play), findViewById(R.id.exo_pause));
-        ((ConstraintLayout) findViewById(R.id.controlsContainer)).addView(bottomReactComponentView);
-
-        findViewById(R.id.exo_pause).setNextFocusDownId(R.id.bottomOverlayComponent);
-        findViewById(R.id.exo_play).setNextFocusDownId(R.id.bottomOverlayComponent);
-        findViewById(R.id.exo_ffwd).setNextFocusDownId(R.id.bottomOverlayComponent);
-        findViewById(R.id.exo_rew).setNextFocusDownId(R.id.bottomOverlayComponent);
-    }
-
-    private void resetOverlayComponentLayout(int guideEndOffset) {
-        View anchorView = findViewById(com.diceplatform.doris.ui.R.id.seekbar_guideline);
-        if (anchorView != null) {
-            ConstraintLayout.LayoutParams anchorViewLp = (ConstraintLayout.LayoutParams) anchorView.getLayoutParams();
-            anchorViewLp.guideEnd = initGuideEnd + guideEndOffset;
-            anchorView.setLayoutParams(anchorViewLp);
-        }
+        ReactRootView reactRootView = new ReactRootView(getContext());
+        reactRootView.setLayoutParams(new FrameLayout.LayoutParams(width > 0 ? width : LayoutParams.WRAP_CONTENT,
+                height > 0 ? height : LayoutParams.WRAP_CONTENT));
+        reactRootView.startReactApplication(((ReactApplication) getContext().getApplicationContext())
+                .getReactNativeHost().getReactInstanceManager(), component, null);
+        exoDorisPlayerView.setBottomComponentView(reactRootView, new BottomComponentLayout.FocusProcessor() {
+                @Override
+                public boolean gainFocus(@Nullable View view) {
+                    return view instanceof ReactViewGroup;
+                }
+            });
     }
 
     public void setControlsOpacity(final float opacity) {
