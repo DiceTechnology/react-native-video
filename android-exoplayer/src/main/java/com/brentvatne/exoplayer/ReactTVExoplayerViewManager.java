@@ -259,6 +259,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             ReadableMap bottomPlugin = ReadableMapUtils.getMap(src.getMap(PROP_SRC_PLUGINS), "bottom");
             if (bottomPlugin != null) {
                 videoView.setBottomOverlayComponent(
+                        uriString,
                         ReadableMapUtils.getString(bottomPlugin, "name"),
                         ReadableMapUtils.getInt(bottomPlugin, "width", -1),
                         ReadableMapUtils.getInt(bottomPlugin, "height", -1));

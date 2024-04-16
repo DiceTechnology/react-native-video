@@ -787,6 +787,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         nativeProgressHandler.removeMessages(SHOW_NATIVE_PROGRESS);
         themedReactContext.removeLifecycleEventListener(this);
         audioBecomingNoisyReceiver.removeListener();
+        exoDorisPlayerView.setTag(R.id.bottomComponentTag, null);
     }
 
     private boolean requestAudioFocus() {
@@ -1619,19 +1620,21 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    public void setBottomOverlayComponent(String component, int width, int height) {
+    public void setBottomOverlayComponent(String key, String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
+        if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key)) return;
         ReactRootView reactRootView = new ReactRootView(getContext());
         reactRootView.setLayoutParams(new FrameLayout.LayoutParams(width > 0 ? width : LayoutParams.WRAP_CONTENT,
                 height > 0 ? height : LayoutParams.WRAP_CONTENT));
         reactRootView.startReactApplication(((ReactApplication) getContext().getApplicationContext())
                 .getReactNativeHost().getReactInstanceManager(), component, null);
+        exoDorisPlayerView.setTag(R.id.bottomComponentTag, key);
         exoDorisPlayerView.setBottomComponentView(reactRootView, new BottomComponentLayout.FocusProcessor() {
-                @Override
-                public boolean gainFocus(@Nullable View view) {
-                    return view instanceof ReactViewGroup;
-                }
-            });
+            @Override
+            public boolean gainFocus(@Nullable View view) {
+                return view instanceof ReactViewGroup;
+            }
+        });
     }
 
     public void setControlsOpacity(final float opacity) {
