@@ -14,6 +14,7 @@ import android.view.Choreographer;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
@@ -84,7 +85,6 @@ import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
 import com.diceplatform.doris.ui.ExoDorisPlayerViewListener;
 import com.diceplatform.doris.ui.ExoDorisTvPlayerView;
-import com.diceplatform.doris.ui.bottomcomponent.BottomComponentLayout;
 import com.diceplatform.doris.ui.entity.Labels;
 import com.diceplatform.doris.ui.entity.LabelsBuilder;
 import com.diceplatform.doris.ui.entity.VideoTile;
@@ -1623,18 +1623,23 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setBottomOverlayComponent(String key, String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
         if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key)) return;
+        // add frameLayout to ExoPlayerView, ReactRootView load data first, move to ExoPlayerControllerView. 
+        ReactRootFrameLayout frameLayout = new ReactRootFrameLayout(getContext());
+        frameLayout.setOnSizeChangedListener((reactRootFrameLayout, childView) -> {
+            reactRootFrameLayout.removeView(childView);
+            childView.setLayoutParams(new FrameLayout.LayoutParams(
+                    width > 0 ? width : LayoutParams.WRAP_CONTENT,
+                    height > 0 ? height : LayoutParams.WRAP_CONTENT));
+            exoDorisPlayerView.setBottomComponentView(childView, view -> view instanceof ReactViewGroup);
+            exoDorisPlayerView.removeView(reactRootFrameLayout);
+        });
         ReactRootView reactRootView = new ReactRootView(getContext());
-        reactRootView.setLayoutParams(new FrameLayout.LayoutParams(width > 0 ? width : LayoutParams.WRAP_CONTENT,
-                height > 0 ? height : LayoutParams.WRAP_CONTENT));
+        reactRootView.setLayoutParams(new FrameLayout.LayoutParams(1, 1));
         reactRootView.startReactApplication(((ReactApplication) getContext().getApplicationContext())
                 .getReactNativeHost().getReactInstanceManager(), component, null);
+        frameLayout.addView(reactRootView);
+        exoDorisPlayerView.addView(frameLayout, new LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         exoDorisPlayerView.setTag(R.id.bottomComponentTag, key);
-        exoDorisPlayerView.setBottomComponentView(reactRootView, new BottomComponentLayout.FocusProcessor() {
-            @Override
-            public boolean gainFocus(@Nullable View view) {
-                return view instanceof ReactViewGroup;
-            }
-        });
     }
 
     public void setControlsOpacity(final float opacity) {
