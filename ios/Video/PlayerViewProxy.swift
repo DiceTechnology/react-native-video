@@ -275,6 +275,7 @@ class PlayerViewProxy {
             testIdentifiers: nil,
             annotations: nil,
             overlayConfig: jsOverlayConfig,
+            plugins: jsProps.source.value?.plugins,
             tracksPolicy: jsTracksPolicy,
             isFullScreen: true,
             allowAirplay: false,

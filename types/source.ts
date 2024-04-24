@@ -5,7 +5,8 @@ import { IVideoPlayerIMA } from './ima';
 import { IMuxData } from './mux';
 import { IVideoPlayerSubtitles } from './subtitles';
 import { IVideoPlayerAPS } from './aps';
-import { INowPlaying } from "./nowPlaying";
+import { INowPlaying } from './nowPlaying';
+import { IPlugins } from './plugins';
 
 type SourceType = 'mpd' | 'm3u8';
 
@@ -81,4 +82,5 @@ export interface IVideoPlayerSource {
   skipMarkers?: IVideoPlayerSkipMarker[];
   dvrSeekForwardInterval?: number;
   dvrSeekBackwardInterval?: number;
+  plugins?: IPlugins;
 }

@@ -7,6 +7,7 @@
 
 import Foundation
 import AVDoris
+import RNDReactNativeDiceVideo
 
 struct Source: SuperCodable {
     let id: String?
@@ -34,6 +35,7 @@ struct Source: SuperCodable {
     var skipMarkers: [RNSkipMarker]?
     let dvrSeekForwardInterval: Int?
     let dvrSeekBackwardInterval: Int?
+    var plugins: JSPlugins?
 }
 
 
