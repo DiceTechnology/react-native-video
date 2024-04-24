@@ -60,11 +60,13 @@ import com.brentvatne.entity.Watermark;
 import com.brentvatne.react.R;
 import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
+
 import com.brentvatne.util.AdTagParametersHelper;
 import com.brentvatne.util.ImdbGenreMap;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
+
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.AdTagParameters;
 import com.diceplatform.doris.entity.DorisAdEvent;
@@ -87,6 +89,7 @@ import com.diceplatform.doris.ui.ExoDorisTvPlayerView;
 import com.diceplatform.doris.ui.entity.Labels;
 import com.diceplatform.doris.ui.entity.LabelsBuilder;
 import com.diceplatform.doris.ui.entity.VideoTile;
+import com.diceplatform.doris.ui.skipmarker.SkipMarker;
 import com.diceplatform.doris.util.DorisExceptionUtil;
 import com.diceplatform.doris.util.LocalizationService;
 import com.facebook.react.bridge.Arguments;
@@ -110,6 +113,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -331,6 +335,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         localizationService = new LocalizationService(Locale.getDefault());
     }
 
+
     @Override
     public void setId(int id) {
         super.setId(id);
@@ -502,7 +507,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             exoPlayer.setAudioAttributes(audioAttributes, false);
             exoPlayer.addListener(this);
             exoPlayer.addAnalyticsListener(this);
-            exoDorisPlayerView.setPlayer(player.createForwardPlayer());
+            Player realPlayer = player.createForwardPlayer();
+            exoDorisPlayerView.setPlayer(realPlayer);
             audioBecomingNoisyReceiver.setListener(this);
             setPlayWhenReady(!isPaused);
             playerNeedsSource = true;
@@ -1759,10 +1765,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setPlayingLiveLabel(translations.getPlayingLiveLabel())
                     .setNowPlayingLabel(translations.getNowPlayingLabel())
                     .setAudioAndSubtitlesLabel(translations.getAudioAndSubtitlesLabel())
+                    .setSkipCreditsLabel(translations.getSkipCreditsLabel())
+                    .setSkipIntroLabel(translations.getSkipIntroLabel())
                     .build();
-
             exoDorisPlayerView.setLabels(labels);
         }
+    }
+
+    public void setSkipMarkers(List<SkipMarker> skipMarkers) {
+        exoDorisPlayerView.setSkipMarkList(skipMarkers);
     }
 
     private boolean isUnauthorizedAdError(Exception error) {
