@@ -15,12 +15,6 @@ class RNVJSOverlayBuilder: OverlayBuilderProtocol {
     init(bridge: RCTBridge) {
         self.bridge = bridge
     }
-
-    func buildOverlay(from config: JSComponent?) -> (view: UIView?, button: String?, height: Double?, width: Double?)? {
-        // unimplemented - Merged on 29.03.2024
-        // BottomView component - https://github.com/DiceTechnology/react-native-dice-video/pull/847 
-        return nil
-    }
     
     func buildOverlay(from config: RNDReactNativeDiceVideo.JSComponent?) -> (view: UIView?, button: String?, height: Double?, width: Double?)? {
         guard let config = config else { return nil }
