@@ -585,7 +585,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    private List<String> getPreferredSubtitleLang() {
+private List<String> getPreferredSubtitleLang() {
         TrackPreferenceStorage trackPreferenceStorage = TrackPreferenceStorage.getInstance(getContext());
         if (!trackPreferenceStorage.isEnabled()) {
             return Collections.singletonList(src.getSelectedSubtitleTrack());
@@ -1421,7 +1421,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         Track track = null;
         List<Track> trackList = getTracks(player.getExoPlayer().getCurrentTracks());
         if (trackType == C.TRACK_TYPE_TEXT) {
-            if (preferredLanguages == null || preferredLanguages.isEmpty()) { // "OFF" or user not select preferred subtitle
+            if (preferredLanguages == null || preferredLanguages.isEmpty() || preferredLanguages.get(0) == null) { // "OFF" or user not select preferred subtitle
                 if (trackPolicy != null) { // track policy is active, select track policy subtitle
                     track = TrackUtils.findMatchingTrack(trackList, trackType, trackPolicy.getSubtitle());
                 }
@@ -1429,7 +1429,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 track = TrackUtils.findMatchingTrack(trackList, trackType, preferredLanguages.get(0));
             }
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+            if (preferredLanguages != null && !preferredLanguages.isEmpty() && preferredLanguages.get(0) != null) {
                 track = TrackUtils.findMatchingTrack(trackList, trackType, preferredLanguages.get(0));
             }
         }
