@@ -176,6 +176,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private boolean playerNeedsSource;
     private long resumePosition; // unit: millisecond
     private boolean loadVideoStarted;
+    private boolean initSelectTrack;
     private boolean isInBackground = false;
     private boolean fromBackground = false;
     private boolean isPaused;
@@ -582,10 +583,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             playerNeedsSource = false;
             eventEmitter.loadStart();
             loadVideoStarted = true;
+            initSelectTrack = true;
         }
     }
 
-private List<String> getPreferredSubtitleLang() {
+    private List<String> getPreferredSubtitleLang() {
         TrackPreferenceStorage trackPreferenceStorage = TrackPreferenceStorage.getInstance(getContext());
         if (!trackPreferenceStorage.isEnabled()) {
             return Collections.singletonList(src.getSelectedSubtitleTrack());
@@ -1021,14 +1023,6 @@ private List<String> getPreferredSubtitleLang() {
     private void videoLoaded() {
         if (loadVideoStarted) {
             loadVideoStarted = false;
-
-            // check track policy
-            Tracks tracks = player.getExoPlayer().getCurrentTracks();
-            TracksPolicy.TrackPolicy trackPolicy = getTrackPolicy(trackSelector, tracks, getPreferredAudioLang());
-
-            // Preselect subtitle and audio.
-            selectTrack(trackPolicy, C.TRACK_TYPE_TEXT, getPreferredSubtitleLang());
-            selectTrack(trackPolicy, C.TRACK_TYPE_AUDIO, getPreferredAudioLang());
 
             ExoPlayer exoPlayer = player.getExoPlayer();
             Format videoFormat = exoPlayer.getVideoFormat();
@@ -1911,6 +1905,18 @@ private List<String> getPreferredSubtitleLang() {
             }
 
             switch (playerEvent.event) {
+                case TRACK_INFO_CHANGED:
+                    if (initSelectTrack) {
+                        initSelectTrack = false;
+                        // check track policy
+                        Tracks tracks = player.getExoPlayer().getCurrentTracks();
+                        TracksPolicy.TrackPolicy trackPolicy = getTrackPolicy(trackSelector, tracks, getPreferredAudioLang());
+
+                        // Preselect subtitle and audio.
+                        selectTrack(trackPolicy, C.TRACK_TYPE_TEXT, getPreferredSubtitleLang());
+                        selectTrack(trackPolicy, C.TRACK_TYPE_AUDIO, getPreferredAudioLang());
+                    }
+                    break;
                 case TIMELINE_ADJUSTER_CHANGED:
                     if (exoDorisPlayerView != null) {
                         exoDorisPlayerView.setExtraTimelineAdjuster(playerEvent.details.timelineAdjuster);
