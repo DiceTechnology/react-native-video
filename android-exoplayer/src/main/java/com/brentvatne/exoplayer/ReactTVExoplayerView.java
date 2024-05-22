@@ -176,7 +176,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private boolean playerNeedsSource;
     private long resumePosition; // unit: millisecond
     private boolean loadVideoStarted;
-    private boolean initSelectTrack;
+    private boolean selectUserPreferredTrack;
     private boolean isInBackground = false;
     private boolean fromBackground = false;
     private boolean isPaused;
@@ -583,7 +583,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             playerNeedsSource = false;
             eventEmitter.loadStart();
             loadVideoStarted = true;
-            initSelectTrack = true;
+            selectUserPreferredTrack = true;
         }
     }
 
@@ -1906,8 +1906,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             switch (playerEvent.event) {
                 case TRACK_INFO_CHANGED:
-                    if (initSelectTrack) {
-                        initSelectTrack = false;
+                    if (selectUserPreferredTrack) {
+                        selectUserPreferredTrack = false;
                         // check track policy
                         Tracks tracks = player.getExoPlayer().getCurrentTracks();
                         TracksPolicy.TrackPolicy trackPolicy = getTrackPolicy(trackSelector, tracks, getPreferredAudioLang());
