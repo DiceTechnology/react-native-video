@@ -20,7 +20,7 @@
         "eslint-plugin-react": "3.16.1"
     },
     "dependencies": {
-        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com:DiceTechnology/react-native-dice-video.git#feat/ADT-1000-hide-ad-countdown-timer",
+        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com:DiceTechnology/react-native-dice-video.git#b57a145643045fa791e732bd1660bcab96bf4f82",
         "@dicetechnology/dice-unity": "^2.26.3",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
