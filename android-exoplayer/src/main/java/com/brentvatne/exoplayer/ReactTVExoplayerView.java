@@ -564,7 +564,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             Map<String, Object> muxData = src.getMuxData();
             if (muxData != null) {
                 String correlationId = (String) muxData.get("correlationId");
-                sourceBuilder.setMuxProperties(muxData, correlationId, exoDorisPlayerView.getVideoSurfaceView());
+                sourceBuilder.setMuxProperties(muxData, correlationId, null, exoDorisPlayerView.getVideoSurfaceView());
             }
 
             LimitedSeekRange limitedSeekRange = isLive ? src.getLimitedSeekRange() : null;
