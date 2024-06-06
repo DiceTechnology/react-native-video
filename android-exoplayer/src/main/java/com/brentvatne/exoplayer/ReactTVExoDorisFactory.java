@@ -60,7 +60,7 @@ public final class ReactTVExoDorisFactory {
             @Nullable TracksPolicy tracksPolicy) {
         final ExoDorisBuilder builder;
         if (adType == AdType.YO_SSAI) {
-            builder = new ExoDorisYoSsaiBuilder(context).setAdViewProvider(checkNotNull(adViewProvider)).setAdLabels(new AdLabels());
+            builder = new ExoDorisYoSsaiBuilder(context).setAdViewProvider(checkNotNull(adViewProvider));
         } else if (adType == AdType.IMA_DAI) {
             builder = new ExoDorisImaDaiBuilder(context).setAdViewProvider(checkNotNull(adViewProvider));
         } else if (adType == AdType.IMA_CSAI_LIVE) {
