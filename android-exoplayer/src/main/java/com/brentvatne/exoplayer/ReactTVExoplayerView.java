@@ -83,6 +83,7 @@ import com.diceplatform.doris.entity.Track;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.ext.imacsailive.ExoDorisImaCsaiLivePlayer;
+import com.diceplatform.doris.ext.yossai.ExoDorisYoSsaiPlayer;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.ui.ExoDorisPlayerTvControlView;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
@@ -504,7 +505,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     translations.getSkipCountdownLabel(),
                     translations.getSkipLabel()
             );
-            AdGlobalSettings adGlobalSettings = new AdGlobalSettings(hideAdUiElements, adLabels);
+            
+            AdGlobalSettings adGlobalSettings = new AdGlobalSettings(hideAdUiElements, true, adLabels);
 
             long dvrSeekBackwardInterval = src.getDvrSeekBackwardInterval();
             long dvrSeekForwardInterval = src.getDvrSeekForwardInterval();
@@ -533,6 +535,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             exoPlayer.addAnalyticsListener(this);
             Player realPlayer = player.createForwardPlayer();
             exoDorisPlayerView.setPlayer(realPlayer);
+            exoDorisPlayerView.setDorisPlayer(player);
+            exoDorisPlayerView.setAdPlayPauseEnabled(player instanceof ExoDorisYoSsaiPlayer);
             audioBecomingNoisyReceiver.setListener(this);
             setPlayWhenReady(!isPaused);
             playerNeedsSource = true;
@@ -1915,6 +1919,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private final DorisPlayerOutput dorisListener = new DorisPlayerOutput() {
         @Override
         public void onPlayerEvent(DorisPlayerEvent playerEvent) {
+            Log.d(TAG, "onPlayerEvent: " + playerEvent);
             if (exoDorisPlayerView != null) {
                 exoDorisPlayerView.onPlayerEvent(playerEvent);
             }
@@ -1971,6 +1976,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         @Override
         public void onAdEvent(DorisAdEvent adEvent) {
             Log.d(TAG, "onAdEvent: " + adEvent);
+            if (exoDorisPlayerView != null) {
+                exoDorisPlayerView.onAdEvent(adEvent);
+            }
             switch (adEvent.event) {
                 case AD_BREAK_STARTED:
                     if (areControlsAllowed) {
