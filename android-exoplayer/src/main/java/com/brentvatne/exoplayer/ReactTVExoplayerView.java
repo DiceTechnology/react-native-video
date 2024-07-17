@@ -65,7 +65,6 @@ import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
 import com.diceplatform.doris.ExoDorisTrackSelector;
-import com.diceplatform.doris.common.ad.AdChoicesTvListener;
 import com.diceplatform.doris.common.ad.AdGlobalSettings;
 import com.diceplatform.doris.common.ad.ui.AdLabels;
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
@@ -107,9 +106,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.i18nmanager.I18nUtil;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.views.view.ReactViewGroup;
-import com.google.android.tv.ads.AdsControlsManager;
-import com.google.android.tv.ads.IconClickFallbackImage;
-import com.google.android.tv.ads.IconClickFallbackImages;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -122,7 +118,6 @@ import java.net.CookiePolicy;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -296,25 +291,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     };
 
-    private AdsControlsManager adsControlsManager;
-    private final AdChoicesTvListener adChoicesTvListener = (view, clickFallbackImage) -> {
-        if (adsControlsManager == null) {
-            return;
-        }
-        IconClickFallbackImages iconClickFallbackImages =
-            IconClickFallbackImages.builder(
-                Arrays.asList(
-                    IconClickFallbackImage.builder()
-                        .setWidth(clickFallbackImage.width)
-                        .setHeight(clickFallbackImage.height)
-                        .setAltText(clickFallbackImage.altText)
-                        .setCreativeType(clickFallbackImage.creativeType)
-                        .setStaticResourceUri(clickFallbackImage.resourceUrl)
-                        .build()))
-              .build();
-        adsControlsManager.handleIconClick(iconClickFallbackImages);
-    };
-
     private final AmazonFireTVAdCallback amazonFireTVAdCallback = new AmazonFireTVAdCallback() {
         @Override
         public void onSuccess(AmazonFireTVAdResponse amazonFireTVAdResponse) {
@@ -360,7 +336,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         audioBecomingNoisyReceiver = new AudioBecomingNoisyReceiver(themedReactContext);
         isAmazonFireTv = isAmazonFireTv(context);
         exoDorisFactory = new ReactTVExoDorisFactory();
-        adsControlsManager = new AdsControlsManager(themedReactContext);
 
         clearResumePosition();
         setPausedModifier(false);
@@ -542,7 +517,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     dvrSeekForwardInterval != 0L ? dvrSeekForwardInterval : exoDorisPlayerView.getFastForwardIncrementMs(),
                     dvrSeekBackwardInterval != 0L ? dvrSeekBackwardInterval : exoDorisPlayerView.getRewindIncrementMs(),
                     adViewProvider,
-                    adChoicesTvListener,
+                    exoDorisPlayerView,
                     adGlobalSettings,
                     src.getTracksPolicy());
 
@@ -1638,7 +1613,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setAreControlsAllowed(boolean allowed) {
         areControlsAllowed = allowed;
         setControls(allowed);
-        exoDorisPlayerView.setAreControlsAllowed(allowed);
     }
 
     public void setControls(final boolean visible) {
