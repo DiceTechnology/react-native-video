@@ -474,6 +474,17 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         onStopPlayback();
         isInBackground = isInteractive();
         deactivateMediaSession();
+        dismissPopupWindow();
+    }
+
+    private void dismissPopupWindow() {
+        if (exoDorisPlayerView != null) {
+            View controller = exoDorisPlayerView.findViewById(R.id.exo_controller);
+            if (controller instanceof ExoDorisPlayerTvControlView) {
+                ((ExoDorisPlayerTvControlView) controller).dismissInfoPopupWindow();
+                ((ExoDorisPlayerTvControlView) controller).dismissTracksPopupWindow();
+            }
+        }
     }
 
     @Override
