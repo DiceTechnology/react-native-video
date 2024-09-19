@@ -1694,7 +1694,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             childView.setLayoutParams(new FrameLayout.LayoutParams(
                     width > 0 ? width : LayoutParams.WRAP_CONTENT,
                     height > 0 ? height : LayoutParams.WRAP_CONTENT));
-            exoDorisPlayerView.setBottomComponentView(childView, view -> view instanceof ReactViewGroup);
+            exoDorisPlayerView.setBottomComponentView(childView, view -> {
+                if (view != null) {
+                    String className = view.getClass().getName();
+                    if (className.equals("androidx.compose.ui.platform.AndroidComposeView")) {
+                        return true;
+                    }
+                }
+                return view instanceof ReactViewGroup;
+            });
             exoDorisPlayerView.removeView(reactRootFrameLayout);
         });
         ReactRootView reactRootView = new ReactRootView(getContext());
