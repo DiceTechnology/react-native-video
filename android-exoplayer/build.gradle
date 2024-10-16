@@ -63,6 +63,7 @@ dependencies {
 
     implementation(project(':dice-shield-android')) {
         exclude group: "androidx.media3"
+        exclude group: 'com.github.DiceTechnology'
     }
 
     implementation 'com.github.bumptech.glide:glide:4.13.0'
