@@ -1,6 +1,7 @@
 import groovy.json.JsonSlurper
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 /**
  * Load ExoDoris version from package.json file
@@ -31,6 +32,7 @@ android {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
+    implementation("com.github.DiceTechnology:dice-messaging-android:0.0.5-SNAPSHOT")
 
     // Amazon Publishing Services
     implementation project(":AmazonFireTVAdsSDK-release")
