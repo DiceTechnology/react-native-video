@@ -83,8 +83,8 @@ import com.diceplatform.doris.entity.TextTrack;
 import com.diceplatform.doris.entity.Track;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
-import com.diceplatform.doris.ext.imacsailive.ExoDorisImaCsaiLivePlayer;
 import com.diceplatform.doris.internal.ResumePositionHandler;
+import com.diceplatform.doris.service.LocalizationService;
 import com.diceplatform.doris.ui.ExoDorisPlayerTvControlView;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
 import com.diceplatform.doris.ui.ExoDorisPlayerViewListener;
@@ -94,7 +94,6 @@ import com.diceplatform.doris.ui.entity.LabelsBuilder;
 import com.diceplatform.doris.ui.entity.VideoTile;
 import com.diceplatform.doris.ui.skipmarker.SkipMarker;
 import com.diceplatform.doris.util.DorisExceptionUtil;
-import com.diceplatform.doris.util.LocalizationService;
 import com.diceplatform.doris.util.TrackUtils;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactRootView;
@@ -177,7 +176,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private ExoDoris player;
     private ExoDorisTrackSelector trackSelector;
     private Source source;
-    private LocalizationService localizationService;
+    private final LocalizationService localizationService;
     private boolean playerNeedsSource;
     private long resumePosition; // unit: millisecond
     private boolean loadVideoStarted;
@@ -353,7 +352,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
         mediaSession = new MediaSessionCompat(getContext(), getContext().getPackageName());
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
-        localizationService = new LocalizationService(Locale.getDefault());
+        localizationService = new LocalizationService(new LocalizationService.Config());
 
         boolean isRTL = I18nUtil.getInstance().isRTL(getContext());
         ExoDorisPlayerTvControlView controller = exoDorisPlayerView.findViewById(R.id.exo_controller);
@@ -520,15 +519,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             AdViewProvider adViewProvider = adType == AdType.IMA_CSAI_LIVE
                     ? secondaryPlayerView
                     : exoDorisPlayerView;
-            AdLabels adLabels = translations == null ? null : new AdLabels(
-                    translations.getLearnMoreLabel(),
-                    translations.getAdsCountdownAdLabel(),
-                    translations.getAdsCountdownOfLabel(),
-                    translations.getSkipCountdownLabel(),
-                    translations.getSkipLabel()
-            );
-            AdGlobalSettings adGlobalSettings = new AdGlobalSettings(hideAdUiElements, isWhyThisAdIconEnabled, adLabels);
-
             long dvrSeekBackwardInterval = src.getDvrSeekBackwardInterval();
             long dvrSeekForwardInterval = src.getDvrSeekForwardInterval();
 
@@ -540,10 +530,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     dvrSeekBackwardInterval != 0L ? dvrSeekBackwardInterval : exoDorisPlayerView.getRewindIncrementMs(),
                     adViewProvider,
                     exoDorisPlayerView,
-                    adGlobalSettings,
                     src.getTracksPolicy());
 
-            player.setDorisListener(dorisListener);
+            player.setOutput(dorisListener);
             trackSelector = player.getTrackSelector();
             ExoPlayer exoPlayer = player.getExoPlayer();
 
@@ -574,6 +563,18 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             showOverlay();
             showWatermark();
 
+            AdLabels adLabels = translations == null ? null : new AdLabels(
+                    translations.getLearnMoreLabel(),
+                    translations.getAdsCountdownAdLabel(),
+                    translations.getAdsCountdownOfLabel(),
+                    translations.getSkipCountdownLabel(),
+                    translations.getSkipLabel()
+            );
+            AdGlobalSettings adGlobalSettings = new AdGlobalSettings.Builder()
+                    .setHideAdUiElements(hideAdUiElements)
+                    .setWhyThisAdIconEnabled(isWhyThisAdIconEnabled)
+                    .setAdLabels(adLabels)
+                    .build();
             SourceBuilder sourceBuilder = new SourceBuilder();
             if (adType == AdType.IMA_DAI) {
                 ImaDaiProperties imaDaiProperties = new ImaDaiPropertiesBuilder()
@@ -595,6 +596,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setUrl(src.getUrl())
                     .setMimeType(src.getMimeType())
                     .setYoSsaiProperties(src.getYoSsai())
+                    .setAdGlobalSettings(adGlobalSettings)
                     .setTextTracks(src.getTextTracks())
                     .setDrmParams(actionToken);
 
@@ -759,7 +761,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Nullable
     private TextTrack[] getTextTracks(ReadableArray textTracks) {
-        LocalizationService localizationService = new LocalizationService(Locale.getDefault());
         if (textTracks != null && textTracks.size() > 0) {
             TextTrack[] dorisTextTracks = new TextTrack[textTracks.size()];
             for (int i = 0; i < textTracks.size(); ++i) {
@@ -767,7 +768,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 String uri = textTrack.getString("uri");
                 String isoCode = textTrack.getString("language");
                 String name = isoCode != null
-                        ? localizationService.getLocalizedLanguageLabel(isoCode, true)
+                        ? localizationService.getLocalizedLanguageLabel(isoCode)
                         : null;
                 dorisTextTracks[i] = new TextTrack(
                         Uri.parse(uri),
@@ -1474,14 +1475,14 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (trackType == C.TRACK_TYPE_TEXT) {
             if (preferredLanguages == null || preferredLanguages.isEmpty() || preferredLanguages.get(0) == null) { // "OFF" or user not select preferred subtitle
                 if (trackPolicy != null) { // track policy is active, select track policy subtitle
-                    track = TrackUtils.findMatchingTrack(trackList, trackType, trackPolicy.getSubtitle());
+                    track = TrackUtils.findMatchingTrack(localizationService, trackList, trackType, trackPolicy.getSubtitle());
                 }
             } else { // select user preferred subtitle
-                track = TrackUtils.findMatchingTrack(trackList, trackType, preferredLanguages.get(0));
+                track = TrackUtils.findMatchingTrack(localizationService, trackList, trackType, preferredLanguages.get(0));
             }
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
             if (preferredLanguages != null && !preferredLanguages.isEmpty() && preferredLanguages.get(0) != null) {
-                track = TrackUtils.findMatchingTrack(trackList, trackType, preferredLanguages.get(0));
+                track = TrackUtils.findMatchingTrack(localizationService, trackList, trackType, preferredLanguages.get(0));
             }
         }
         if (track != null) {
@@ -1499,7 +1500,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 Format format = group.getFormat(0);
                 String name = TrackUtils.getTrackName(group, trackType);
                 String language = format.language;
-                trackSet.add(new Track(trackType, name, language, isSelected));
+                trackSet.add(new Track(format.id, trackType, name, language, isSelected));
             }
         }
         return new ArrayList<>(trackSet);
@@ -2004,7 +2005,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     reloadCurrentSource();
                     break;
                 case ERROR:
-                    Exception error = playerEvent.details.error;
+                    Exception error = playerEvent.details.error == null ? null : playerEvent.details.error.getException();
                     if (error instanceof PlaybackException) {
                         handlePlaybackError((PlaybackException) error);
                     } else if (error != null) {
@@ -2050,7 +2051,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 case AD_LOADING:
                     // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
                     if (isCsaiLiveEvent(adEvent)) {
-                        secondaryPlayerView.setPlayer(((ExoDorisImaCsaiLivePlayer) player).getLiveAdExoPlayer());
+                        secondaryPlayerView.setPlayer(player.getDorisExtension() == null ? null : player.getDorisExtension().getSecondaryAdPlayer());
                     }
                     break;
                 case AD_MARKERS_CHANGED:
