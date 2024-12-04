@@ -1,6 +1,6 @@
 {
     "name": "react-native-video",
-    "version": "7.5.27-yospace-live-hotfix-02",
+    "version": "7.5.27-player-version-hotfix-03",
     "dorisAndroidVersion": "3.10.5-black-screen-hotfix-01",
     "description": "A <Video /> element for react-native",
     "main": "Video.tsx",
