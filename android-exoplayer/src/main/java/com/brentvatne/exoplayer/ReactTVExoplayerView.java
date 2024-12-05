@@ -495,6 +495,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     public void cleanUpResources() {
+        Log.d(TAG, "cleanUpResources");
         stopPlayback();
         Choreographer.getInstance().removeFrameCallback(frameCallback);
     }
