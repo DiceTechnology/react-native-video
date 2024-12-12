@@ -81,7 +81,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
     private static final String PROP_SRC_PLUGINS = "plugins";
     private static final String PROP_SRC_LIVE = "live";
-    private static final String PROP_SRC_LIVE = "live";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
