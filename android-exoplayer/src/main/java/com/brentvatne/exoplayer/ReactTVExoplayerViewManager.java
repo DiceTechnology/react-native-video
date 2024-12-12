@@ -631,7 +631,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     @ReactProp(name = PROP_LOCALE)
     public void setLocale(final ReactTVExoplayerView videoView, final String locale) {
-        videoView.setLocale(locale);
+        videoView.setAppLanguageLocale(locale);
     }
 
     private boolean startsWithValidScheme(String uriString) {

@@ -1751,9 +1751,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    public void setLocale(String locale) {
+    public void setAppLanguageLocale(String locale) {
         if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setLocale(locale);
+            exoDorisPlayerView.setAppLanguageLocale(locale);
         }
     }
 
