@@ -61,6 +61,7 @@ import com.brentvatne.receiver.AudioBecomingNoisyReceiver;
 import com.brentvatne.receiver.BecomingNoisyListener;
 import com.brentvatne.util.AdTagParametersHelper;
 import com.brentvatne.util.ImdbGenreMap;
+import com.dice.messaging.DorisMessaging;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.DorisPlayerOutput;
 import com.diceplatform.doris.ExoDoris;
@@ -231,6 +232,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private final float NATIVE_PROGRESS_UPDATE_INTERVAL = 250.0f;
     private final int VIDEO_ABOUT_TO_END_TIME_MS = 5_000;
+
+    private DorisMessaging dorisMessaging;
 
     @SuppressLint("HandlerLeak")
     private final Handler jsProgressHandler = new Handler() {
@@ -630,6 +633,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             eventEmitter.loadStart();
             loadVideoStarted = true;
             selectUserPreferredTrack = true;
+            if (dorisMessaging != null) {
+                dorisMessaging.release();
+            }
+            dorisMessaging = new DorisMessaging(player, source);
+            dorisMessaging.setLive(isLive);
         }
     }
 
@@ -1419,6 +1427,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     programInfo.getEndDate(),
                     programInfo.getDateFormat());
             exoDorisPlayerView.setChannelLogo(programInfo.getChannelLogoUrl());
+            if (dorisMessaging != null) {
+                dorisMessaging.setTitle(programInfo.getTitle());
+            }
         }
     }
 
@@ -1607,6 +1618,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setLive(final boolean live) {
         this.isLive = live;
+        if (dorisMessaging != null) {
+            dorisMessaging.setLive(live);
+        }
 
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setIsLive(live);
@@ -1690,7 +1704,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setBottomOverlayComponent(String key, String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
-        if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key)) return;
+        if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key))
+            return;
         // add frameLayout to ExoPlayerView, ReactRootView load data first, move to ExoPlayerControllerView.
         ReactRootFrameLayout frameLayout = new ReactRootFrameLayout(getContext());
         frameLayout.setOnSizeChangedListener((reactRootFrameLayout, childView) -> {
@@ -1698,7 +1713,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             childView.setLayoutParams(new FrameLayout.LayoutParams(
                     width > 0 ? width : LayoutParams.WRAP_CONTENT,
                     height > 0 ? height : LayoutParams.WRAP_CONTENT));
-            exoDorisPlayerView.setBottomComponentView(childView, view -> view instanceof ReactViewGroup);
+            exoDorisPlayerView.setBottomComponentView(childView, view -> {
+                if (view != null) {
+                    String className = view.getClass().getName();
+                    if (className.equals("androidx.compose.ui.platform.AndroidComposeView")) {
+                        return true;
+                    }
+                }
+                return view instanceof ReactViewGroup;
+            });
             exoDorisPlayerView.removeView(reactRootFrameLayout);
         });
         ReactRootView reactRootView = new ReactRootView(getContext());
@@ -1726,11 +1749,17 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setStateProgressBar(final String state) {
     }
 
-     public void setSubtitleHorizontalPadding(int padding) {
+    public void setSubtitleHorizontalPadding(int padding) {
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.getSubtitleView().setSubtitleHorizontalPadding(padding);
         }
-     }
+    }
+
+    public void setAppLanguageLocale(String locale) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setAppLanguageLocale(locale);
+        }
+    }
 
     private boolean getEnabledFromState(String stateStr) {
         ControlState state = ControlState.make(stateStr);
@@ -1970,6 +1999,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             }
 
             switch (playerEvent.event) {
+                case POSITION_CHANGED:
+                    dorisMessaging.onProgressChanged(
+                            playerEvent.details.currentPosition,
+                            playerEvent.details.duration,
+                            playerEvent.details.windowStartTimeMs
+                    );
                 case TRACK_INFO_CHANGED:
                     if (selectUserPreferredTrack) {
                         selectUserPreferredTrack = false;
