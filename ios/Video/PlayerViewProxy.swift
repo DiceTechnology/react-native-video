@@ -206,6 +206,7 @@ class PlayerViewProxy {
         rndvJsProps.isMinimised.value = false
         rndvJsProps.highlightUrl.value = nil
         rndvJsProps.isFavourite.value = jsProps.isFavourite.value
+        rndvJsProps.locale.value = jsProps.locale.value
 
         var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
         if let sourceValue = jsProps.source.value {
