@@ -20,7 +20,7 @@
         "eslint-plugin-react": "3.16.1"
     },
     "dependencies": {
-        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com:DiceTechnology/react-native-dice-video.git#a3e7d60e",
+        "@dicetechnology/react-native-dice-video": "git+ssh://git@github.com:DiceTechnology/react-native-dice-video.git#0cf869b2",
         "@dicetechnology/dice-unity": "^2.26.3",
         "keymirror": "0.1.1",
         "prop-types": "^15.5.10"
