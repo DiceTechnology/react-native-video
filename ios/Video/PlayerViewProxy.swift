@@ -46,7 +46,7 @@ class PlayerViewProxy {
                 envKey: config.muxData.envKey,
                 videoTitle: config.muxData.videoTitle,
                 viewerUserId: config.muxData.viewerUserId,
-                playerVersion: nil,
+                playerVersion: config.muxData.playerVersion,
                 videoId: config.muxData.videoId,
                 playerName: config.muxData.playerName,
                 videoStreamType: config.muxData.videoStreamType,
@@ -104,6 +104,8 @@ class PlayerViewProxy {
             dorisTranslationsViewModel.skipCredits = translationsValue.skipCredits
             dorisTranslationsViewModel.rewind = translationsValue.rewind
             dorisTranslationsViewModel.fastForward = translationsValue.fastForward
+            dorisTranslationsViewModel.off = translationsValue.off
+            dorisTranslationsViewModel.audioOnlyBadge = translationsValue.audioOnlyBadge
             jsTranslations = JSTranslations(beaconTranslations: nil, dorisTranslations: dorisTranslationsViewModel)
         }
         return jsTranslations
@@ -206,6 +208,7 @@ class PlayerViewProxy {
         rndvJsProps.isMinimised.value = false
         rndvJsProps.highlightUrl.value = nil
         rndvJsProps.isFavourite.value = jsProps.isFavourite.value
+        rndvJsProps.locale.value = jsProps.locale.value
 
         var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
         if let sourceValue = jsProps.source.value {

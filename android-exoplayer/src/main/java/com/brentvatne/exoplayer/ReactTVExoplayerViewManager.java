@@ -16,7 +16,6 @@ import androidx.media3.common.util.Log;
 import androidx.media3.datasource.RawResourceDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
 
-import com.brentvatne.entity.RNMetadata;
 import com.brentvatne.entity.RelatedVideo;
 import com.brentvatne.entity.Watermark;
 import com.brentvatne.react.BuildConfig;
@@ -37,7 +36,6 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.google.gson.Gson;
-import com.imggaming.translations.DiceLocalizedStrings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +44,9 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+/**
+ * @noinspection ALL
+ */
 public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplayerView> {
 
     private static final String REACT_CLASS = "RCTVideo";
@@ -80,6 +81,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_SRC_DVR_SEEK_BACKWARD_INTERVAL = "dvrSeekBackwardInterval";
     private static final String PROP_SRC_DVR_SEEK_FORWARD_INTERVAL = "dvrSeekForwardInterval";
     private static final String PROP_SRC_PLUGINS = "plugins";
+    private static final String PROP_SRC_LIVE = "live";
+    private static final String PROP_SRC_AUDIO_ONLY = "isAudioOnly";
 
     // Metadata properties
     private static final String PROP_METADATA = "metadata";
@@ -150,6 +153,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_RELATED_VIDEOS_SUBTITLE = "subtitle";
     private static final String PROP_IS_FAVOURITE = "isFavourite";
     private static final String PROP_SKIP_MARKERS = "skipMarkers";
+    private static final String PROP_SUBTITLE_HORIZONTAL_PADDING = "subtitleHorizontalPadding";
+    private static final String PROP_LOCALE = "locale";
 
     private static final int COMMAND_SEEK_TO_NOW = 1;
     private static final int COMMAND_SEEK_TO_TIMESTAMP = 2;
@@ -223,8 +228,12 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         Context context = videoView.getContext().getApplicationContext();
         // MockStreamSource.logRNParam(0, "src", ReadableType.Map, src);
 
+        // Move the PROP_LIVE as PROP_SRC_LIVE
+        videoView.setLive(src.hasKey(PROP_SRC_LIVE) && src.getBoolean(PROP_SRC_LIVE));
+
         String uriString = src.hasKey(PROP_SRC_URI) ? src.getString(PROP_SRC_URI) : null;
         String mimeType = ReadableMapUtils.getString(src, PROP_SRC_CONTENT_TYPE);
+        boolean isAudioOnly = ReadableMapUtils.getBoolean(src, PROP_SRC_AUDIO_ONLY);
         String id = src.hasKey(PROP_SRC_ID) ? src.getString(PROP_SRC_ID) : null;
         ReadableArray textTracks = src.hasKey(PROP_SRC_SUBTITLES) ? src.getArray(PROP_SRC_SUBTITLES) : null;
         String extension = src.hasKey(PROP_SRC_TYPE) ? src.getString(PROP_SRC_TYPE) : null;
@@ -322,6 +331,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     (actionToken == null ? "-" : actionToken.getLicensingServerUrl()),
                     uriString));
 
+            videoView.setAudioOnly(isAudioOnly);
+
             videoView.setSrc(
                     uriString,
                     mimeType,
@@ -375,12 +386,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     @ReactProp(name = PROP_METADATA)
     public void setMetadata(final ReactTVExoplayerView videoView, final ReadableMap metadata) {
         if (metadata != null) {
-            String description = metadata.hasKey(PROP_METADATA_DESCRIPTION) ? metadata.getString(PROP_METADATA_DESCRIPTION) : null;
-            String thumbnailUrl = metadata.hasKey(PROP_METADATA_THUMBNAIL_URL) ? metadata.getString(PROP_METADATA_THUMBNAIL_URL) : null;
-            String type = metadata.hasKey(PROP_METADATA_TYPE) ? metadata.getString(PROP_METADATA_TYPE) : null;
-            String episodeTitle = metadata.hasKey(PROP_METADATA_EPISODE_INFO) ? metadata.getString(PROP_METADATA_EPISODE_INFO) : null;
-
-            videoView.setMetadata(new RNMetadata(description, thumbnailUrl, episodeTitle, type));
+            videoView.setMetadata(toStringMap(metadata));
         }
     }
 
@@ -482,7 +488,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     @ReactProp(name = PROP_LIVE, defaultBoolean = false)
     public void setLive(final ReactTVExoplayerView videoView, final boolean live) {
-        videoView.setLive(live);
+        // Move the PROP_LIVE as PROP_SRC_LIVE
+        // videoView.setLive(live);
     }
 
     @ReactProp(name = PROP_EPG, defaultBoolean = false)
@@ -570,8 +577,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
 
     @ReactProp(name = PROP_TRANSLATIONS)
     public void setTranslations(final ReactTVExoplayerView videoView, @Nullable ReadableMap translations) {
-        DiceLocalizedStrings.getInstance().updateTranslations(toStringMap(translations));
-        videoView.applyTranslations(translations != null ? translations.toHashMap() : null);
+        videoView.setTranslations(toStringMap(translations));
     }
 
     @ReactProp(name = PROP_RELATED_VIDEOS)
@@ -615,6 +621,16 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     @ReactProp(name = PROP_IS_FAVOURITE)
     public void setIsFavourite(final ReactTVExoplayerView videoView, final boolean isFavourite) {
         videoView.setIsFavourite(isFavourite);
+    }
+
+    @ReactProp(name = PROP_SUBTITLE_HORIZONTAL_PADDING, defaultInt = 0)
+    public void setSubtitleHorizontalPadding(final ReactTVExoplayerView videoView, final int padding) {
+        videoView.setSubtitleHorizontalPadding(padding);
+    }
+
+    @ReactProp(name = PROP_LOCALE)
+    public void setLocale(final ReactTVExoplayerView videoView, final String locale) {
+        videoView.setAppLanguageLocale(locale);
     }
 
     private boolean startsWithValidScheme(String uriString) {
