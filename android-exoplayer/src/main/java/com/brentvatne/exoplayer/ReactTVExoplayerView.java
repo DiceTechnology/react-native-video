@@ -1294,8 +1294,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private void reloadCurrentSource() {
         if (src != null && metadata != null) {
-            Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + metadata.type);
-            eventEmitter.reloadCurrentSource(src.getId(), metadata.type);
+            Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + metadata.getType());
+            eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
             return;
         }
         Log.i(TAG, "Reload current source, ignored for src or metadata is null");
