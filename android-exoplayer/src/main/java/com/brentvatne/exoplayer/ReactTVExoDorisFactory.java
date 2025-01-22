@@ -10,7 +10,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.Parameters;
 import com.diceplatform.doris.ExoDoris;
 import com.diceplatform.doris.ExoDorisBuilder;
 import com.diceplatform.doris.common.ad.ui.AdChoicesClickViewRenderer;
-import com.diceplatform.doris.entity.DorisAdEvent.AdType;
+import com.diceplatform.doris.entity.AdType;
 import com.diceplatform.doris.entity.TracksPolicy;
 
 public final class ReactTVExoDorisFactory {

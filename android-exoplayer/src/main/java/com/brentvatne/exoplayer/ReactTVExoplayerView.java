@@ -67,20 +67,22 @@ import com.diceplatform.doris.ExoDorisTrackSelector;
 import com.diceplatform.doris.common.ad.AdGlobalSettings;
 import com.diceplatform.doris.common.ad.ui.AdLabels;
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
+import com.diceplatform.doris.entity.AdMarkers;
 import com.diceplatform.doris.entity.AdTagParameters;
+import com.diceplatform.doris.entity.AdType;
 import com.diceplatform.doris.entity.DorisAdEvent;
-import com.diceplatform.doris.entity.DorisAdEvent.AdMarkers;
-import com.diceplatform.doris.entity.DorisAdEvent.AdType;
 import com.diceplatform.doris.entity.DorisPlayerEvent;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.ImaDaiProperties;
 import com.diceplatform.doris.entity.ImaDaiPropertiesBuilder;
 import com.diceplatform.doris.entity.Source;
 import com.diceplatform.doris.entity.SourceBuilder;
+import com.diceplatform.doris.entity.State;
 import com.diceplatform.doris.entity.TextTrack;
 import com.diceplatform.doris.entity.Track;
 import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
+import com.diceplatform.doris.extension.ExoDorisExtension;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.service.LocalizationService;
 import com.diceplatform.doris.sourceresolver.ContentMetadata;
@@ -1973,59 +1975,52 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             if (exoDorisPlayerView != null) {
                 exoDorisPlayerView.onPlayerEvent(playerEvent);
             }
-            switch (playerEvent.details.state) {
-                case PLAYING:
+            if (playerEvent instanceof DorisPlayerEvent.StateChanged) {
+                State state = ((DorisPlayerEvent.StateChanged) playerEvent).getState();
+                if (state == State.PLAYING) {
                     eventEmitter.playbackRateChange(1f);
-                    break;
-                case PAUSED:
+                } else if (state == State.PAUSED) {
                     eventEmitter.playbackRateChange(0f);
-                    break;
-                case ENDED:
+                } else if (state == State.ENDED) {
                     eventEmitter.playbackRateChange(0f);
                     if (exoDorisPlayerView != null) {
                         exoDorisPlayerView.hideController();
                     }
-                    break;
-            }
+                }
+            } else if (playerEvent instanceof DorisPlayerEvent.PositionChanged) {
+                DorisPlayerEvent.PositionChanged event = (DorisPlayerEvent.PositionChanged) playerEvent;
+                dorisMessaging.onProgressChanged(
+                    event.getCurrentPosition(),
+                    event.getDuration(),
+                    event.getWindowStartTimeMs()
+                );
+            } else if (playerEvent instanceof DorisPlayerEvent.TrackInfoChanged) {
+                if (selectUserPreferredTrack) {
+                    selectUserPreferredTrack = false;
+                    // check track policy
+                    Tracks tracks = player.getExoPlayer().getCurrentTracks();
+                    TracksPolicy.TrackPolicy trackPolicy = getTrackPolicy(trackSelector, tracks, getPreferredAudioLang());
 
-            switch (playerEvent.event) {
-                case POSITION_CHANGED:
-                    dorisMessaging.onProgressChanged(
-                            playerEvent.details.currentPosition,
-                            playerEvent.details.duration,
-                            playerEvent.details.windowStartTimeMs
-                    );
-                case TRACK_INFO_CHANGED:
-                    if (selectUserPreferredTrack) {
-                        selectUserPreferredTrack = false;
-                        // check track policy
-                        Tracks tracks = player.getExoPlayer().getCurrentTracks();
-                        TracksPolicy.TrackPolicy trackPolicy = getTrackPolicy(trackSelector, tracks, getPreferredAudioLang());
-
-                        // Preselect subtitle and audio.
-                        selectTrack(trackPolicy, C.TRACK_TYPE_TEXT, getPreferredSubtitleLang());
-                        selectTrack(trackPolicy, C.TRACK_TYPE_AUDIO, getPreferredAudioLang());
-                    }
-                    break;
-                case TIMELINE_ADJUSTER_CHANGED:
-                    if (exoDorisPlayerView != null) {
-                        exoDorisPlayerView.setExtraTimelineAdjuster(playerEvent.details.timelineAdjuster);
-                    }
-                    break;
-                case RELOAD_WITH_DRM_L3:
-                    reloadCurrentSource();
-                    break;
-                case ERROR:
-                    Exception error = playerEvent.details.error == null ? null : playerEvent.details.error.getException();
-                    if (error instanceof PlaybackException) {
-                        handlePlaybackError((PlaybackException) error);
-                    } else if (error != null) {
-                        resetSourceUrl();
-                        eventEmitter.error("Player exception", error);
-                    }
-                    break;
-                default:
-                    break;
+                    // Preselect subtitle and audio.
+                    selectTrack(trackPolicy, C.TRACK_TYPE_TEXT, getPreferredSubtitleLang());
+                    selectTrack(trackPolicy, C.TRACK_TYPE_AUDIO, getPreferredAudioLang());
+                }
+            } else if (playerEvent instanceof DorisPlayerEvent.TimelineAdjusterChanged) {
+                if (exoDorisPlayerView != null) {
+                    DorisPlayerEvent.TimelineAdjusterChanged event = (DorisPlayerEvent.TimelineAdjusterChanged) playerEvent;
+                    exoDorisPlayerView.setExtraTimelineAdjuster(event.getTimelineAdjuster());
+                }
+            } else if (playerEvent instanceof DorisPlayerEvent.ReloadWithDrmL3) {
+                reloadCurrentSource();
+            } else if (playerEvent instanceof DorisPlayerEvent.Error) {
+                DorisPlayerEvent.Error event = (DorisPlayerEvent.Error) playerEvent;
+                Exception error = event.getError() == null ? null : event.getError().getException();
+                if (error instanceof PlaybackException) {
+                    handlePlaybackError((PlaybackException) error);
+                } else if (error != null) {
+                    resetSourceUrl();
+                    eventEmitter.error("Player exception", error);
+                }
             }
         }
 
@@ -2035,75 +2030,68 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             if (exoDorisPlayerView != null) {
                 exoDorisPlayerView.onAdEvent(adEvent);
             }
-            switch (adEvent.event) {
-                case AD_BREAK_STARTED:
-                    if (areControlsAllowed) {
-                        setControls(false);
+            if (adEvent instanceof DorisAdEvent.AdBreakStarted) {
+                if (areControlsAllowed) {
+                  setControls(false);
+                }
+            } else if (adEvent instanceof DorisAdEvent.AdBreakEnded) {
+                // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
+                if (isCsaiLiveEvent(adEvent)) {
+                    exoDorisPlayerView.setVisibility(View.VISIBLE);
+                    secondaryPlayerView.setPlayer(null);
+                    secondaryPlayerView.setVisibility(View.GONE);
+                }
+                if (areControlsAllowed) {
+                    setControls(true);
+                }
+            } else if (adEvent instanceof DorisAdEvent.AdResumed) {
+                // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
+                if (isCsaiLiveEvent(adEvent)) {
+                    secondaryPlayerView.setVisibility(View.VISIBLE);
+                    exoDorisPlayerView.setVisibility(View.GONE);
+                }
+            } else if (adEvent instanceof DorisAdEvent.AdLoading) {
+                // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
+                if (isCsaiLiveEvent(adEvent)) {
+                    ExoDorisExtension extension = player.getDorisExtension();
+                    secondaryPlayerView.setPlayer(extension == null ? null : extension.getSecondaryAdPlayer());
+                }
+            } else if (adEvent instanceof DorisAdEvent.AdMarkersChanged) {
+                if (adEvent.getAdType() != AdType.IMA_CSAI && exoDorisPlayerView != null) {
+                    DorisAdEvent.AdMarkersChanged event = (DorisAdEvent.AdMarkersChanged) adEvent;
+                    AdMarkers adMarkers = event.getAdMarkers();
+                    exoDorisPlayerView.setExtraAdGroupMarkers(adMarkers.getAdGroupTimesMs(), adMarkers.getPlayedAdGroups());
+                    Log.d(TAG, adEvent.getAdType() + " Ad Stream ID = " + event.getStreamId());
+                }
+            } else if (adEvent instanceof DorisAdEvent.AdPostRollSkipped) {
+                Log.i(TAG, adEvent.getAdType() + " post roll skipped");
+                isPostRollSkipped = true;
+                eventEmitter.end();
+            } else if (adEvent instanceof DorisAdEvent.RequireAdTagParameters) {
+                if (adEvent.getAdType() == AdType.IMA_DAI) {
+                    double positionMs = ((DorisAdEvent.RequireAdTagParameters) adEvent).getPositionMs();
+                    eventEmitter.requireAdParameters(positionMs, true);
+                }
+            } else if (adEvent instanceof DorisAdEvent.Error) {
+                // We can ignore the csai ad error and make the content continue to playback.
+                AdType adType = adEvent.getAdType();
+                boolean ignoreAdError = adType == AdType.IMA_CSAI || adType == AdType.IMA_CSAI_LIVE;
+                Exception error = ((DorisAdEvent.Error) adEvent).getError();
+                if (adType == AdType.IMA_DAI) {
+                    if (!hasReloadedCurrentSource && isUnauthorizedAdError(error)) {
+                        hasReloadedCurrentSource = true;
+                        ignoreAdError = true;
+                        reloadCurrentSource();
                     }
-                    break;
-                case AD_BREAK_ENDED:
-                    // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
-                    if (isCsaiLiveEvent(adEvent)) {
-                        exoDorisPlayerView.setVisibility(View.VISIBLE);
-                        secondaryPlayerView.setPlayer(null);
-                        secondaryPlayerView.setVisibility(View.GONE);
-                    }
-                    if (areControlsAllowed) {
-                        setControls(true);
-                    }
-                    break;
-                case AD_RESUMED:
-                    // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
-                    if (isCsaiLiveEvent(adEvent)) {
-                        secondaryPlayerView.setVisibility(View.VISIBLE);
-                        exoDorisPlayerView.setVisibility(View.GONE);
-                    }
-                    break;
-                case AD_LOADING:
-                    // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
-                    if (isCsaiLiveEvent(adEvent)) {
-                        secondaryPlayerView.setPlayer(player.getDorisExtension() == null ? null : player.getDorisExtension().getSecondaryAdPlayer());
-                    }
-                    break;
-                case AD_MARKERS_CHANGED:
-                    if (adEvent.details.adType != AdType.IMA_CSAI && exoDorisPlayerView != null) {
-                        AdMarkers adMarkers = adEvent.details.adMarkers;
-                        exoDorisPlayerView.setExtraAdGroupMarkers(adMarkers.adGroupTimesMs, adMarkers.playedAdGroups);
-                        Log.d(TAG, adEvent.details.adType + " Ad Stream ID = " + adEvent.details.streamId);
-                    }
-                    break;
-                case AD_POST_ROLL_SKIPPED:
-                    Log.i(TAG, adEvent.details.adType + " post roll skipped");
-                    isPostRollSkipped = true;
-                    eventEmitter.end();
-                    break;
-                case REQUIRE_AD_TAG_PARAMETERS:
-                    if (adEvent.details.adType == AdType.IMA_DAI) {
-                        eventEmitter.requireAdParameters((double) adEvent.details.positionMs, true);
-                    }
-                    break;
-                case ERROR:
-                    // We can ignore the csai ad error and make the content continue to playback.
-                    boolean ignoreAdError = adEvent.details.adType == AdType.IMA_CSAI || adEvent.details.adType == AdType.IMA_CSAI_LIVE;
-                    if (adEvent.details.adType == AdType.IMA_DAI) {
-                        Exception error = adEvent.details.error;
-                        if (!hasReloadedCurrentSource && isUnauthorizedAdError(error)) {
-                            hasReloadedCurrentSource = true;
-                            ignoreAdError = true;
-                            reloadCurrentSource();
-                        }
-                    }
-                    if (!ignoreAdError) {
-                        eventEmitter.error("Ad exception", adEvent.details.error);
-                    }
-                    break;
-                default:
-                    break;
+                }
+                if (!ignoreAdError) {
+                    eventEmitter.error("Ad exception", error);
+                }
             }
         }
 
         private boolean isCsaiLiveEvent(DorisAdEvent adEvent) {
-            return adEvent.details.adType == AdType.IMA_CSAI_LIVE && exoDorisPlayerView != null && secondaryPlayerView != null;
+            return adEvent.getAdType() == AdType.IMA_CSAI_LIVE && exoDorisPlayerView != null && secondaryPlayerView != null;
         }
     };
 }
