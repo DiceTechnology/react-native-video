@@ -85,7 +85,7 @@ import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.extension.ExoDorisExtension;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.service.LocalizationService;
-import com.diceplatform.doris.sourceresolver.ContentMetadata;
+import com.diceplatform.doris.sourceresolver.data.ContentMetadata;
 import com.diceplatform.doris.ui.ExoDorisPlayerTvControlView;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
 import com.diceplatform.doris.ui.ExoDorisPlayerViewListener;
@@ -200,6 +200,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     // Props from React
     private RNSource src;
     private ContentMetadata metadata;
+    private String type;
     private boolean repeat;
     private boolean disableFocus;
     private boolean isLive = false;
@@ -1296,8 +1297,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private void reloadCurrentSource() {
         if (src != null && metadata != null) {
-            Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + metadata.getType());
-            eventEmitter.reloadCurrentSource(src.getId(), metadata.getType());
+            Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + type);
+            eventEmitter.reloadCurrentSource(src.getId(), type);
             return;
         }
         Log.i(TAG, "Reload current source, ignored for src or metadata is null");
@@ -1417,8 +1418,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 .setThumbnailUrl(map.get(KEY_METADATA_THUMBNAIL_URL))
                 .setEpisodeTitle(map.get(KEY_METADATA_EPISODE_INFO))
                 .setDescription(map.get(KEY_METADATA_DESCRIPTION))
-                .setType(map.get(KEY_METADATA_TYPE))
                 .build();
+        this.type = map.get(KEY_METADATA_TYPE);
 
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setMetadata(metadata);
