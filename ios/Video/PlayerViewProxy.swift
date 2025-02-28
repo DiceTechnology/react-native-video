@@ -127,7 +127,8 @@ class PlayerViewProxy {
                 share: nil,
                 watchlist: buttonsValue.watchlist,
                 epg: buttonsValue.epg,
-                annotations: buttonsValue.annotations)
+                annotations: buttonsValue.annotations,
+                multiView: true)
         }
         return jsButtons
     }
@@ -203,6 +204,64 @@ class PlayerViewProxy {
             return JSSkipMarker(startTime: $0.startTime, stopTime: $0.stopTime, type: rndvType)
         }
     }
+  
+  static func convertRNVideoSourceToRNDV(jsProps: JSProps, sourceValue: Source) -> RNDReactNativeDiceVideo.JSSource? {
+      var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
+      let jsNowPlaying = RNDReactNativeDiceVideo.JSNowPlaying(
+          title: sourceValue.nowPlaying?.title ?? jsProps.metadata.value?.title,
+          channelLogoUrl: sourceValue.nowPlaying?.channelLogoUrl,
+          episodeInfo: jsProps.metadata.value?.episodeInfo, //tvos new
+          startDate: sourceValue.nowPlaying?.startDate,
+          endDate: sourceValue.nowPlaying?.endDate,
+          dateFormat: sourceValue.nowPlaying?.dateFormat)
+      
+      let rndvJSIma = PlayerViewProxy.convertRNVideoImaToRNDV(sourceIma: sourceValue.ima)
+      let rndvJSDrm = PlayerViewProxy.convertRNVideoDrmToRNDV(sourceDrm: sourceValue.drm)
+      let jsPartialVideoInformation = JSPartialVideoInformation(
+          title: sourceValue.partialVideoInformation?.title,
+          imageUri: sourceValue.partialVideoInformation?.imageUri)
+      let jsConfig = PlayerViewProxy.convertRNVideoConfigToRNDV(sourceConfig: sourceValue.config)
+      let jsAds = PlayerViewProxy.convertRNVideoAdsToRNDV(sourceAds: sourceValue.ads)
+      var jsSubtitles: [RNDReactNativeDiceVideo.JSSubtitles]?
+      if let subtitles = sourceValue.subtitles {
+          jsSubtitles = [RNDReactNativeDiceVideo.JSSubtitles]()
+          for subtitle in subtitles {
+              jsSubtitles!.append(RNDReactNativeDiceVideo.JSSubtitles(language: subtitle.language, uri: subtitle.uri))
+          }
+      }
+      let jsLimitedSeekableRange = RNDReactNativeDiceVideo.JSLimitedSeekableRange(start: sourceValue.limitedSeekableRange?.start, end: sourceValue.limitedSeekableRange?.end, seekToStart: sourceValue.limitedSeekableRange?.seekToStart)
+      
+      let metadata = JSMetadata(metadata: sourceValue.metadata)
+
+      rndvJSSource = RNDReactNativeDiceVideo.JSSource(
+        id: sourceValue.id ?? "",
+        ima: rndvJSIma,
+        uri: sourceValue.uri,
+        drm: rndvJSDrm,
+        progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
+        type: sourceValue.type,
+        title: sourceValue.title ?? "",
+        description: jsProps.metadata.value?.description, //tvos new
+        live: sourceValue.live,
+        partialVideoInformation: jsPartialVideoInformation,
+        isAudioOnly: sourceValue.isAudioOnly,
+        config: jsConfig,
+        imageUri: jsProps.metadata.value?.thumbnailUrl,
+        thumbnailsPreview: sourceValue.thumbnailsPreview,
+        resumePosition: jsProps.startAt.value,
+        delay: nil,
+        ads: jsAds,
+        metadata: metadata,
+        subtitles: jsSubtitles,
+        limitedSeekableRange: jsLimitedSeekableRange,
+        selectedAudioTrack: nil,
+        selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
+        selectedPlaybackQuality: nil,
+        nowPlaying: jsNowPlaying,
+        preferredAudioTracks: sourceValue.preferredAudioTracks,
+        watchContext: nil)
+      return rndvJSSource
+    }
     
     static func convertRNVideoJSPropsToRNDV(jsProps: JSProps) -> RNDReactNativeDiceVideo.JSProps {
         let rndvJsProps = RNDReactNativeDiceVideo.JSProps()
@@ -214,62 +273,17 @@ class PlayerViewProxy {
 
         var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
         if let sourceValue = jsProps.source.value {
-            let jsNowPlaying = RNDReactNativeDiceVideo.JSNowPlaying(
-                title: sourceValue.nowPlaying?.title ?? jsProps.metadata.value?.title,
-                channelLogoUrl: sourceValue.nowPlaying?.channelLogoUrl,
-                episodeInfo: jsProps.metadata.value?.episodeInfo, //tvos new
-                startDate: sourceValue.nowPlaying?.startDate,
-                endDate: sourceValue.nowPlaying?.endDate,
-                dateFormat: sourceValue.nowPlaying?.dateFormat)
-            rndvJsProps.nowPlaying.value = jsNowPlaying
-            
-            let rndvJSIma = PlayerViewProxy.convertRNVideoImaToRNDV(sourceIma: sourceValue.ima)
-            let rndvJSDrm = PlayerViewProxy.convertRNVideoDrmToRNDV(sourceDrm: sourceValue.drm)
-            let jsPartialVideoInformation = JSPartialVideoInformation(
-                title: sourceValue.partialVideoInformation?.title,
-                imageUri: sourceValue.partialVideoInformation?.imageUri)
-            let jsConfig = PlayerViewProxy.convertRNVideoConfigToRNDV(sourceConfig: sourceValue.config)
-            let jsAds = PlayerViewProxy.convertRNVideoAdsToRNDV(sourceAds: sourceValue.ads)
-            var jsSubtitles: [RNDReactNativeDiceVideo.JSSubtitles]?
-            if let subtitles = sourceValue.subtitles {
-                jsSubtitles = [RNDReactNativeDiceVideo.JSSubtitles]()
-                for subtitle in subtitles {
-                    jsSubtitles!.append(RNDReactNativeDiceVideo.JSSubtitles(language: subtitle.language, uri: subtitle.uri))
-                }
-            }
-            let jsLimitedSeekableRange = RNDReactNativeDiceVideo.JSLimitedSeekableRange(start: sourceValue.limitedSeekableRange?.start, end: sourceValue.limitedSeekableRange?.end, seekToStart: sourceValue.limitedSeekableRange?.seekToStart)
-            
-            let metadata = JSMetadata(metadata: sourceValue.metadata)
-
-            rndvJSSource = RNDReactNativeDiceVideo.JSSource(
-                id: sourceValue.id ?? "",
-                ima: rndvJSIma,
-                uri: sourceValue.uri,
-                drm: rndvJSDrm,
-                progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
-                type: sourceValue.type,
-                title: sourceValue.title ?? "",
-                description: jsProps.metadata.value?.description, //tvos new
-                live: sourceValue.live,
-                partialVideoInformation: jsPartialVideoInformation,
-                isAudioOnly: sourceValue.isAudioOnly,
-                config: jsConfig,
-                imageUri: jsProps.metadata.value?.thumbnailUrl,
-                thumbnailsPreview: sourceValue.thumbnailsPreview,
-                resumePosition: jsProps.startAt.value,
-                delay: nil,
-                ads: jsAds,
-                metadata: metadata,
-                subtitles: jsSubtitles,
-                limitedSeekableRange: jsLimitedSeekableRange,
-                selectedAudioTrack: nil,
-                selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
-                selectedPlaybackQuality: nil,
-                nowPlaying: jsNowPlaying,
-                preferredAudioTracks: sourceValue.preferredAudioTracks,
-                watchContext: nil) //tvos new
+          rndvJSSource = PlayerViewProxy.convertRNVideoSourceToRNDV(jsProps: jsProps, sourceValue: sourceValue)
+          rndvJsProps.nowPlaying.value = rndvJSSource?.nowPlaying
         }
-
+        var rndvMultiViewJSSources = [RNDReactNativeDiceVideo.JSSource]()
+        if let multiViewSources = jsProps.multiViewSources.value {
+          for multiViewSource in multiViewSources {
+            if let rndvMultiViewJSSource = PlayerViewProxy.convertRNVideoSourceToRNDV(jsProps: jsProps, sourceValue: multiViewSource) {
+              rndvMultiViewJSSources.append(rndvMultiViewJSSource)
+            }
+          }
+        }
         let jsTranslations = PlayerViewProxy.convertRNVideoTranslationsToRNDV(translations: jsProps.translations.value)
         let jsButtons = PlayerViewProxy.convertRNVideoButtonsToRNDV(buttons: jsProps.buttons.value)
         let jsTheme = PlayerViewProxy.convertRNVideoThemeToRNDV(theme: jsProps.theme.value)
@@ -306,6 +320,14 @@ class PlayerViewProxy {
         if let rndvJSSource = rndvJSSource {
             let jsVideoData = RNDReactNativeDiceVideo.JSVideoData(source: rndvJSSource, config: rndvJSVideoDataConfig)
             rndvJsProps.videoData.value = jsVideoData
+        }
+        var multiViewJSVideoData = [JSVideoData]()
+        for rndvMultiViewJSSource in rndvMultiViewJSSources {
+          let jsVideoData = RNDReactNativeDiceVideo.JSVideoData(source: rndvMultiViewJSSource, config: rndvJSVideoDataConfig)
+          multiViewJSVideoData.append(jsVideoData)
+        }
+        if multiViewJSVideoData.count > 0 {
+          rndvJsProps.multiViewVideoData.value = multiViewJSVideoData
         }
         return rndvJsProps
     }
