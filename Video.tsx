@@ -145,6 +145,10 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
     this.props.onBehindLiveWindowError?.(event.nativeEvent);
   }
 
+  onSetMultiViewMode = (event) => {
+    this.props.onSetMultiViewMode?.(event);
+  }
+
   /**
    * seekToResume jumps to a certain position for vod and live content
    * time parameter can be the following:
