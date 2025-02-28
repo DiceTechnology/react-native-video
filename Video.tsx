@@ -230,6 +230,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
       onWatchlistButtonClick: this.onWatchlistButtonClick,
       onReloadCurrentSource: this.onReloadCurrentSource,
       onBehindLiveWindowError: this.onBehindLiveWindowError,
+      onSetMultiViewMode: this.onSetMultiViewMode,
     };
   };
 
