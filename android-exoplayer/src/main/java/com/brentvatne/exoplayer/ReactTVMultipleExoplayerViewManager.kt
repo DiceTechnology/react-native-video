@@ -160,7 +160,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
 
         Handler(Looper.getMainLooper()).postDelayed({
             Toast.makeText(reactApplicationContext, "onSetMultiViewMode", Toast.LENGTH_SHORT).show()
-            eventEmitter.setMultipleVideoMode(true)
+            eventEmitter.setMultiViewMode(true)
         }, 5000L)
     }
 
