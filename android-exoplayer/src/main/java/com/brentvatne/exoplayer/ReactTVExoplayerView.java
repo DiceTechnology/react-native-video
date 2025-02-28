@@ -1552,6 +1552,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
+    public void setMultipleViewMode(boolean multipleViewMode) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setMultipleViewMode(multipleViewMode);
+        }
+    }
+
     public void resumeTo(long positionMs) {
         if (player != null) {
             player.setResumePosition(positionMs);
