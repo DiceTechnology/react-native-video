@@ -63,6 +63,7 @@ class VideoEventEmitter {
     private static final String EVENT_ANNOTATIONS_BUTTON_CLICK = "onAnnotationsButtonClick";
     private static final String EVENT_SUBTITLE_TRACK_CHANGED = "onSubtitleTrackChanged";
     private static final String EVENT_AUDIO_TRACK_CHANGED = "onAudioTrackChanged";
+    private static final String EVENT_SET_MULTIPLE_VIEW = "onSetMultiViewMode";
 
     static final String[] Events = {
             EVENT_LOAD_START,
@@ -100,7 +101,8 @@ class VideoEventEmitter {
             EVENT_AUDIO_TRACK_CHANGED,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
-            EVENT_BEHIND_LIVE_WINDOW_ERROR
+            EVENT_BEHIND_LIVE_WINDOW_ERROR,
+            EVENT_SET_MULTIPLE_VIEW
     };
 
     @Retention(RetentionPolicy.SOURCE)
@@ -140,7 +142,8 @@ class VideoEventEmitter {
             EVENT_AUDIO_TRACK_CHANGED,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
-            EVENT_BEHIND_LIVE_WINDOW_ERROR
+            EVENT_BEHIND_LIVE_WINDOW_ERROR,
+            EVENT_SET_MULTIPLE_VIEW
     })
     @interface VideoEvents {
     }
@@ -184,6 +187,7 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ERROR_EXCEPTION = "errorException";
 
     private static final String EVENT_PROP_TIMED_METADATA = "metadata";
+    private static final String EVENT_PROP_MULTIPLE_VIEW_MODE = "multiViewMode";
 
     void setViewId(int viewId) {
         this.viewId = viewId;
@@ -430,6 +434,12 @@ class VideoEventEmitter {
         event.putString(EVENT_PROP_ID, id);
         event.putString(EVENT_PROP_TYPE, type);
         receiveEvent(EVENT_RELOAD_CURRENT_SOURCE, event);
+    }
+
+    void setMultiViewMode(boolean mode) {
+        WritableMap map = Arguments.createMap();
+        map.putBoolean(EVENT_PROP_MULTIPLE_VIEW_MODE, mode);
+        receiveEvent(EVENT_SET_MULTIPLE_VIEW, map);
     }
 
     void behindLiveWindowError() {
