@@ -24,6 +24,8 @@ class JSProps {
     var hideAdUiElements: Dynamic<Bool> = Dynamic(false)
     var isWhyThisAdIconEnabled: Dynamic<Bool> = Dynamic(false)
     var locale: Dynamic<String?> = Dynamic(nil)
+    var multiViewMode: Dynamic<Bool> = Dynamic(false)
+    var multiViewSources: Dynamic<[Source]?> = Dynamic(nil)
 }
 
 class Dynamic<T> {
