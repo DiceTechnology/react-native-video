@@ -45,6 +45,7 @@ export interface IVideoPlayer extends IVideoPlayerCallbacks, ViewProps {
   selectedAudioTrack?: any // TODO
   width?: number;
   subtitleHorizontalPadding?: number;
+  enableMultiView?: boolean;
   multiViewMode?: boolean;
   multiViewSources: IVideoPlayerSource[];
 }
