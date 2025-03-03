@@ -84,10 +84,17 @@ class NewPlayerView: UIView, JSInputProtocol {
         didSet { jsProps.metadata.value = try? Metadata(dict: metadata) } }
     @objc var overlayConfig: NSDictionary? {
         didSet { jsProps.overlayConfig.value = try? OverlayConfig(dict: overlayConfig) } }
-  @objc var multiViewSources: NSDictionary? {
+  @objc var multiViewSources: [NSDictionary]? {
     didSet {
       
     }
+  }
+  
+  @objc var multiViewMode: Bool = false {
+      didSet {
+          jsPlayerView?.multiViewMode = multiViewMode
+          jsProps.multiViewMode.value = multiViewMode
+      }
   }
     
     //new separate prop
