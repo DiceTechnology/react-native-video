@@ -146,7 +146,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
   }
 
   onSetMultiViewMode = (event) => {
-    this.props.onSetMultiViewMode?.(event);
+    this.props.onSetMultiViewMode?.(event.nativeEvent);
   }
 
   /**
