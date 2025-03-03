@@ -2,13 +2,11 @@ package com.brentvatne.exoplayer
 
 import android.annotation.SuppressLint
 import android.text.TextUtils
-import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.children
 import com.brentvatne.react.R
 import com.brentvatne.util.ReadableMapUtils
-import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
@@ -31,9 +29,15 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         (children.find { it is ReactRootView } as? ReactRootView)?.unmountReactApplication()
     }
 
+    override fun setId(id: Int) {
+        super.setId(id)
+        (multipleLayout.getChildAt(0) as? ReactTVExoplayerView)?.eventEmitter?.setViewId(id)
+    }
+
     override fun addView(view: View) {
         if (view is ReactTVExoplayerView) {
-            view.setMultipleViewMode(true)
+            view.mute(multipleLayout.childCount > 1)
+            view.setMultipleViewMode(multipleLayout.childCount > 1)
             multipleLayout.addView(view)
         } else {
             super.addView(view)
@@ -86,16 +90,16 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 //            })
 //            exoDorisPlayerView.removeView(reactRootFrameLayout)
 //        }
-        val reactRootView = ReactRootView(context)
-        reactRootView.tag = R.id.bottom_overlay_component
-        reactRootView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 300).apply {
-            gravity = Gravity.BOTTOM
-        }
-        reactRootView.startReactApplication(
-            (context.applicationContext as ReactApplication)
-                .reactNativeHost.reactInstanceManager, component, null
-        )
-        addView(reactRootView)
+//        val reactRootView = ReactRootView(context)
+//        reactRootView.tag = R.id.bottom_overlay_component
+//        reactRootView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 300).apply {
+//            gravity = Gravity.BOTTOM
+//        }
+//        reactRootView.startReactApplication(
+//            (context.applicationContext as ReactApplication)
+//                .reactNativeHost.reactInstanceManager, component, null
+//        )
+//        addView(reactRootView)
 //        exoDorisPlayerView.addView(frameLayout, LayoutParams(LayoutParams.WRAP_CONTENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT))
 //        exoDorisPlayerView.setTag(R.id.bottomComponentTag, key)
     }

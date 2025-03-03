@@ -369,6 +369,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         playList.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
     }
 
+    public VideoEventEmitter getEventEmitter() {
+        return eventEmitter;
+    }
+
     @Override
     public void setId(int id) {
         super.setId(id);
@@ -1555,6 +1559,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setMultipleViewMode(boolean multipleViewMode) {
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setMultipleViewMode(multipleViewMode);
+        }
+    }
+
+    public void mute(boolean mute) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.mute(mute);
         }
     }
 

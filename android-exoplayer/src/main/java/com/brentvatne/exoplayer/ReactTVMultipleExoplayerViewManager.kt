@@ -1,13 +1,9 @@
 package com.brentvatne.exoplayer
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.annotations.ReactProp
@@ -124,8 +120,6 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     private lateinit var primaryView: ReactTVExoplayerView
     private lateinit var rootView: ReactTvMultipleExoplayerView
 
-    private val deviceEventEmitter = reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-
     override fun getName(): String = "RCTVideo"
 
     override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? = primaryViewManager.exportedCustomDirectEventTypeConstants
@@ -134,8 +128,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
 
     override fun getCommandsMap(): Map<String, Int>? = primaryViewManager.commandsMap
 
-    @Deprecated("Deprecated in Java")
-    override fun receiveCommand(root: ReactTvMultipleExoplayerView, commandId: Int, args: ReadableArray?) {
+    override fun receiveCommand(root: ReactTvMultipleExoplayerView, commandId: String?, args: ReadableArray?) {
         primaryViewManager.receiveCommand(primaryView, commandId, args)
     }
 
@@ -151,17 +144,10 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
         primaryViewManager.onDropViewInstance(primaryView)
     }
 
-    private val eventEmitter: VideoEventEmitter = VideoEventEmitter(reactApplicationContext)
-
     @ReactProp(name = PROP_SRC)
     fun setSrc(videoView: ReactTvMultipleExoplayerView, src: ReadableMap?) {
         rootView.setSrc(src)
         primaryViewManager.setSrc(primaryView, src)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            Toast.makeText(reactApplicationContext, "onSetMultiViewMode", Toast.LENGTH_SHORT).show()
-            eventEmitter.setMultiViewMode(true)
-        }, 5000L)
     }
 
     @ReactProp(name = PROP_METADATA)
