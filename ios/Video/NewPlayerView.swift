@@ -84,18 +84,21 @@ class NewPlayerView: UIView, JSInputProtocol {
         didSet { jsProps.metadata.value = try? Metadata(dict: metadata) } }
     @objc var overlayConfig: NSDictionary? {
         didSet { jsProps.overlayConfig.value = try? OverlayConfig(dict: overlayConfig) } }
-  @objc var multiViewSources: [NSDictionary]? {
-    didSet {
-      
-    }
-  }
-  
-  @objc var multiViewMode: Bool = false {
-      didSet {
-          jsPlayerView?.multiViewMode = multiViewMode
-          jsProps.multiViewMode.value = multiViewMode
+    @objc var multiViewSources: NSArray? {
+        didSet {
+          if let sources = multiViewSources, sources.count > 0 {
+            var convertSources = [Source]()
+            for dict in sources {
+              if let source = try? Source(dict: dict as? NSDictionary) {
+                convertSources.append(source)
+              }
+            }
+            self.jsProps.multiViewSources.value = convertSources
+            let rndvJSProps = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
+            jsPlayerView?.multiViewVideoData = rndvJSProps.multiViewVideoData.value
+          }
+        }
       }
-  }
     
     //new separate prop
     @objc var isFavourite: Bool = false {

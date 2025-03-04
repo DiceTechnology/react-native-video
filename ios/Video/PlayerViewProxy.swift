@@ -110,6 +110,7 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.fastForward = translations.fastForward
         dorisTranslationsViewModel.off = translations.off
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
+        dorisTranslationsViewModel.multiView = translations.multiView
         return dorisTranslationsViewModel
     }
 
@@ -128,7 +129,7 @@ class PlayerViewProxy {
                 watchlist: buttonsValue.watchlist,
                 epg: buttonsValue.epg,
                 annotations: buttonsValue.annotations,
-                multiView: true)
+                multiView: buttonsValue.multiView)
         }
         return jsButtons
     }
