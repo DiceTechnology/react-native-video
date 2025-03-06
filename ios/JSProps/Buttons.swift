@@ -17,7 +17,7 @@ struct Buttons: SuperCodable {
     let stats: Bool
     let favourite: Bool
     let info: Bool?
-    let multiView: Bool?
+    let multiview: Bool?
     //ios only
     let fullscreen: Bool?
     let zoom: Bool?//ios

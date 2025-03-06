@@ -4,5 +4,5 @@ export interface IVideoPlayerButtons {
   epg?: boolean;
   stats?: boolean;
   annotations?: boolean;
-  multiView?: boolean;
+  multiview?: boolean;
 }
