@@ -953,7 +953,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         setKeepScreenOn(false);
     }
 
-    private void stopPlayback() {
+    public void stopPlayback() {
         hideWatermark();
         onStopPlayback();
         releasePlayer();
@@ -1710,13 +1710,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean showFavouriteButton,
             boolean showEpgButton,
             boolean showStatsButton,
-            boolean showAnnotationsButton) {
+            boolean showAnnotationsButton,
+            boolean showMultiViewButton) {
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setShowWatchlistButton(showWatchlistButton);
             exoDorisPlayerView.setShowFavoriteButton(showFavouriteButton);
             exoDorisPlayerView.setShowEpgButton(showEpgButton);
             exoDorisPlayerView.setShowStatsButton(showStatsButton);
             exoDorisPlayerView.setShowAnnotationsButton(showAnnotationsButton);
+            exoDorisPlayerView.setShowMultiViewButton(showMultiViewButton);
         }
     }
 
@@ -1729,6 +1731,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setBottomOverlayComponent(String key, String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
         if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key))
+            return;
+        if (!exoDorisPlayerView.getUseController())
             return;
         // add frameLayout to ExoPlayerView, ReactRootView load data first, move to ExoPlayerControllerView.
         ReactRootFrameLayout frameLayout = new ReactRootFrameLayout(getContext());
@@ -1940,6 +1944,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     @Override
     public void onStatsButtonClicked() {
         eventEmitter.statsIconClick();
+    }
+
+    @Override
+    public void onMultiViewButtonClicked() {
+        //TODO: show to set false, exit multiView mode.
+        eventEmitter.setMultiViewMode(true);
     }
 
     @Override

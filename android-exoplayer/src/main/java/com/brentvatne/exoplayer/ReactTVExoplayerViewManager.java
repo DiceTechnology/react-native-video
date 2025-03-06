@@ -107,6 +107,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_EPG_BUTTON = "epg";
     private static final String PROP_STATS_BUTTON = "stats";
     private static final String PROP_ANNOTATIONS_BUTTON = "annotations";
+    private static final String PROP_MULTIVIEW = "multiView";
 
     private static final String PROP_RESIZE_MODE = "resizeMode";
     private static final String PROP_REPEAT = "repeat";
@@ -615,7 +616,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         boolean showEpgButton = (buttons != null && buttons.hasKey(PROP_EPG_BUTTON)) && buttons.getBoolean(PROP_EPG_BUTTON);
         boolean showStatsButton = (buttons != null && buttons.hasKey(PROP_STATS_BUTTON)) && buttons.getBoolean(PROP_STATS_BUTTON);
         boolean showAnnotationsButton = (buttons != null && buttons.hasKey(PROP_ANNOTATIONS_BUTTON)) && buttons.getBoolean(PROP_ANNOTATIONS_BUTTON);
-        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton, showAnnotationsButton);
+        boolean showMultiViewButton = (buttons != null && buttons.hasKey(PROP_MULTIVIEW)) && buttons.getBoolean(PROP_MULTIVIEW);
+        videoView.setButtons(showWatchlistButton, showFavouriteButton, showEpgButton, showStatsButton, showAnnotationsButton, showMultiViewButton);
     }
 
     @ReactProp(name = PROP_IS_FAVOURITE)

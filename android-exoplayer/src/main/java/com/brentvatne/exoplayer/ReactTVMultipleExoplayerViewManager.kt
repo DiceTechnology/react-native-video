@@ -1,6 +1,8 @@
 package com.brentvatne.exoplayer
 
 import android.util.Log
+import android.view.ViewGroup.LayoutParams
+import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -15,76 +17,28 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
         // Source properties
         private const val PROP_SRC: String = "src"
         const val PROP_SRC_URI: String = "uri"
-        private const val PROP_SRC_CONTENT_TYPE: String = "contentType"
-        private const val PROP_SRC_SUBTITLES: String = "subtitles"
-        private const val PROP_SRC_ID: String = "id"
-        private const val PROP_SRC_TYPE: String = "type"
-        private const val PROP_SRC_DRM: String = "drm"
-        private const val PROP_SRC_IMA: String = "ima"
-        private const val PROP_SRC_CHANNEL_ID: String = "channelId"
-        private const val PROP_SRC_SERIES_ID: String = "seriesId"
-        private const val PROP_SRC_SEASON_ID: String = "seasonId"
-        private const val PROP_SRC_PLAYLIST_ID: String = "playlistId"
-        private const val PROP_SRC_DURATION: String = "duration"
-        private const val PROP_SRC_CHANNEL_NAME: String = "channelName"
-        private const val PROP_SRC_CONFIG: String = "config"
-        private const val PROP_SRC_MUX_DATA: String = "muxData"
-        private const val PROP_SRC_HEADERS: String = "requestHeaders"
-        private const val PROP_SRC_APS: String = "aps"
-        private const val PROP_SRC_APS_TEST_MODE: String = "testMode"
-        private const val PROP_SRC_METADATA: String = "metadata"
-        private const val PROP_SRC_LIMIT_RANGE: String = "limitedSeekableRange"
-        private const val PROP_SRC_SAVE_SUBTITLE_SELECTION: String = "shouldSaveSubtitleSelection"
         private const val PROP_SRC_NOW_PLAYING: String = "nowPlaying"
-        private const val PROP_SRC_BIF_URL: String = "thumbnailsPreview"
-        private const val PROP_SRC_SELECTED_SUBTITLE_TRACK: String = "selectedSubtitleTrack"
-        private const val PROP_SRC_PREFERRED_AUDIO_TRACKS: String = "preferredAudioTracks"
-        private const val PROP_SRC_DVR_SEEK_BACKWARD_INTERVAL: String = "dvrSeekBackwardInterval"
-        private const val PROP_SRC_DVR_SEEK_FORWARD_INTERVAL: String = "dvrSeekForwardInterval"
         const val PROP_SRC_PLUGINS: String = "plugins"
-        private const val PROP_SRC_LIVE: String = "live"
 
         // Metadata properties
         private const val PROP_METADATA: String = "metadata"
-        private const val PROP_METADATA_CHANNEL_LOGO_URL: String = "channelLogoUrl"
-        private const val PROP_METADATA_DESCRIPTION: String = "description"
-        private const val PROP_METADATA_THUMBNAIL_URL: String = "thumbnailUrl"
-        private const val PROP_METADATA_DURATION: String = "duration"
-        private const val PROP_METADATA_TITLE: String = "title"
-        private const val PROP_METADATA_TYPE: String = "type"
-        private const val PROP_METADATA_EPISODE_INFO: String = "episodeInfo"
         private const val PROP_THEME: String = "theme"
-        private const val PROP_DRM_CRO_TOKEN: String = "croToken"
         private const val PROP_BUTTONS: String = "buttons"
-        private const val PROP_WATCHLIST_BUTTON: String = "watchlist"
-        private const val PROP_FAVOURITE_BUTTON: String = "favourite"
-        private const val PROP_EPG_BUTTON: String = "epg"
-        private const val PROP_STATS_BUTTON: String = "stats"
-        private const val PROP_ANNOTATIONS_BUTTON: String = "annotations"
         private const val PROP_RESIZE_MODE: String = "resizeMode"
         private const val PROP_REPEAT: String = "repeat"
         private const val PROP_SELECTED_AUDIO_TRACK: String = "selectedAudioTrack"
-        private const val PROP_SELECTED_AUDIO_TRACK_TYPE: String = "type"
-        private const val PROP_SELECTED_AUDIO_TRACK_VALUE: String = "value"
         private const val PROP_SELECTED_TEXT_TRACK: String = "selectedTextTrack"
-        private const val PROP_SELECTED_TEXT_TRACK_TYPE: String = "type"
-        private const val PROP_SELECTED_TEXT_TRACK_VALUE: String = "value"
         private const val PROP_PAUSED: String = "paused"
         private const val PROP_MUTED: String = "muted"
         private const val PROP_MEDIA_KEYS: String = "mediaKeys"
         private const val PROP_VOLUME: String = "volume"
         private const val PROP_BUFFER_CONFIG: String = "bufferConfig"
-        private const val PROP_BUFFER_CONFIG_MIN_BUFFER_MS: String = "minBufferMs"
-        private const val PROP_BUFFER_CONFIG_MAX_BUFFER_MS: String = "maxBufferMs"
-        private const val PROP_BUFFER_CONFIG_BUFFER_FOR_PLAYBACK_MS: String = "bufferForPlaybackMs"
-        private const val PROP_BUFFER_CONFIG_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS: String = "bufferForPlaybackAfterRebufferMs"
         private const val PROP_PROGRESS_UPDATE_INTERVAL: String = "progressUpdateInterval"
         private const val PROP_SEEK: String = "seek"
         private const val PROP_RATE: String = "rate"
         private const val PROP_PLAY_IN_BACKGROUND: String = "playInBackground"
         private const val PROP_DISABLE_FOCUS: String = "disableFocus"
         private const val PROP_USE_TEXTURE_VIEW: String = "useTextureView"
-        private const val PROP_COLOR_PROGRESS_BAR: String = "colorProgressBar"
         private const val PROP_LIVE: String = "live"
         private const val PROP_EPG: String = "hasEpg"
         private const val PROP_STATS: String = "hasStats"
@@ -98,22 +52,9 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
         private const val PROP_STATE_MIDDLE_CORE_CONTROLS: String = "stateMiddleCoreControls"
         private const val PROP_STATE_PROGRESS_BAR: String = "stateProgressBar"
         private const val PROP_TRANSLATIONS: String = "translations"
-        private const val PROP_LABEL_FONT_NAME: String = "labelFontName"
         private const val PROP_RELATED_VIDEOS: String = "relatedVideos"
-        private const val PROP_RELATED_VIDEOS_ITEMS: String = "items"
-        private const val PROP_RELATED_VIDEOS_HEAD_INDEX: String = "headIndex"
-        private const val PROP_RELATED_VIDEOS_HAS_MORE: String = "hasMore"
-        private const val PROP_RELATED_VIDEOS_SUBTITLE: String = "subtitle"
         private const val PROP_IS_FAVOURITE: String = "isFavourite"
-        private const val PROP_SKIP_MARKERS: String = "skipMarkers"
-        private const val PROP_MULTI_VIEW_MODE: String = "mutliViewMode"
-
-        private const val COMMAND_SEEK_TO_NOW: Int = 1
-        private const val COMMAND_SEEK_TO_TIMESTAMP: Int = 2
-        private const val COMMAND_SEEK_TO_RESUME_POSITION: Int = 3
-        private const val COMMAND_SEEK_TO_POSITION: Int = 4
-        private const val COMMAND_REPLACE_AD_TAG_PARAMETERS: Int = 5
-        private const val COMMAND_LIMIT_SEEKABLE_RANGE: Int = 6
+        private const val PROP_MULTI_VIEW_MODE: String = "multiViewMode"
     }
 
     private val primaryViewManager: ReactTVExoplayerViewManager = ReactTVExoplayerViewManager(reactApplicationContext)
@@ -135,6 +76,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     override fun createViewInstance(context: ThemedReactContext): ReactTvMultipleExoplayerView {
         primaryView = primaryViewManager.createViewInstance(context)
         rootView = ReactTvMultipleExoplayerView(context)
+        rootView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         rootView.addView(primaryView)
         return rootView
     }
@@ -146,7 +88,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
 
     @ReactProp(name = PROP_SRC)
     fun setSrc(videoView: ReactTvMultipleExoplayerView, src: ReadableMap?) {
-        rootView.setSrc(src)
+        Log.d(this.javaClass.simpleName, "setSrc: ${src?.getString("id")}")
         primaryViewManager.setSrc(primaryView, src)
     }
 
@@ -330,13 +272,43 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     }
 
     @ReactProp(name = "multiViewSources")
-    fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, list: ReadableArray?) {
-        Log.d(this.javaClass.simpleName, "multiViewSources: $list")
-        if (list == null || list.size() == 0) return
-        val manager = ReactTVExoplayerViewManager(reactApplicationContext)
-        val playerView = manager.createViewInstance(rootView.themedReactContext)
-        manager.setSrc(playerView, list.getMap(list.size() - 1))
-        rootView.addView(playerView)
+    fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
+        Log.d(this.javaClass.simpleName, "multiViewSources[${array?.size()}]: ${array?.toArrayList()?.map { (it as HashMap<*, *>)["id"] }}")
+        if (array == null || array.size() == 0) {
+            rootView.multiViewMode = false
+            return
+        }
+        if (array.size() == 1 && !rootView.multiViewMode) {
+            primaryView.stopPlayback()
+            rootView.multiViewMode = true
+            rootView.removeView(primaryView)
+            rootView.loadBottomOverlayComponent(array.getMap(0))
+        }
+
+        if (array.size() > rootView.getMultiViewChildrenList().size) {
+            val list = rootView.getMultiViewChildrenList().mapNotNull { it.tag as? ReadableMap }
+            for (i in 0 until array.size()) {
+                val src = array.getMap(i)
+                if (list.isEmpty() || src !in list) {
+                    val playerView = primaryViewManager.createViewInstance(rootView.themedReactContext)
+                    playerView.tag = src
+                    playerView.mute(true)
+                    playerView.setMultipleViewMode(true)
+                    primaryViewManager.setSrc(playerView, src)
+                    rootView.addView(playerView)
+                    break
+                }
+            }
+        } else if (array.size() < rootView.getMultiViewChildrenList().size) {
+            val removeView = rootView.getMultiViewChildrenList().find { view ->
+                val tagSrc = view.tag as? ReadableMap
+                tagSrc != null && !ReadableMapUtils.contain(array, tagSrc)
+            }
+            removeView?.let {
+                (it as? ReactTVExoplayerView)?.stopPlayback()
+                rootView.removeView(it)
+            }
+        }
     }
 
     @ReactProp(name = PROP_MULTI_VIEW_MODE)

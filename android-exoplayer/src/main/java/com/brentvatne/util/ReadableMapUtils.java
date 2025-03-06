@@ -2,8 +2,11 @@ package com.brentvatne.util;
 
 import androidx.annotation.NonNull;
 
+import com.brentvatne.exoplayer.ReactTVMultipleExoplayerViewManager;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 import javax.annotation.Nullable;
 
@@ -59,5 +62,14 @@ public class ReadableMapUtils {
             return 0;
         }
         return map.hasKey(key) ? map.getDouble(key) : 0;
+    }
+
+    public static boolean contain(ReadableArray array, ReadableMap map) {
+        for (int i = 0; i < array.size(); i++) {
+            if (array.getMap(i).equals(map)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
