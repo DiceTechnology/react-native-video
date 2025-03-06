@@ -107,7 +107,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
     private static final String PROP_EPG_BUTTON = "epg";
     private static final String PROP_STATS_BUTTON = "stats";
     private static final String PROP_ANNOTATIONS_BUTTON = "annotations";
-    private static final String PROP_MULTIVIEW = "multiView";
+    private static final String PROP_MULTIVIEW = "multiview";
 
     private static final String PROP_RESIZE_MODE = "resizeMode";
     private static final String PROP_REPEAT = "repeat";

@@ -294,6 +294,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
                     playerView.tag = src
                     playerView.mute(true)
                     playerView.setMultipleViewMode(true)
+                    playerView.setShowBottomComponent(false)
                     primaryViewManager.setSrc(playerView, src)
                     rootView.addView(playerView)
                     break
