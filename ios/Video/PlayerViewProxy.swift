@@ -129,7 +129,7 @@ class PlayerViewProxy {
                 watchlist: buttonsValue.watchlist,
                 epg: buttonsValue.epg,
                 annotations: buttonsValue.annotations,
-                multiView: buttonsValue.multiView)
+                multiview: buttonsValue.multiview)
         }
         return jsButtons
     }
