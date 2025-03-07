@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.children
+import androidx.core.view.isEmpty
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
@@ -41,6 +42,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 
     fun dropView() {
         (bottomContainer.getChildAt(0) as? ReactRootView)?.unmountReactApplication()
+        multiViewLayout.removeAllViews()
+        bottomContainer.removeAllViews()
     }
 
     fun getMultiViewChildrenList(): List<View> {
@@ -71,7 +74,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         if (src.hasKey(ReactTVMultipleExoplayerViewManager.PROP_SRC_PLUGINS)) {
             val uriString = ReadableMapUtils.getString(src, ReactTVMultipleExoplayerViewManager.PROP_SRC_URI)
             val bottomPlugin = ReadableMapUtils.getMap(src.getMap(ReactTVMultipleExoplayerViewManager.PROP_SRC_PLUGINS), "bottom")
-            if (bottomPlugin != null && bottomContainer.childCount == 0) {
+            if (bottomPlugin != null && bottomContainer.isEmpty()) {
                 val width = ReadableMapUtils.getInt(bottomPlugin, "width", -1)
                 val height = ReadableMapUtils.getInt(bottomPlugin, "height", -1)
                 val component = ReadableMapUtils.getString(bottomPlugin, "name")

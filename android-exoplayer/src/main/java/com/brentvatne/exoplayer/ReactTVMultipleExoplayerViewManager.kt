@@ -74,6 +74,9 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     }
 
     override fun createViewInstance(context: ThemedReactContext): ReactTvMultipleExoplayerView {
+        if (this::rootView.isInitialized) {
+            rootView.dropView()
+        }
         primaryView = primaryViewManager.createViewInstance(context)
         rootView = ReactTvMultipleExoplayerView(context)
         rootView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
@@ -273,15 +276,13 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
 
     @ReactProp(name = "multiViewSources")
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
-        Log.d(this.javaClass.simpleName, "multiViewSources[${array?.size()}]: ${array?.toArrayList()?.map { (it as HashMap<*, *>)["id"] }}")
         if (array == null || array.size() == 0) {
-            rootView.multiViewMode = false
+            rootView.getMultiViewChildrenList().filter { it != primaryView }.forEach {
+                rootView.removeView(it)
+            }
             return
         }
-        if (array.size() == 1 && !rootView.multiViewMode) {
-            primaryView.stopPlayback()
-            rootView.multiViewMode = true
-            rootView.removeView(primaryView)
+        if (array.size() == 1 && rootView.multiViewMode) {
             rootView.loadBottomOverlayComponent(array.getMap(0))
         }
 
@@ -315,5 +316,9 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     @ReactProp(name = PROP_MULTI_VIEW_MODE)
     fun setMultiViewMode(videoView: ReactTvMultipleExoplayerView, multiViewMode: Boolean) {
         Log.d(this.javaClass.simpleName, "setMultiViewMode: $multiViewMode")
+        rootView.multiViewMode = multiViewMode
+        if (multiViewMode) {
+            rootView.removeView(primaryView)
+        }
     }
 }
