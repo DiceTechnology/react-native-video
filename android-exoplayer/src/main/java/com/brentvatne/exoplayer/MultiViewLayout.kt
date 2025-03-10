@@ -3,6 +3,7 @@ package com.brentvatne.exoplayer
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
+import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context) {
 
@@ -63,27 +64,46 @@ class MultiViewLayout(context: Context) : FrameLayout(context) {
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val isRTL = I18nUtil.getInstance().isRTL(context)
         when (childCount) {
             1 -> {
                 layoutView(getChildAt(0), 0, 0)
             }
 
             2 -> {
-                layoutView(getChildAt(0), 0, 0)
-                layoutView(getChildAt(1), measuredWidth / 2, 0)
+                if (isRTL) {
+                    layoutView(getChildAt(1), 0, 0)
+                    layoutView(getChildAt(0), measuredWidth / 2, 0)
+                } else {
+                    layoutView(getChildAt(0), 0, 0)
+                    layoutView(getChildAt(1), measuredWidth / 2, 0)
+                }
             }
 
             3 -> {
-                layoutView(getChildAt(0), 0, 0)
-                layoutView(getChildAt(1), measuredWidth / 2, 0)
-                layoutView(getChildAt(2), measuredWidth / 2, measuredHeight / 2)
+                if (isRTL) {
+                    layoutView(getChildAt(0), measuredWidth / 2, 0)
+                    layoutView(getChildAt(1), 0, 0)
+                    layoutView(getChildAt(2), 0, measuredHeight / 2)
+                } else {
+                    layoutView(getChildAt(0), 0, 0)
+                    layoutView(getChildAt(1), measuredWidth / 2, 0)
+                    layoutView(getChildAt(2), measuredWidth / 2, measuredHeight / 2)
+                }
             }
 
             4 -> {
-                layoutView(getChildAt(0), 0, 0)
-                layoutView(getChildAt(1), measuredWidth / 2, 0)
-                layoutView(getChildAt(2), measuredWidth / 2, measuredHeight / 2)
-                layoutView(getChildAt(3), 0, measuredHeight / 2)
+                if (isRTL) {
+                    layoutView(getChildAt(0), measuredWidth / 2, 0)
+                    layoutView(getChildAt(1), measuredWidth / 2, measuredHeight / 2)
+                    layoutView(getChildAt(2), 0, measuredHeight / 2)
+                    layoutView(getChildAt(3), 0, 0)
+                } else {
+                    layoutView(getChildAt(0), 0, 0)
+                    layoutView(getChildAt(1), measuredWidth / 2, 0)
+                    layoutView(getChildAt(2), measuredWidth / 2, measuredHeight / 2)
+                    layoutView(getChildAt(3), 0, measuredHeight / 2)
+                }
             }
         }
     }
