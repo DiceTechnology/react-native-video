@@ -1,7 +1,7 @@
 package com.brentvatne.exoplayer
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.widget.FrameLayout
@@ -20,9 +20,14 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
     var multiViewMode = false
+        set(value) {
+            field = value
+            multiViewLayout.multiViewMode = value
+        }
 
     init {
         orientation = VERTICAL
+        gravity = Gravity.CENTER_VERTICAL
         addView(
             multiViewLayout,
             LayoutParams(

@@ -2,6 +2,8 @@ package com.brentvatne.exoplayer
 
 import android.util.Log
 import android.view.ViewGroup.LayoutParams
+import androidx.core.content.res.ResourcesCompat
+import com.brentvatne.react.R
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -295,6 +297,8 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
                     playerView.tag = src
                     playerView.mute(true)
                     playerView.setMultipleViewMode(true)
+                    playerView.isFocusable = true
+                    playerView.foreground = ResourcesCompat.getDrawable(rootView.resources, R.drawable.ic_item_focus_selector, null)
                     playerView.setShowBottomComponent(false)
                     primaryViewManager.setSrc(playerView, src)
                     rootView.addView(playerView)
