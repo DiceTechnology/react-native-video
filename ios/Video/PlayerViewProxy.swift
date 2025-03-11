@@ -24,7 +24,7 @@ class PlayerViewProxy {
         }
         return jsIma
     }
-    
+
     private static func convertRNVideoDrmToRNDV(sourceDrm: Source.Drm?) -> JSDrm? {
         var jsDrm: JSDrm?
         if let drm = sourceDrm {
@@ -38,7 +38,7 @@ class PlayerViewProxy {
         }
         return jsDrm
     }
-    
+
     private static func convertRNVideoConfigToRNDV(sourceConfig: Source.Config?) -> JSConfig? {
         var jsConfig: JSConfig?
         if let config = sourceConfig {
@@ -61,7 +61,7 @@ class PlayerViewProxy {
         }
         return jsConfig
     }
-    
+
     private static func convertRNVideoAdsToRNDV(sourceAds: react_native_video.JSAds?) -> RNDReactNativeDiceVideo.JSAds? {
         var jsAds: RNDReactNativeDiceVideo.JSAds?
         if let adUnits = sourceAds?.adUnits.map({ adUnit -> RNDReactNativeDiceVideo.JSAds.AdUnit in
@@ -79,7 +79,7 @@ class PlayerViewProxy {
         }
         return jsAds
     }
-    
+
     private static func convertRNVideoTranslationsToRNDV(translations: Translations?) -> JSTranslations? {
         guard let translations else { return nil }
         let dorisTranslationsViewModel = convertRNVideoTranslationsToDorisTranslations(translations: translations)
@@ -110,6 +110,7 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.fastForward = translations.fastForward
         dorisTranslationsViewModel.off = translations.off
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
+        dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.multiView = translations.multiView
         return dorisTranslationsViewModel
     }
@@ -133,7 +134,7 @@ class PlayerViewProxy {
         }
         return jsButtons
     }
-    
+
     private static func convertRNVideoThemeToRNDV(theme: Theme?) -> JSTheme? {
         var jsTheme: JSTheme?
         if let themeValue = theme {
@@ -148,7 +149,7 @@ class PlayerViewProxy {
         }
         return jsTheme
     }
-    
+
     private static func convertRNVideoOverlayConfigToRNDV(overlayConfig: OverlayConfig?) -> JSOverlayConfig? {
         var jsOverlayConfig: JSOverlayConfig?
         if let overlayConfigValue = overlayConfig {
@@ -165,7 +166,7 @@ class PlayerViewProxy {
         }
         return jsOverlayConfig
     }
-    
+
     private static func convertRNVideoTracksPolicyToRNDV(tracksPolicy: react_native_video.JSTracksPolicy?) -> RNDReactNativeDiceVideo.JSTracksPolicy? {
         var jsTracksPolicy: RNDReactNativeDiceVideo.JSTracksPolicy?
         if let items = tracksPolicy?.items.map({ trackPolicyPair -> RNDReactNativeDiceVideo.JSTrackPolicyPair in
@@ -175,7 +176,7 @@ class PlayerViewProxy {
         }
         return jsTracksPolicy
     }
-    
+
     private static func convertRNVideoReleatedVideosToRNDV(relatedVideos: RelatedVideos?) -> JSPlaylist? {
         var jsPlaylist: JSPlaylist?
         if let playlist = relatedVideos {
@@ -192,20 +193,20 @@ class PlayerViewProxy {
         }
         return jsPlaylist
     }
-    
+
     private static func convertRNVideoSkipMarkersToRNDV(skipMarkers: [Source.RNSkipMarker]?) -> [JSSkipMarker]? {
         return skipMarkers?.map {
             let rndvType: JSSkipMarker.JSSkipMarkerType
-            
+
             switch $0.type {
             case .SKIP_CREDITS: rndvType = .SKIP_CREDITS
             case .SKIP_INTRO: rndvType = .SKIP_INTRO
             }
-            
+
             return JSSkipMarker(startTime: $0.startTime, stopTime: $0.stopTime, type: rndvType)
         }
     }
-  
+
   static func convertRNVideoSourceToRNDV(jsProps: JSProps, sourceValue: Source) -> RNDReactNativeDiceVideo.JSSource? {
       var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
       let jsNowPlaying = RNDReactNativeDiceVideo.JSNowPlaying(
@@ -215,7 +216,7 @@ class PlayerViewProxy {
           startDate: sourceValue.nowPlaying?.startDate,
           endDate: sourceValue.nowPlaying?.endDate,
           dateFormat: sourceValue.nowPlaying?.dateFormat)
-      
+
       let rndvJSIma = PlayerViewProxy.convertRNVideoImaToRNDV(sourceIma: sourceValue.ima)
       let rndvJSDrm = PlayerViewProxy.convertRNVideoDrmToRNDV(sourceDrm: sourceValue.drm)
       let jsPartialVideoInformation = JSPartialVideoInformation(
@@ -231,7 +232,7 @@ class PlayerViewProxy {
           }
       }
       let jsLimitedSeekableRange = RNDReactNativeDiceVideo.JSLimitedSeekableRange(start: sourceValue.limitedSeekableRange?.start, end: sourceValue.limitedSeekableRange?.end, seekToStart: sourceValue.limitedSeekableRange?.seekToStart)
-      
+
       let metadata = JSMetadata(metadata: sourceValue.metadata)
 
       rndvJSSource = RNDReactNativeDiceVideo.JSSource(
@@ -263,7 +264,7 @@ class PlayerViewProxy {
         watchContext: nil)
       return rndvJSSource
     }
-    
+
     static func convertRNVideoJSPropsToRNDV(jsProps: JSProps) -> RNDReactNativeDiceVideo.JSProps {
         let rndvJsProps = RNDReactNativeDiceVideo.JSProps()
         rndvJsProps.isFullScreen.value = true
@@ -294,7 +295,7 @@ class PlayerViewProxy {
         let skipMarkers = PlayerViewProxy.convertRNVideoSkipMarkersToRNDV(skipMarkers: jsProps.source.value?.skipMarkers)
         let seekForwardInterval = jsProps.source.value?.dvrSeekForwardInterval ?? 30
         let seekBackwardInterval = jsProps.source.value?.dvrSeekBackwardInterval ?? 30
-        
+
         let rndvJSVideoDataConfig = RNDReactNativeDiceVideo.JSVideoData.JSVideoDataConfig(
             translations: jsTranslations,
             buttons: jsButtons,
@@ -317,7 +318,7 @@ class PlayerViewProxy {
             seekBackwardInterval: seekBackwardInterval,
             hideAdUiElements: jsProps.hideAdUiElements.value,
             isWhyThisAdIconEnabled: jsProps.isWhyThisAdIconEnabled.value)
-        
+
         if let rndvJSSource = rndvJSSource {
             let jsVideoData = RNDReactNativeDiceVideo.JSVideoData(source: rndvJSSource, config: rndvJSVideoDataConfig)
             rndvJsProps.videoData.value = jsVideoData
