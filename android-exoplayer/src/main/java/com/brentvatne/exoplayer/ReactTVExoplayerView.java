@@ -2,6 +2,7 @@ package com.brentvatne.exoplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -124,11 +126,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 
 @SuppressLint("ViewConstructor")
-class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener,
+public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener,
         Player.Listener,
         AnalyticsListener,
         BecomingNoisyListener,
@@ -345,6 +348,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private final MediaSessionCompat mediaSession;
     private final MediaSessionConnector mediaSessionConnector;
 
+    //TODO: ---- test code --------------------------
+    private TextView textView;
+    //TODO: ---- test code --------------------------
+
     public ReactTVExoplayerView(ThemedReactContext context) {
         super(context);
         this.themedReactContext = context;
@@ -368,6 +375,21 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         controller.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
         View playList = controller.findViewById(R.id.playlistView);
         playList.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+
+        //TODO: ---- test code --------------------------
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+        textView = new TextView(getContext());
+        textView.setPadding(20, 20, 20, 20);
+        textView.setText("Order");
+        textView.setTextSize(48);
+        textView.setTextColor(Color.WHITE);
+        addView(textView);
+        //TODO: ---- test code --------------------------
+    }
+
+    public void setTextView(String text) {
+        textView.setText(text);
     }
 
     public VideoEventEmitter getEventEmitter() {
@@ -1524,6 +1546,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             }
         }
         return new ArrayList<>(trackSet);
+    }
+
+    //TODO: ---- test code --------------------------
+    public ExoDorisTvPlayerView getExoDorisPlayerView() {
+        return exoDorisPlayerView;
     }
 
     public void setPausedModifier(boolean paused) {

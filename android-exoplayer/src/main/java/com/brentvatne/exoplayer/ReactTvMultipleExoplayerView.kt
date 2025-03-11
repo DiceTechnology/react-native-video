@@ -4,10 +4,11 @@ import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isEmpty
+import androidx.core.view.isVisible
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
@@ -15,32 +16,49 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
 
 @SuppressLint("ViewConstructor")
-class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : LinearLayout(themedReactContext) {
+class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext) {
 
+    private val fullscreenControlBarHeight = (96 * themedReactContext.resources.displayMetrics.density).toInt()
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
+    private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext, multiViewLayout)
     var multiViewMode = false
         set(value) {
             field = value
             multiViewLayout.multiViewMode = value
         }
+    private var fullscreenMode = false
+        set(value) {
+            field = value
+            bottomContainer.visibility = if (value) View.GONE else View.VISIBLE
+            multiViewLayout.fullscreenMode = value
+            multiViewControlBar.multiViewSize = getMultiViewChildrenList().size
+            multiViewControlBar.setVisible(value)
+        }
 
     init {
-        orientation = VERTICAL
-        gravity = Gravity.CENTER_VERTICAL
         addView(
             multiViewLayout,
             LayoutParams(
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT,
-                1f
+                Gravity.TOP
             )
         )
         addView(
             bottomContainer,
             LayoutParams(
                 LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT
+                LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM
+            )
+        )
+        addView(
+            multiViewControlBar,
+            LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                fullscreenControlBarHeight,
+                Gravity.BOTTOM
             )
         )
     }
@@ -53,26 +71,6 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 
     fun getMultiViewChildrenList(): List<View> {
         return multiViewLayout.children.toList()
-    }
-
-    override fun setId(id: Int) {
-        super.setId(id)
-        multiViewLayout.children.forEach { view ->
-            (view as? ReactTVExoplayerView)?.id = id
-        }
-    }
-
-    override fun addView(child: View) {
-        if (child is ReactTVExoplayerView) {
-            child.id = id
-            multiViewLayout.addView(child)
-            requestLayout()
-        }
-    }
-
-    override fun removeView(view: View) {
-        multiViewLayout.removeView(view)
-        requestLayout()
     }
 
     fun loadBottomOverlayComponent(src: ReadableMap) {
@@ -98,6 +96,31 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         }
     }
 
+    override fun setId(id: Int) {
+        super.setId(id)
+        multiViewLayout.children.forEach { view ->
+            (view as? ReactTVExoplayerView)?.id = id
+        }
+    }
+
+    override fun addView(child: View) {
+        if (child is ReactTVExoplayerView) {
+            child.id = id
+            child.setOnFocusChangeListener(childViewOnFocusChangeListener)
+            multiViewLayout.addView(child)
+            requestLayout()
+        }
+    }
+
+    private val childViewOnFocusChangeListener = OnFocusChangeListener { playerView, hasFocus ->
+        (playerView as ReactTVExoplayerView).mute(!hasFocus)
+    }
+
+    override fun removeView(view: View) {
+        multiViewLayout.removeView(view)
+        requestLayout()
+    }
+
     override fun requestLayout() {
         super.requestLayout()
         if (width > 0 && width > 0) {
@@ -113,14 +136,63 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         layout(left, top, right, bottom)
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        if (bottomContainer.measuredHeight > 1 && bottomContainer.isVisible) {
+            multiViewLayout.measure(
+                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height - bottomContainer.measuredHeight, MeasureSpec.EXACTLY)
+            )
+        }
+    }
+
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
+        multiViewLayout.layout(
+            left,
+            top,
+            left + multiViewLayout.measuredWidth,
+            top + multiViewLayout.measuredHeight
+        )
+        if (bottomContainer.isVisible && bottomContainer.measuredHeight > 0) {
+            bottomContainer.layout(
+                left,
+                top + multiViewLayout.measuredHeight,
+                right,
+                top + multiViewLayout.measuredHeight + bottomContainer.measuredHeight
+            )
+        }
+        if (multiViewControlBar.isVisible && multiViewControlBar.measuredHeight > 0) {
+            multiViewControlBar.layout(
+                left, bottom - multiViewControlBar.measuredHeight, right, bottom
+            )
+        }
+    }
+
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (multiViewMode) {
+        if (multiViewMode) { // Exit multi view mode when back key is pressed.
             if (event.keyCode == KeyEvent.KEYCODE_BACK) {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     return true
                 } else if (event.action == KeyEvent.ACTION_UP) {
-                    (multiViewLayout.getChildAt(0) as? ReactTVExoplayerView)?.eventEmitter?.setMultiViewMode(false)
+                    if (multiViewLayout.pictureInPictureMode) {
+                        multiViewLayout.pictureInPictureMode = false
+                    } else if (fullscreenMode) {
+                        fullscreenMode = false
+                    } else {
+                        (multiViewLayout.getChildAt(0) as? ReactTVExoplayerView)?.eventEmitter?.setMultiViewMode(false)
+                    }
                     return true
+                }
+            } else if (event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER || event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                // enter fullscreen mode
+                if (focusedChild is MultiViewLayout && getMultiViewChildrenList().size > 1) {
+                    fullscreenMode = true
                 }
             }
         }

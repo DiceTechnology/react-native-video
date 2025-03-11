@@ -13,7 +13,7 @@ import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.annotations.ReactProp
 
 @Suppress("UNUSED_PARAMETER")
-class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: ReactApplicationContext) : ViewGroupManager<ReactTvMultipleExoplayerView>() {
+class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicationContext) : ViewGroupManager<ReactTvMultipleExoplayerView>() {
 
     companion object Keys {
         // Source properties
@@ -76,7 +76,7 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
     }
 
     override fun createViewInstance(context: ThemedReactContext): ReactTvMultipleExoplayerView {
-        if (this::rootView.isInitialized) {
+        if (this::rootView.isInitialized) { // createViewInstance may be called multiple times, so we need to clean up the previous instance first.
             rootView.dropView()
         }
         primaryView = primaryViewManager.createViewInstance(context)
@@ -300,6 +300,8 @@ class ReactTVMultipleExoplayerViewManager(private val reactApplicationContext: R
                     playerView.isFocusable = true
                     playerView.foreground = ResourcesCompat.getDrawable(rootView.resources, R.drawable.ic_item_focus_selector, null)
                     playerView.setShowBottomComponent(false)
+                    //TODO: ---- test code --------------------------
+                    playerView.setTextView((i + 1).toString())
                     primaryViewManager.setSrc(playerView, src)
                     rootView.addView(playerView)
                     break
