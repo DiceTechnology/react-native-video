@@ -276,6 +276,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = "multiViewSources")
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
+        Log.d(this.javaClass.simpleName, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
             rootView.getMultiViewChildrenList().filter { it != primaryView }.forEach {
                 rootView.removeView(it)
@@ -293,11 +294,11 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                 if (list.isEmpty() || src !in list) {
                     val playerView = primaryViewManager.createViewInstance(rootView.themedReactContext)
                     playerView.tag = src
+                    playerView.mute(mute)
                     //TODO ---- test Code -----------------------------------
                     playerView.setTextView((i + 1).toString())
                     rootView.addMultiViewChild(playerView, true)
-                    primaryViewManager.setSrc(playerView, src) // setSrc must be called after addMultiViewChild
-                    playerView.mute(mute)
+                    primaryViewManager.setSrc(playerView, src)
                     break
                 }
             }
