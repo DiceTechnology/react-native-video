@@ -2,8 +2,6 @@ package com.brentvatne.exoplayer
 
 import android.util.Log
 import android.view.ViewGroup.LayoutParams
-import androidx.core.content.res.ResourcesCompat
-import com.brentvatne.react.R
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -82,7 +80,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         primaryView = primaryViewManager.createViewInstance(context)
         rootView = ReactTvMultipleExoplayerView(context)
         rootView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        rootView.addView(primaryView)
+        rootView.addMultiViewChild(primaryView, false)
         return rootView
     }
 
@@ -287,7 +285,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         if (array.size() == 1 && rootView.multiViewMode) {
             rootView.loadBottomOverlayComponent(array.getMap(0))
         }
-
+        val mute = rootView.getMultiViewChildrenList().isNotEmpty()
         if (array.size() > rootView.getMultiViewChildrenList().size) {
             val list = rootView.getMultiViewChildrenList().mapNotNull { it.tag as? ReadableMap }
             for (i in 0 until array.size()) {
@@ -295,15 +293,11 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                 if (list.isEmpty() || src !in list) {
                     val playerView = primaryViewManager.createViewInstance(rootView.themedReactContext)
                     playerView.tag = src
-                    playerView.mute(true)
-                    playerView.setMultipleViewMode(true)
-                    playerView.isFocusable = true
-                    playerView.foreground = ResourcesCompat.getDrawable(rootView.resources, R.drawable.ic_item_focus_selector, null)
-                    playerView.setShowBottomComponent(false)
-                    //TODO: ---- test code --------------------------
+                    //TODO ---- test Code -----------------------------------
                     playerView.setTextView((i + 1).toString())
-                    primaryViewManager.setSrc(playerView, src)
-                    rootView.addView(playerView)
+                    rootView.addMultiViewChild(playerView, true)
+                    primaryViewManager.setSrc(playerView, src) // setSrc must be called after addMultiViewChild
+                    playerView.mute(mute)
                     break
                 }
             }
@@ -322,7 +316,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     @ReactProp(name = PROP_MULTI_VIEW_MODE)
     fun setMultiViewMode(videoView: ReactTvMultipleExoplayerView, multiViewMode: Boolean) {
         Log.d(this.javaClass.simpleName, "setMultiViewMode: $multiViewMode")
-        rootView.multiViewMode = multiViewMode
+        rootView.setMultiViewMode(multiViewMode)
         if (multiViewMode) {
             rootView.removeView(primaryView)
         }

@@ -12,6 +12,7 @@ import android.os.PowerManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.view.Choreographer;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +127,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -348,9 +348,8 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     private final MediaSessionCompat mediaSession;
     private final MediaSessionConnector mediaSessionConnector;
 
-    //TODO: ---- test code --------------------------
+    //TODO: ---- test code --------------------------------
     private TextView textView;
-    //TODO: ---- test code --------------------------
 
     public ReactTVExoplayerView(ThemedReactContext context) {
         super(context);
@@ -376,18 +375,18 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         View playList = controller.findViewById(R.id.playlistView);
         playList.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
 
-        //TODO: ---- test code --------------------------
-        Random random = new Random();
-        random.setSeed(System.currentTimeMillis());
+        //TODO: ---- test code --------------------------------
         textView = new TextView(getContext());
-        textView.setPadding(20, 20, 20, 20);
-        textView.setText("Order");
+        textView.setPadding(30, 20, 30, 20);
+        textView.setText("0");
         textView.setTextSize(48);
-        textView.setTextColor(Color.WHITE);
+        textView.setTextColor(Color.MAGENTA);
+        textView.setGravity(Gravity.TOP | Gravity.START);
         addView(textView);
-        //TODO: ---- test code --------------------------
+        //TODO: ---- test code --------------------------------
     }
 
+    //TODO: ---- test code --------------------------------
     public void setTextView(String text) {
         textView.setText(text);
     }
@@ -1548,7 +1547,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         return new ArrayList<>(trackSet);
     }
 
-    //TODO: ---- test code --------------------------
+    //TODO: ---- test code --------------------------------
     public ExoDorisTvPlayerView getExoDorisPlayerView() {
         return exoDorisPlayerView;
     }

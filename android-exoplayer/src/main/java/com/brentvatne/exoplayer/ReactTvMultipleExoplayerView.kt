@@ -5,8 +5,10 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.children
+import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import com.brentvatne.util.ReadableMapUtils
@@ -22,19 +24,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
     private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext, multiViewLayout)
-    var multiViewMode = false
-        set(value) {
-            field = value
-            multiViewLayout.multiViewMode = value
-        }
-    private var fullscreenMode = false
-        set(value) {
-            field = value
-            bottomContainer.visibility = if (value) View.GONE else View.VISIBLE
-            multiViewLayout.fullscreenMode = value
-            multiViewControlBar.multiViewSize = getMultiViewChildrenList().size
-            multiViewControlBar.setVisible(value)
-        }
+    val multiViewMode
+        get() = multiViewLayout.multiViewMode
 
     init {
         addView(
@@ -69,8 +60,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         bottomContainer.removeAllViews()
     }
 
-    fun getMultiViewChildrenList(): List<View> {
-        return multiViewLayout.children.toList()
+    fun getMultiViewChildrenList(): List<ReactTVExoplayerView> {
+        return multiViewLayout.children.map { (it as ViewGroup)[0] as ReactTVExoplayerView }.toList()
     }
 
     fun loadBottomOverlayComponent(src: ReadableMap) {
@@ -96,18 +87,24 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         }
     }
 
+    fun setMultiViewMode(multiViewMode: Boolean) {
+        multiViewLayout.multiViewMode = multiViewMode
+    }
+
     override fun setId(id: Int) {
         super.setId(id)
-        multiViewLayout.children.forEach { view ->
+        getMultiViewChildrenList().forEach { view ->
             (view as? ReactTVExoplayerView)?.id = id
         }
     }
 
-    override fun addView(child: View) {
+    fun addMultiViewChild(child: View, multiViewMode: Boolean) {
         if (child is ReactTVExoplayerView) {
             child.id = id
+            child.setMultipleViewMode(multiViewMode)
+            child.setShowBottomComponent(!multiViewMode)
             child.setOnFocusChangeListener(childViewOnFocusChangeListener)
-            multiViewLayout.addView(child)
+            multiViewLayout.addView(MultiViewFocusableView(child, multiViewMode))
             requestLayout()
         }
     }
@@ -117,8 +114,10 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     }
 
     override fun removeView(view: View) {
-        multiViewLayout.removeView(view)
-        requestLayout()
+        multiViewLayout.children.find { (it as ViewGroup)[0] == view }?.let { child ->
+            multiViewLayout.removeView(child)
+            requestLayout()
+        }
     }
 
     override fun requestLayout() {
@@ -182,20 +181,30 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 } else if (event.action == KeyEvent.ACTION_UP) {
                     if (multiViewLayout.pictureInPictureMode) {
                         multiViewLayout.pictureInPictureMode = false
-                    } else if (fullscreenMode) {
-                        fullscreenMode = false
+                    } else if (multiViewLayout.fullscreenMode) {
+                        setFullscreenMode(false)
                     } else {
-                        (multiViewLayout.getChildAt(0) as? ReactTVExoplayerView)?.eventEmitter?.setMultiViewMode(false)
+                        getMultiViewChildrenList()[0].eventEmitter?.setMultiViewMode(false)
                     }
                     return true
                 }
             } else if (event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER || event.keyCode == KeyEvent.KEYCODE_ENTER) {
-                // enter fullscreen mode
+                // only allow more than one child to enter fullscreen mode
                 if (focusedChild is MultiViewLayout && getMultiViewChildrenList().size > 1) {
-                    fullscreenMode = true
+                    setFullscreenMode(true)
                 }
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    private fun setFullscreenMode(fullscreen: Boolean) {
+        bottomContainer.visibility = if (fullscreen) View.GONE else View.VISIBLE
+        multiViewLayout.fullscreenMode = fullscreen
+        multiViewControlBar.multiViewSize = getMultiViewChildrenList().size
+        multiViewControlBar.setVisible(fullscreen)
+        multiViewLayout.children.forEach { child ->
+            (child as MultiViewFocusableView).showVolumeIcon(fullscreen)
+        }
     }
 }
