@@ -106,12 +106,12 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 )
                 measureView(
                     child = getChildAt(1),
-                    childWidth = getChildAt(0).measuredWidth / 2,
+                    childWidth = (parentMaxWidth - itemSpace * 3) * 1 / 3,
                     childHeight = (getChildAt(0).measuredHeight - itemSpace) / 2
                 )
                 measureView(
                     child = getChildAt(2),
-                    childWidth = getChildAt(0).measuredWidth / 2,
+                    childWidth = (parentMaxWidth - itemSpace * 3) * 1 / 3,
                     childHeight = (getChildAt(0).measuredHeight - itemSpace) / 2
                 )
             }

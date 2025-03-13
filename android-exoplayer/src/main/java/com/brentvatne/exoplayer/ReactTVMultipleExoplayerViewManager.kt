@@ -1,7 +1,7 @@
 package com.brentvatne.exoplayer
 
-import android.util.Log
 import android.view.ViewGroup.LayoutParams
+import com.brentvatne.util.Logger
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -60,6 +60,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     private val primaryViewManager: ReactTVExoplayerViewManager = ReactTVExoplayerViewManager(reactApplicationContext)
     private lateinit var primaryView: ReactTVExoplayerView
     private lateinit var rootView: ReactTvMultipleExoplayerView
+    private var hasDroppedView = false
 
     override fun getName(): String = "RCTVideo"
 
@@ -74,8 +75,11 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     }
 
     override fun createViewInstance(context: ThemedReactContext): ReactTvMultipleExoplayerView {
+        Logger.warn(this, "createViewInstance")
         if (this::rootView.isInitialized) { // createViewInstance may be called multiple times, so we need to clean up the previous instance first.
             rootView.dropView()
+            primaryViewManager.onDropViewInstance(primaryView)
+            hasDroppedView = true
         }
         primaryView = primaryViewManager.createViewInstance(context)
         rootView = ReactTvMultipleExoplayerView(context)
@@ -85,13 +89,17 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     }
 
     override fun onDropViewInstance(view: ReactTvMultipleExoplayerView) {
-        view.dropView()
-        primaryViewManager.onDropViewInstance(primaryView)
+        Logger.warn(this, "onDropViewInstance")
+        if (!hasDroppedView) {
+            view.dropView()
+            primaryViewManager.onDropViewInstance(primaryView)
+        }
+        hasDroppedView = false
     }
 
     @ReactProp(name = PROP_SRC)
     fun setSrc(videoView: ReactTvMultipleExoplayerView, src: ReadableMap?) {
-        Log.d(this.javaClass.simpleName, "setSrc: ${src?.getString("id")}")
+        Logger.log(this, "setSrc: ${src?.getString("id")}")
         primaryViewManager.setSrc(primaryView, src)
     }
 
@@ -276,7 +284,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = "multiViewSources")
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
-        Log.d(this.javaClass.simpleName, "setMultiVideos: $array")
+        Logger.log(this, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
             rootView.getMultiViewChildrenList().filter { it != primaryView }.forEach {
                 rootView.removeView(it)
@@ -316,7 +324,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = PROP_MULTI_VIEW_MODE)
     fun setMultiViewMode(videoView: ReactTvMultipleExoplayerView, multiViewMode: Boolean) {
-        Log.d(this.javaClass.simpleName, "setMultiViewMode: $multiViewMode")
+        Logger.log(this, "setMultiViewMode: $multiViewMode")
         rootView.setMultiViewMode(multiViewMode)
         if (multiViewMode) {
             rootView.removeView(primaryView)
