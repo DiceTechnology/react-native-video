@@ -74,7 +74,11 @@ class NewPlayerView: UIView, JSInputProtocol {
         }
     }
     @objc var buttons: NSDictionary? {
-        didSet { jsProps.buttons.value = try? Buttons(dict: buttons) } }
+        didSet {
+            jsProps.buttons.value = try? Buttons(dict: buttons)
+            jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isAnnotationsButtonHidden = jsProps.buttons.value?.annotations == false
+        }
+    }
     @objc var theme: NSDictionary? {
         didSet { jsProps.theme.value = try? Theme(dict: theme) } }
     @objc var relatedVideos: NSDictionary? {
