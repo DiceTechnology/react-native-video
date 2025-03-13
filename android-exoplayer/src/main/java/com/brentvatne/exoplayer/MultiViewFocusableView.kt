@@ -3,6 +3,7 @@ package com.brentvatne.exoplayer
 import android.annotation.SuppressLint
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -13,7 +14,12 @@ import com.brentvatne.react.R
 class MultiViewFocusableView(
     child: ReactTVExoplayerView,
     focusable: Boolean,
-) : FrameLayout(child.context), OnFocusChangeListener {
+    private val listener: OnVolumeChangedListener,
+) : FrameLayout(child.context), OnFocusChangeListener, OnClickListener {
+
+    interface OnVolumeChangedListener {
+        fun onRequestVolume(view: ReactTVExoplayerView)
+    }
 
     private val iconSize = (24 * child.resources.displayMetrics.density).toInt()
     private val volumeIcon: ImageView = ImageView(child.context)
@@ -29,6 +35,7 @@ class MultiViewFocusableView(
         volumeIcon.visibility = View.INVISIBLE
         volumeIcon.isFocusable = false
         volumeIcon.onFocusChangeListener = this
+        volumeIcon.setOnClickListener(this)
         addView(
             volumeIcon,
             LayoutParams(iconSize, iconSize).apply {
@@ -41,9 +48,12 @@ class MultiViewFocusableView(
         )
     }
 
+    override fun onClick(v: View) {
+        listener.onRequestVolume(getChildAt(0) as ReactTVExoplayerView)
+    }
+
     override fun onFocusChange(v: View, hasFocus: Boolean) {
         isSelected = hasFocus
-        (getChildAt(0) as ReactTVExoplayerView).mute(!hasFocus)
     }
 
     fun showVolumeIcon(show: Boolean) {

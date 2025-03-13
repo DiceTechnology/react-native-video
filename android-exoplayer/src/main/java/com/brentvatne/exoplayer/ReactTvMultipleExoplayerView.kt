@@ -19,7 +19,8 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
 
 @SuppressLint("ViewConstructor")
-class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext) {
+class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext),
+    MultiViewFocusableView.OnVolumeChangedListener {
 
     private val fullscreenControlBarHeight = (96 * themedReactContext.resources.displayMetrics.density).toInt()
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
@@ -107,13 +108,19 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
             child.setMultipleViewMode(multiViewMode)
             child.setShowBottomComponent(!multiViewMode)
             child.setOnFocusChangeListener(childViewOnFocusChangeListener)
-            multiViewLayout.addView(MultiViewFocusableView(child, multiViewMode))
+            multiViewLayout.addView(MultiViewFocusableView(child, multiViewMode, this))
             requestLayout()
         }
     }
 
     private val childViewOnFocusChangeListener = OnFocusChangeListener { playerView, hasFocus ->
         (playerView as ReactTVExoplayerView).mute(!hasFocus)
+    }
+
+    override fun onRequestVolume(view: ReactTVExoplayerView) {
+        getMultiViewChildrenList().forEach { child ->
+            child.mute(view != child)
+        }
     }
 
     override fun removeView(view: View) {
