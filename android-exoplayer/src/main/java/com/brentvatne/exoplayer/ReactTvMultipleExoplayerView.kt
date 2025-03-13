@@ -62,8 +62,12 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         bottomContainer.removeAllViews()
     }
 
-    fun getMultiViewChildrenList(): List<ReactTVExoplayerView> {
+    fun getExoplayerChildrenList(): List<ReactTVExoplayerView> {
         return multiViewLayout.children.map { (it as ViewGroup)[0] as ReactTVExoplayerView }.toList()
+    }
+
+    private fun getFocusableChildrenList(): List<MultiViewFocusableView> {
+        return multiViewLayout.children.map { it as MultiViewFocusableView }.toList()
     }
 
     fun loadBottomOverlayComponent(src: ReadableMap) {
@@ -97,7 +101,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 
     override fun setId(id: Int) {
         super.setId(id)
-        getMultiViewChildrenList().forEach { view ->
+        getExoplayerChildrenList().forEach { view ->
             (view as? ReactTVExoplayerView)?.id = id
         }
     }
@@ -117,8 +121,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         (playerView as ReactTVExoplayerView).mute(!hasFocus)
     }
 
-    override fun onRequestVolume(view: ReactTVExoplayerView) {
-        getMultiViewChildrenList().forEach { child ->
+    override fun onRequestVolume(view: MultiViewFocusableView) {
+        getFocusableChildrenList().forEach { child ->
             child.mute(view != child)
         }
     }
@@ -194,13 +198,13 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                     } else if (multiViewLayout.fullscreenMode) {
                         setFullscreenMode(false)
                     } else {
-                        getMultiViewChildrenList()[0].eventEmitter?.setMultiViewMode(false)
+                        getExoplayerChildrenList()[0].eventEmitter?.setMultiViewMode(false)
                     }
                     return true
                 }
             } else if (event.keyCode == KeyEvent.KEYCODE_DPAD_CENTER || event.keyCode == KeyEvent.KEYCODE_ENTER) {
                 // only allow more than one child to enter fullscreen mode
-                if (focusedChild is MultiViewLayout && getMultiViewChildrenList().size > 1) {
+                if (focusedChild is MultiViewLayout && getExoplayerChildrenList().size > 1) {
                     setFullscreenMode(true)
                 }
             }
@@ -211,7 +215,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private fun setFullscreenMode(fullscreen: Boolean) {
         bottomContainer.visibility = if (fullscreen) View.GONE else View.VISIBLE
         multiViewLayout.fullscreenMode = fullscreen
-        multiViewControlBar.multiViewSize = getMultiViewChildrenList().size
+        multiViewControlBar.multiViewSize = getExoplayerChildrenList().size
         multiViewControlBar.setVisible(fullscreen)
         multiViewLayout.children.forEach { child ->
             (child as MultiViewFocusableView).showVolumeIcon(fullscreen)

@@ -12,26 +12,28 @@ import com.brentvatne.react.R
 
 @SuppressLint("ViewConstructor")
 class MultiViewFocusableView(
-    child: ReactTVExoplayerView,
+    private val tvExoplayerView: ReactTVExoplayerView,
     focusable: Boolean,
     private val listener: OnVolumeChangedListener,
-) : FrameLayout(child.context), OnFocusChangeListener, OnClickListener {
+) : FrameLayout(tvExoplayerView.context), OnFocusChangeListener, OnClickListener {
 
     interface OnVolumeChangedListener {
-        fun onRequestVolume(view: ReactTVExoplayerView)
+        fun onRequestVolume(view: MultiViewFocusableView)
     }
 
-    private val iconSize = (24 * child.resources.displayMetrics.density).toInt()
-    private val volumeIcon: ImageView = ImageView(child.context)
+    private val iconSize = (24 * tvExoplayerView.resources.displayMetrics.density).toInt()
+    private val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
+    private val isMute: Boolean
+        get() = tvExoplayerView.exoDorisPlayerView.isMute
 
     init {
         isFocusable = focusable
-        foreground = ResourcesCompat.getDrawable(child.resources, R.drawable.ic_item_focus_selector, null)
+        foreground = ResourcesCompat.getDrawable(tvExoplayerView.resources, R.drawable.ic_item_focus_selector, null)
         // add player view
-        addView(child)
+        addView(tvExoplayerView)
 
         // add volume icon
-        volumeIcon.setImageResource(R.drawable.ic_multiview_mute_selector)
+        resetVolumeIcon()
         volumeIcon.visibility = View.INVISIBLE
         volumeIcon.isFocusable = false
         volumeIcon.onFocusChangeListener = this
@@ -49,7 +51,7 @@ class MultiViewFocusableView(
     }
 
     override fun onClick(v: View) {
-        listener.onRequestVolume(getChildAt(0) as ReactTVExoplayerView)
+        listener.onRequestVolume(this)
     }
 
     override fun onFocusChange(v: View, hasFocus: Boolean) {
@@ -60,5 +62,19 @@ class MultiViewFocusableView(
         isFocusable = !show
         volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
         volumeIcon.isFocusable = show
+    }
+
+    fun mute(mute: Boolean) {
+        tvExoplayerView.mute(mute)
+        resetVolumeIcon()
+    }
+
+    private fun resetVolumeIcon() {
+        volumeIcon.setImageResource(
+            if (isMute)
+                R.drawable.ic_multiview_mute_selector
+            else
+                R.drawable.ic_multiview_volume_selector
+        )
     }
 }

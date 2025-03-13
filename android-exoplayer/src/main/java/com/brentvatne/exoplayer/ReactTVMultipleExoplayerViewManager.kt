@@ -286,7 +286,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
         Logger.log(this, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
-            rootView.getMultiViewChildrenList().filter { it != primaryView }.forEach {
+            rootView.getExoplayerChildrenList().filter { it != primaryView }.forEach {
                 rootView.removeView(it)
             }
             return
@@ -294,9 +294,9 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         if (array.size() == 1 && rootView.multiViewMode) {
             rootView.loadBottomOverlayComponent(array.getMap(0))
         }
-        val mute = rootView.getMultiViewChildrenList().isNotEmpty()
-        if (array.size() > rootView.getMultiViewChildrenList().size) {
-            val list = rootView.getMultiViewChildrenList().mapNotNull { it.tag as? ReadableMap }
+        val mute = rootView.getExoplayerChildrenList().isNotEmpty()
+        if (array.size() > rootView.getExoplayerChildrenList().size) {
+            val list = rootView.getExoplayerChildrenList().mapNotNull { it.tag as? ReadableMap }
             for (i in 0 until array.size()) {
                 val src = array.getMap(i)
                 if (list.isEmpty() || src !in list) {
@@ -308,8 +308,8 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     break
                 }
             }
-        } else if (array.size() < rootView.getMultiViewChildrenList().size) {
-            val removeView = rootView.getMultiViewChildrenList().find { view ->
+        } else if (array.size() < rootView.getExoplayerChildrenList().size) {
+            val removeView = rootView.getExoplayerChildrenList().find { view ->
                 val tagSrc = view.tag as? ReadableMap
                 tagSrc != null && !ReadableMapUtils.contain(array, tagSrc)
             }
