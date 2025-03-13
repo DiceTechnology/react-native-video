@@ -303,8 +303,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     val playerView = primaryViewManager.createViewInstance(rootView.themedReactContext)
                     playerView.tag = src
                     playerView.mute(mute)
-                    //TODO ---- test Code -----------------------------------
-                    playerView.setTextView((i + 1).toString())
                     rootView.addMultiViewChild(playerView, true)
                     primaryViewManager.setSrc(playerView, src)
                     break

@@ -3,6 +3,8 @@ package com.brentvatne.exoplayer
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.view.children
+import com.brentvatne.react.R
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControlBar.MultiViewControlBarListener {
@@ -29,7 +31,6 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 requestLayout()
             }
         }
-    private var layoutSwapIndex = 0
 
     override fun requestLayout() {
         super.requestLayout()
@@ -70,7 +71,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         when (childCount) {
             1 -> {
                 measureView(
-                    child = getChildAt(0),
+                    child = getChildByPositionTag(0),
                     childWidth = parentMaxWidth - itemSpace * 2,
                     childHeight = parentMaxHeight - itemSpace * 2
                 )
@@ -78,12 +79,12 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
             2 -> {
                 measureView(
-                    child = getChildAt(0),
+                    child = getChildByPositionTag(0),
                     childWidth = if (pictureInPictureMode) parentMaxWidth else (parentMaxWidth - itemSpace * 3) / 2,
                     childHeight = if (pictureInPictureMode) parentMaxHeight else parentMaxHeight - itemSpace * 2
                 )
                 measureView(
-                    child = getChildAt(1),
+                    child = getChildByPositionTag(1),
                     childWidth = if (pictureInPictureMode) parentMaxWidth / 4 else (parentMaxWidth - itemSpace * 3) / 2,
                     childHeight = if (pictureInPictureMode) parentMaxHeight / 4 else parentMaxHeight - itemSpace * 2
                 )
@@ -100,26 +101,26 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
             3 -> {
                 measureView(
-                    child = getChildAt(0),
+                    child = getChildByPositionTag(0),
                     childWidth = (parentMaxWidth - itemSpace * 3) * 2 / 3,
                     childHeight = parentMaxHeight - itemSpace * 2
                 )
                 measureView(
-                    child = getChildAt(1),
+                    child = getChildByPositionTag(1),
                     childWidth = (parentMaxWidth - itemSpace * 3) * 1 / 3,
-                    childHeight = (getChildAt(0).measuredHeight - itemSpace) / 2
+                    childHeight = (getChildByPositionTag(0).measuredHeight - itemSpace) / 2
                 )
                 measureView(
-                    child = getChildAt(2),
+                    child = getChildByPositionTag(2),
                     childWidth = (parentMaxWidth - itemSpace * 3) * 1 / 3,
-                    childHeight = (getChildAt(0).measuredHeight - itemSpace) / 2
+                    childHeight = (getChildByPositionTag(0).measuredHeight - itemSpace) / 2
                 )
             }
 
             4 -> {
                 for (i in 0 until childCount) {
                     measureView(
-                        child = getChildAt(i),
+                        child = getChildByPositionTag(i),
                         childWidth = (parentMaxWidth - itemSpace * 3) / 2,
                         childHeight = (parentMaxHeight - itemSpace * 3) / 2
                     )
@@ -161,9 +162,9 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         when (childCount) {
             1 -> {
                 layoutViewInCenterByOffset(
-                    child = getChildAt(0),
-                    offsetX = -getChildAt(0).measuredWidth / 2,
-                    offsetY = -getChildAt(0).measuredHeight / 2
+                    child = getChildByPositionTag(0),
+                    offsetX = -getChildByPositionTag(0).measuredWidth / 2,
+                    offsetY = -getChildByPositionTag(0).measuredHeight / 2
                 )
             }
 
@@ -171,45 +172,45 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 // primary view size match as parent, secondary view locate in left|bottom or right|bottom.
                 if (pictureInPictureMode) {
                     layoutViewByPosition(
-                        child = getChildAt(0),
+                        child = getChildByPositionTag(0),
                         left = 0,
                         top = 0
                     )
                     if (isRTL) {
                         layoutViewByPosition(
-                            child = getChildAt(1),
-                            left = right - gap - getChildAt(1).measuredWidth,
-                            top = bottom - gap - getChildAt(1).measuredHeight
+                            child = getChildByPositionTag(1),
+                            left = right - gap - getChildByPositionTag(1).measuredWidth,
+                            top = bottom - gap - getChildByPositionTag(1).measuredHeight
                         )
                     } else {
                         layoutViewByPosition(
-                            child = getChildAt(1),
+                            child = getChildByPositionTag(1),
                             left = gap,
-                            top = bottom - gap - getChildAt(1).measuredHeight
+                            top = bottom - gap - getChildByPositionTag(1).measuredHeight
                         )
                     }
                 } else {
                     if (isRTL) {
                         layoutViewInCenterByOffset(
-                            child = getChildAt(0),
+                            child = getChildByPositionTag(0),
                             offsetX = itemSpace / 2,
-                            offsetY = -getChildAt(0).measuredHeight / 2
+                            offsetY = -getChildByPositionTag(0).measuredHeight / 2
                         )
                         layoutViewInCenterByOffset(
-                            child = getChildAt(1),
-                            offsetX = -(getChildAt(1).measuredWidth + itemSpace / 2),
-                            offsetY = -getChildAt(1).measuredHeight / 2
+                            child = getChildByPositionTag(1),
+                            offsetX = -(getChildByPositionTag(1).measuredWidth + itemSpace / 2),
+                            offsetY = -getChildByPositionTag(1).measuredHeight / 2
                         )
                     } else {
                         layoutViewInCenterByOffset(
-                            child = getChildAt(0),
-                            offsetX = -(getChildAt(0).measuredWidth + itemSpace / 2),
-                            offsetY = -getChildAt(0).measuredHeight / 2
+                            child = getChildByPositionTag(0),
+                            offsetX = -(getChildByPositionTag(0).measuredWidth + itemSpace / 2),
+                            offsetY = -getChildByPositionTag(0).measuredHeight / 2
                         )
                         layoutViewInCenterByOffset(
-                            child = getChildAt(1),
+                            child = getChildByPositionTag(1),
                             offsetX = itemSpace / 2,
-                            offsetY = -getChildAt(1).measuredHeight / 2
+                            offsetY = -getChildByPositionTag(1).measuredHeight / 2
                         )
                     }
                 }
@@ -218,34 +219,34 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             3 -> {
                 if (isRTL) {
                     layoutViewByPosition(
-                        child = getChildAt(1),
+                        child = getChildByPositionTag(1),
                         left = itemSpace,
-                        top = height / 2 - itemSpace / 2 - getChildAt(1).measuredHeight
+                        top = height / 2 - itemSpace / 2 - getChildByPositionTag(1).measuredHeight
                     )
                     layoutViewByPosition(
-                        child = getChildAt(2),
+                        child = getChildByPositionTag(2),
                         left = itemSpace,
                         top = height / 2 + itemSpace / 2
                     )
                     layoutViewByPosition(
-                        child = getChildAt(0),
-                        left = itemSpace * 2 + getChildAt(2).measuredWidth,
-                        top = height / 2 - getChildAt(0).measuredHeight / 2
+                        child = getChildByPositionTag(0),
+                        left = itemSpace * 2 + getChildByPositionTag(2).measuredWidth,
+                        top = height / 2 - getChildByPositionTag(0).measuredHeight / 2
                     )
                 } else {
                     layoutViewByPosition(
-                        child = getChildAt(0),
+                        child = getChildByPositionTag(0),
                         left = itemSpace,
-                        top = height / 2 - getChildAt(0).measuredHeight / 2
+                        top = height / 2 - getChildByPositionTag(0).measuredHeight / 2
                     )
                     layoutViewByPosition(
-                        child = getChildAt(1),
-                        left = itemSpace * 2 + getChildAt(0).measuredWidth,
-                        top = height / 2 - itemSpace / 2 - getChildAt(1).measuredHeight
+                        child = getChildByPositionTag(1),
+                        left = itemSpace * 2 + getChildByPositionTag(0).measuredWidth,
+                        top = height / 2 - itemSpace / 2 - getChildByPositionTag(1).measuredHeight
                     )
                     layoutViewByPosition(
-                        child = getChildAt(2),
-                        left = itemSpace * 2 + getChildAt(0).measuredWidth,
+                        child = getChildByPositionTag(2),
+                        left = itemSpace * 2 + getChildByPositionTag(0).measuredWidth,
                         top = height / 2 + itemSpace / 2
                     )
                 }
@@ -254,45 +255,45 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             4 -> {
                 if (isRTL) {
                     layoutViewInCenterByOffset(
-                        getChildAt(0),
+                        getChildByPositionTag(0),
                         offsetX = itemSpace / 2,
-                        offsetY = -(itemSpace / 2 + getChildAt(0).measuredHeight)
+                        offsetY = -(itemSpace / 2 + getChildByPositionTag(0).measuredHeight)
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(1),
-                        offsetX = -(itemSpace / 2 + getChildAt(3).measuredWidth),
-                        offsetY = -(itemSpace / 2 + getChildAt(3).measuredHeight)
+                        getChildByPositionTag(1),
+                        offsetX = -(itemSpace / 2 + getChildByPositionTag(3).measuredWidth),
+                        offsetY = -(itemSpace / 2 + getChildByPositionTag(3).measuredHeight)
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(2),
-                        offsetX = -(itemSpace / 2 + getChildAt(2).measuredWidth),
+                        getChildByPositionTag(2),
+                        offsetX = itemSpace / 2,
                         offsetY = itemSpace / 2
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(3),
-                        offsetX = itemSpace / 2,
+                        getChildByPositionTag(3),
+                        offsetX = -(itemSpace / 2 + getChildByPositionTag(2).measuredWidth),
                         offsetY = itemSpace / 2
                     )
 
                 } else {
                     layoutViewInCenterByOffset(
-                        getChildAt(0),
-                        offsetX = -itemSpace / 2 - getChildAt(0).measuredWidth,
-                        offsetY = -(itemSpace / 2 + getChildAt(0).measuredHeight)
+                        getChildByPositionTag(0),
+                        offsetX = -itemSpace / 2 - getChildByPositionTag(0).measuredWidth,
+                        offsetY = -(itemSpace / 2 + getChildByPositionTag(0).measuredHeight)
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(1),
+                        getChildByPositionTag(1),
                         offsetX = itemSpace / 2,
-                        offsetY = -itemSpace / 2 - getChildAt(1).measuredHeight
+                        offsetY = -itemSpace / 2 - getChildByPositionTag(1).measuredHeight
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(2),
-                        offsetX = itemSpace / 2,
+                        getChildByPositionTag(2),
+                        offsetX = -(itemSpace / 2 + getChildByPositionTag(2).measuredWidth),
                         offsetY = itemSpace / 2
                     )
                     layoutViewInCenterByOffset(
-                        getChildAt(3),
-                        offsetX = -(itemSpace / 2 + getChildAt(2).measuredWidth),
+                        getChildByPositionTag(3),
+                        offsetX = itemSpace / 2,
                         offsetY = itemSpace / 2
                     )
                 }
@@ -316,8 +317,13 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         child.layout(left, top, left + child.measuredWidth, top + child.measuredHeight)
     }
 
-    override fun getChildAt(index: Int): View {
-        return super.getChildAt((index + layoutSwapIndex) % childCount)
+    override fun addView(child: View) {
+        child.setTagPosition(childCount)
+        super.addView(child)
+    }
+
+    private fun getChildByPositionTag(position: Int): View {
+        return children.find { it.getTagPosition() == position } ?: throw IllegalArgumentException("$position, can not find this position tag.") //getChildAt(position)
     }
 
     override fun getChildDrawingOrder(childCount: Int, drawingPosition: Int): Int {
@@ -331,13 +337,48 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         return super.getChildDrawingOrder(childCount, drawingPosition)
     }
 
+    override fun removeView(view: View) {
+        val position = view.getTagPosition()
+        super.removeView(view)
+        children.forEach {
+            if (it.getTagPosition() > position) {
+                it.setTagPosition(it.getTagPosition() - 1)
+            }
+        }
+    }
+
     // ----------------- MultiViewControlBar.MultiViewControlBarListener -----------------
     override fun onMultiviewPipButtonClicked() {
         pictureInPictureMode = true
     }
 
     override fun onMultiviewSwapButtonClicked() {
-        layoutSwapIndex++
+        if (childCount == 4) {
+            val tag0 = getChildByPositionTag(0)
+            val tag1 = getChildByPositionTag(1)
+            val tag2 = getChildByPositionTag(2)
+            val tag3 = getChildByPositionTag(3)
+            tag0.setTagPosition(1)
+            tag1.setTagPosition(3)
+            tag2.setTagPosition(0)
+            tag3.setTagPosition(2)
+        } else {
+            children.forEach {
+                it.setTagPosition((it.getTagPosition() + 1) % childCount)
+            }
+        }
         requestLayout()
+    }
+}
+
+internal fun View.getTagPosition(): Int {
+    return getTag(R.id.multiview_position_tag) as Int
+}
+
+internal fun View.setTagPosition(position: Int) {
+    setTag(R.id.multiview_position_tag, position)
+    //TODO: ---- test code --------------------------------
+    if (this is MultiViewFocusableView) {
+        (getChildAt(0) as ReactTVExoplayerView).setTextView((position).toString())
     }
 }
