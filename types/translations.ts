@@ -22,4 +22,5 @@ export interface IVideoPlayerTranslations {
   tvPlayerEPG: string;
   audioOnlyBadge: string;
   multiView: string;
+  multiViewPlaybackError: string;
 }

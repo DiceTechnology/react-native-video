@@ -34,4 +34,5 @@ struct Translations: SuperCodable {
     var off: String?
     var audioOnlyBadge: String?
     var multiView: String?
+    var multiViewPlaybackError: String?
 }

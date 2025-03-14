@@ -112,6 +112,7 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
         dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.multiView = translations.multiView
+        dorisTranslationsViewModel.multiViewPlaybackError = translations.multiViewPlaybackError
         return dorisTranslationsViewModel
     }
 

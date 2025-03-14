@@ -89,8 +89,11 @@ class NewPlayerView: UIView, JSInputProtocol {
           if let sources = multiViewSources, sources.count > 0 {
             var convertSources = [Source]()
             for dict in sources {
-              if let source = try? Source(dict: dict as? NSDictionary) {
+              do {
+                let source = try Source(dict: dict as? NSDictionary)
                 convertSources.append(source)
+              } catch {
+                onVideoError?(["value": dict, "error": (error as NSError).description])
               }
             }
             self.jsProps.multiViewSources.value = convertSources
@@ -180,6 +183,10 @@ class NewPlayerView: UIView, JSInputProtocol {
     
     var jsProps = JSProps()
     var jsPlayerView: RNDReactNativeDiceVideo.JSPlayerView?
+  
+    deinit {
+      jsPlayerView?.removeMultiview()
+    }
     
     func seekToNow() {
         jsPlayerView?.seekNow()
