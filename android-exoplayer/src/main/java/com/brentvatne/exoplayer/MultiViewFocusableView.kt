@@ -22,7 +22,7 @@ class MultiViewFocusableView(
     }
 
     private val iconSize = (24 * tvExoplayerView.resources.displayMetrics.density).toInt()
-    private val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
+    val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
     private val isMute: Boolean
         get() = tvExoplayerView.exoDorisPlayerView.isMute
 

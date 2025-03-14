@@ -4,14 +4,12 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.children
+import androidx.core.view.isInvisible
 import com.brentvatne.react.R
+import com.diceplatform.doris.ui.ExoDorisTvPlayerView
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControlBar.MultiViewControlBarListener {
-
-    init {
-        isChildrenDrawingOrderEnabled = true
-    }
 
     private val isRTL = I18nUtil.getInstance().isRTL(context)
     private val childSizeRatio: Float = 16f / 9f // width / height
@@ -29,8 +27,22 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             if (field != value) {
                 field = value
                 requestLayout()
+                resetPIP(value)
             }
         }
+
+    private fun resetPIP(pipMode: Boolean) {
+        // pip mode, hide focus indicator foreground image
+        children.forEach { view ->
+            (view as MultiViewFocusableView).apply {
+                isFocusable = !pipMode
+                volumeIcon.isInvisible = pipMode
+            }
+        }
+        // fullscreen player should always has audio. the pip one mute.
+        getChildByPositionTag(0).mute(false)
+        getChildByPositionTag(1).mute(true)
+    }
 
     override fun requestLayout() {
         super.requestLayout()
@@ -88,15 +100,6 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                     childWidth = if (pictureInPictureMode) parentMaxWidth / 4 else (parentMaxWidth - itemSpace * 3) / 2,
                     childHeight = if (pictureInPictureMode) parentMaxHeight / 4 else parentMaxHeight - itemSpace * 2
                 )
-//                if (pictureInPictureMode) {
-//                    val videoSurfaceView = (getChildAt(1) as ReactTVExoplayerView).exoDorisPlayerView.videoSurfaceView
-//                    Log.d("MultiViewLayout", "videoSurfaceView: ${videoSurfaceView?.javaClass?.simpleName}")
-//                    if (videoSurfaceView is SurfaceView) {
-//                        videoSurfaceView.setZOrderOnTop(true)
-//                    } else {
-//                        getChildAt(1).bringToFront()
-//                    }
-//                }
             }
 
             3 -> {
@@ -322,19 +325,8 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         super.addView(child)
     }
 
-    private fun getChildByPositionTag(position: Int): View {
-        return children.find { it.getTagPosition() == position } ?: throw IllegalArgumentException("$position, can not find this position tag.") //getChildAt(position)
-    }
-
-    override fun getChildDrawingOrder(childCount: Int, drawingPosition: Int): Int {
-//        if (pictureInPictureMode && childCount == 2) {
-//            if (drawingPosition == 0) {
-//                return layoutSwapIndex % 2
-//            } else if (drawingPosition == 1) {
-//                return (layoutSwapIndex + 1) % 2
-//            }
-//        }
-        return super.getChildDrawingOrder(childCount, drawingPosition)
+    private fun getChildByPositionTag(position: Int): MultiViewFocusableView {
+        return (children.find { it.getTagPosition() == position } ?: getChildAt(position)) as MultiViewFocusableView
     }
 
     override fun removeView(view: View) {
@@ -353,21 +345,41 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     }
 
     override fun onMultiviewSwapButtonClicked() {
-        if (childCount == 4) {
-            val tag0 = getChildByPositionTag(0)
-            val tag1 = getChildByPositionTag(1)
-            val tag2 = getChildByPositionTag(2)
-            val tag3 = getChildByPositionTag(3)
-            tag0.setTagPosition(1)
-            tag1.setTagPosition(3)
-            tag2.setTagPosition(0)
-            tag3.setTagPosition(2)
+        if (pictureInPictureMode) {
+//            val tag0 = getChildByPositionTag(0)
+//            val tag1 = getChildByPositionTag(1)
+            val tag0PlayerView = getDorisTvExoplayerView(0)
+            val tag1PlayerView = getDorisTvExoplayerView(1)
+            val player = tag0PlayerView.player
+            tag0PlayerView.player = null
+            tag0PlayerView.player = tag1PlayerView.player
+            tag0PlayerView.mute(false)
+            tag1PlayerView.player = null
+            tag1PlayerView.player = player
+            tag1PlayerView.mute(true)
+//            tag0.setTagPosition(1)
+//            tag1.setTagPosition(0)
         } else {
-            children.forEach {
-                it.setTagPosition((it.getTagPosition() + 1) % childCount)
+            if (childCount == 4) {
+                val tag0 = getChildByPositionTag(0)
+                val tag1 = getChildByPositionTag(1)
+                val tag2 = getChildByPositionTag(2)
+                val tag3 = getChildByPositionTag(3)
+                tag0.setTagPosition(1)
+                tag1.setTagPosition(3)
+                tag2.setTagPosition(0)
+                tag3.setTagPosition(2)
+            } else {
+                children.forEach {
+                    it.setTagPosition((it.getTagPosition() + 1) % childCount)
+                }
             }
+            requestLayout()
         }
-        requestLayout()
+    }
+
+    private fun getDorisTvExoplayerView(position: Int): ExoDorisTvPlayerView {
+        return (getChildByPositionTag(position).getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
     }
 }
 
@@ -377,8 +389,4 @@ internal fun View.getTagPosition(): Int {
 
 internal fun View.setTagPosition(position: Int) {
     setTag(R.id.multiview_position_tag, position)
-    //TODO: ---- test code --------------------------------
-    if (this is MultiViewFocusableView) {
-        (getChildAt(0) as ReactTVExoplayerView).setTextView((position).toString())
-    }
 }
