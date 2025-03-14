@@ -75,8 +75,18 @@ class NewPlayerView: UIView, JSInputProtocol {
     }
     @objc var buttons: NSDictionary? {
         didSet {
-            jsProps.buttons.value = try? Buttons(dict: buttons)
-            jsPlayerView?.dorisGlue?.doris?.viewModel.toggles.isAnnotationsButtonHidden = jsProps.buttons.value?.annotations == false
+            let buttonsModel = try? Buttons(dict: buttons)
+            jsProps.buttons.value = buttonsModel
+            if let buttonsModel, buttons != oldValue, var toggles = jsPlayerView?.dorisGlue?.doris?.viewModel.toggles {
+                toggles.isFavouriteButtonHidden = !buttonsModel.favourite
+                toggles.isSettingsButtonHidden = !(buttonsModel.settings ?? true)
+                toggles.isStatsButtonHidden = !buttonsModel.stats
+                toggles.isFullScreenButtonHidden = !(buttonsModel.fullscreen ?? true)
+                toggles.isWatchlistButtonHidden = !(buttonsModel.watchlist ?? false)
+                toggles.isAnnotationsButtonHidden = !(buttonsModel.annotations ?? false)
+                toggles.isScheduleButtonHidden = !(buttonsModel.epg ?? false)
+                jsPlayerView?.dorisGlue?.doris?.viewModel.toggles = toggles
+            }
         }
     }
     @objc var theme: NSDictionary? {
