@@ -77,7 +77,7 @@ class NewPlayerView: UIView, JSInputProtocol {
         didSet {
             let buttonsModel = try? Buttons(dict: buttons)
             jsProps.buttons.value = buttonsModel
-            if let buttonsModel, buttons != oldValue, var toggles = jsPlayerView?.dorisGlue?.doris?.viewModel.toggles {
+            if let buttonsModel, buttons != oldValue, let toggles = jsPlayerView?.dorisGlue?.doris?.viewModel.toggles {
                 toggles.isFavouriteButtonHidden = !buttonsModel.favourite
                 toggles.isSettingsButtonHidden = !(buttonsModel.settings ?? true)
                 toggles.isStatsButtonHidden = !buttonsModel.stats
@@ -85,7 +85,6 @@ class NewPlayerView: UIView, JSInputProtocol {
                 toggles.isWatchlistButtonHidden = !(buttonsModel.watchlist ?? false)
                 toggles.isAnnotationsButtonHidden = !(buttonsModel.annotations ?? false)
                 toggles.isScheduleButtonHidden = !(buttonsModel.epg ?? false)
-                jsPlayerView?.dorisGlue?.doris?.viewModel.toggles = toggles
             }
         }
     }
