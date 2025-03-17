@@ -6,7 +6,6 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.isInvisible
 import com.brentvatne.react.R
-import com.diceplatform.doris.ui.ExoDorisTvPlayerView
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControlBar.MultiViewControlBarListener {
@@ -182,13 +181,13 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                     if (isRTL) {
                         layoutViewByPosition(
                             child = getChildByPositionTag(1),
-                            left = right - gap - getChildByPositionTag(1).measuredWidth,
+                            left = gap,
                             top = bottom - gap - getChildByPositionTag(1).measuredHeight
                         )
                     } else {
                         layoutViewByPosition(
                             child = getChildByPositionTag(1),
-                            left = gap,
+                            left = right - gap - getChildByPositionTag(1).measuredWidth,
                             top = bottom - gap - getChildByPositionTag(1).measuredHeight
                         )
                     }
@@ -352,19 +351,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
     override fun onMultiviewSwapButtonClicked() {
         if (pictureInPictureMode) {
-//            val tag0 = getChildByPositionTag(0)
-//            val tag1 = getChildByPositionTag(1)
-            val tag0PlayerView = getDorisTvExoplayerView(0)
-            val tag1PlayerView = getDorisTvExoplayerView(1)
-            val player = tag0PlayerView.player
-            tag0PlayerView.player = null
-            tag0PlayerView.player = tag1PlayerView.player
-            tag0PlayerView.mute(false)
-            tag1PlayerView.player = null
-            tag1PlayerView.player = player
-            tag1PlayerView.mute(true)
-//            tag0.setTagPosition(1)
-//            tag1.setTagPosition(0)
+            getChildByPositionTag(0).swap(getChildByPositionTag(1))
         } else {
             if (childCount == 4) {
                 val tag0 = getChildByPositionTag(0)
@@ -382,10 +369,6 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             }
             requestLayout()
         }
-    }
-
-    private fun getDorisTvExoplayerView(position: Int): ExoDorisTvPlayerView {
-        return (getChildByPositionTag(position).getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
     }
 }
 

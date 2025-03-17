@@ -68,6 +68,10 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TextAppearance.MultiviewErrorMsg" parent="TextAppearance.PlayerText">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="TextAppearance.SkipMarker">
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">16sp</item>

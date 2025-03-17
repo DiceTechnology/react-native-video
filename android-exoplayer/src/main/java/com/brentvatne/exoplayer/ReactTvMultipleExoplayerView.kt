@@ -116,6 +116,10 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
             child.setOnFocusChangeListener(childViewOnFocusChangeListener)
             multiViewLayout.addView(MultiViewStateView(child, labelsTranslation, multiViewMode, this))
             requestLayout()
+            // fix only one view in multiview mode, this view can not receive dispatch key event fun.
+            if (!child.exoDorisPlayerView.isMute) {
+                post { multiViewLayout.children.last().requestFocus() }
+            }
         }
     }
 
