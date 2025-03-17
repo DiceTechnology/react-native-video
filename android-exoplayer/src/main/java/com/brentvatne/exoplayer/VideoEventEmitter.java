@@ -158,6 +158,7 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ID = "id";
     private static final String EVENT_PROP_TYPE = "type";
     private static final String EVENT_PROP_DURATION = "duration";
+    private static final String EVENT_PROP_VIDEO_ID = "videoId";
 
     private static final String EVENT_PROP_PLAYABLE_DURATION = "playableDuration";
     private static final String EVENT_PROP_SEEKABLE_DURATION = "seekableDuration";
@@ -198,7 +199,7 @@ class VideoEventEmitter {
     }
 
     void load(
-            double duration, double currentPosition, int videoWidth, int videoHeight,
+            String videoId, double duration, double currentPosition, int videoWidth, int videoHeight,
             WritableArray audioTracks, WritableArray textTracks) {
         WritableMap event = Arguments.createMap();
         event.putDouble(EVENT_PROP_DURATION, duration / 1000D);
@@ -216,6 +217,7 @@ class VideoEventEmitter {
 
         event.putArray(EVENT_PROP_AUDIO_TRACKS, audioTracks);
         event.putArray(EVENT_PROP_TEXT_TRACKS, textTracks);
+        event.putString(EVENT_PROP_VIDEO_ID, videoId);
 
         // TODO: Actually check if you can.
         event.putBoolean(EVENT_PROP_FAST_FORWARD, true);
@@ -289,12 +291,13 @@ class VideoEventEmitter {
         receiveEvent(EVENT_FULLSCREEN_DID_DISMISS, null);
     }
 
-    void error(String errorString, Exception exception) {
+    void error(String videoId, String errorString, Exception exception) {
         WritableMap error = Arguments.createMap();
         error.putString(EVENT_PROP_ERROR_STRING, errorString);
         error.putString(EVENT_PROP_ERROR_EXCEPTION, android.util.Log.getStackTraceString(exception));
         WritableMap event = Arguments.createMap();
         event.putMap(EVENT_PROP_ERROR, error);
+        event.putString(EVENT_PROP_VIDEO_ID, videoId);
         receiveEvent(EVENT_ERROR, event);
     }
 

@@ -867,7 +867,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     private void handleDrmSessionManagerError(Exception exception) {
         final int errorStringId = R.string.error_drm_session_manager;
         final String errorString = getContext().getString(errorStringId);
-        eventEmitter.error("DRM exception: " + errorString, exception);
+        eventEmitter.error(src.getId(), "DRM exception: " + errorString, exception);
     }
 
     private void releasePlayer() {
@@ -1121,7 +1121,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             int height = videoFormat != null ? videoFormat.height : 0;
             // MockStreamSource.logDceTracks(C.TRACK_TYPE_AUDIO, exoPlayer, trackSelector);
             // MockStreamSource.logDceTracks(C.TRACK_TYPE_TEXT, exoPlayer, trackSelector);
-            eventEmitter.load(exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
+            eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
         }
     }
@@ -1315,7 +1315,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         }
         if (errorString != null) {
             resetSourceUrl();
-            eventEmitter.error("Playback exception: " + errorString, ex);
+            eventEmitter.error(src.getId(), "Playback exception: " + errorString, ex);
         }
     }
 
@@ -2078,7 +2078,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
                         handlePlaybackError((PlaybackException) error);
                     } else if (error != null) {
                         resetSourceUrl();
-                        eventEmitter.error("Player exception", error);
+                        eventEmitter.error(src.getId(), "Player exception", error);
                     }
                     break;
                 default:
@@ -2151,7 +2151,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
                         }
                     }
                     if (!ignoreAdError) {
-                        eventEmitter.error("Ad exception", adEvent.details.error);
+                        eventEmitter.error(src.getId(), "Ad exception", adEvent.details.error);
                     }
                     break;
                 default:
