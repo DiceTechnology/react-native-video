@@ -198,6 +198,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     private int viewHeight = 0;
     private boolean hasReloadedCurrentSource = false;
     private boolean isMuted = false;
+    private boolean ignoreProgressUpdates = false;
 
     // Props from React
     private RNSource src;
@@ -268,7 +269,9 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
                         eventEmitter.videoAboutToEnd(isAboutToEnd);
                     }
 
-                    eventEmitter.progressChanged(contentTimestampMs, position, bufferedDuration, duration);
+                    if (!ignoreProgressUpdates) {
+                        eventEmitter.progressChanged(contentTimestampMs, position, bufferedDuration, duration);
+                    }
 
                     jsProgressHandler.removeMessages(SHOW_JS_PROGRESS);
                     msg = obtainMessage(SHOW_JS_PROGRESS);
@@ -1597,6 +1600,10 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.mute(mute);
         }
+    }
+
+    public void setIgnoreProgressUpdates(boolean ignoreProgressUpdates) {
+        this.ignoreProgressUpdates = ignoreProgressUpdates;
     }
 
     public void resumeTo(long positionMs) {

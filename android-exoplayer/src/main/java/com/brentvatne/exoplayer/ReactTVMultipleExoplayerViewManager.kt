@@ -306,6 +306,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                 val src = array.getMap(i)
                 if (list.isEmpty() || src !in list) {
                     val playerView = primaryViewManager.createViewInstance(rootView.themedReactContext)
+                    playerView.setIgnoreProgressUpdates(true)
                     playerView.tag = src
                     playerView.mute(mute)
                     playerView.setTextView((++index).toString())
