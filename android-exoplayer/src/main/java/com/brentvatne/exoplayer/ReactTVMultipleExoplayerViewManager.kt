@@ -265,6 +265,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     @ReactProp(name = PROP_TRANSLATIONS)
     fun setTranslations(videoView: ReactTvMultipleExoplayerView, translations: ReadableMap?) {
         primaryViewManager.setTranslations(primaryView, translations)
+        rootView.labelsTranslation = primaryView.exoDorisPlayerView.labelsTranslation
     }
 
     @ReactProp(name = PROP_RELATED_VIDEOS)

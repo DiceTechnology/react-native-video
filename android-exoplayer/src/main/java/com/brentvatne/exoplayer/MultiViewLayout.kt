@@ -34,7 +34,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     private fun resetPIP(pipMode: Boolean) {
         // pip mode, hide focus indicator foreground image
         children.forEach { view ->
-            (view as MultiViewFocusableView).apply {
+            (view as MultiViewStateView).apply {
                 isFocusable = !pipMode
                 volumeIcon.isInvisible = pipMode
             }
@@ -325,8 +325,8 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         super.addView(child)
     }
 
-    private fun getChildByPositionTag(position: Int): MultiViewFocusableView {
-        return (children.find { it.getTagPosition() == position } ?: getChildAt(position)) as MultiViewFocusableView
+    private fun getChildByPositionTag(position: Int): MultiViewStateView {
+        return (children.find { it.getTagPosition() == position } ?: getChildAt(position)) as MultiViewStateView
     }
 
     override fun removeView(view: View) {
@@ -340,6 +340,12 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     }
 
     // ----------------- MultiViewControlBar.MultiViewControlBarListener -----------------
+    override fun onMultiviewIndicatorClick() {
+        if (pictureInPictureMode) {
+            pictureInPictureMode = false
+        }
+    }
+
     override fun onMultiviewPipButtonClicked() {
         pictureInPictureMode = true
     }

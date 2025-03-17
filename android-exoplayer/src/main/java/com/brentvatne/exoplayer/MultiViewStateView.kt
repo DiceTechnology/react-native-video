@@ -1,28 +1,38 @@
 package com.brentvatne.exoplayer
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.setPadding
 import com.brentvatne.react.R
+import com.diceplatform.doris.DorisPlayerOutput
+import com.diceplatform.doris.entity.DorisPlayerEvent
+import com.diceplatform.doris.ui.entity.LabelsTranslation
 
 @SuppressLint("ViewConstructor")
-class MultiViewFocusableView(
+class MultiViewStateView(
     private val tvExoplayerView: ReactTVExoplayerView,
+    labelsTranslation: LabelsTranslation?,
     focusable: Boolean,
     private val listener: OnVolumeChangedListener,
-) : FrameLayout(tvExoplayerView.context), OnFocusChangeListener, OnClickListener {
+) : FrameLayout(tvExoplayerView.context), OnFocusChangeListener, OnClickListener,
+    DorisPlayerOutput {
 
     interface OnVolumeChangedListener {
-        fun onRequestVolume(view: MultiViewFocusableView)
+        fun onRequestVolume(view: MultiViewStateView)
     }
 
     private val iconSize = (24 * tvExoplayerView.resources.displayMetrics.density).toInt()
     val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
+    private val errorMsgView: TextView = TextView(tvExoplayerView.context)
     private val isMute: Boolean
         get() = tvExoplayerView.exoDorisPlayerView.isMute
 
@@ -48,6 +58,41 @@ class MultiViewFocusableView(
                 rightMargin = 32
             }
         )
+
+        // add error msg view
+        errorMsgView.apply {
+            text = labelsTranslation?.get("multiViewPlaybackError")
+            gravity = Gravity.CENTER
+            visibility = View.GONE
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+            setTextColor(Color.WHITE)
+            setBackgroundColor(Color.BLACK)
+            setPadding(16)
+        }
+        addView(
+            errorMsgView, LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            ).apply {
+                gravity = Gravity.CENTER
+            }
+        )
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        tvExoplayerView.exoDorisPlayerView.setDorisPlayerOutput(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        tvExoplayerView.exoDorisPlayerView.setDorisPlayerOutput(null)
+        super.onDetachedFromWindow()
+    }
+
+    override fun onPlayerEvent(event: DorisPlayerEvent) {
+        if (event.event == DorisPlayerEvent.Event.ERROR) {
+            errorMsgView.visibility = View.VISIBLE
+        }
     }
 
     override fun onClick(v: View) {

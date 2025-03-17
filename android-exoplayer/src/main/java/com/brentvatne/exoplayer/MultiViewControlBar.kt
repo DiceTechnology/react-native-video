@@ -17,6 +17,7 @@ class MultiViewControlBar(
 ) : LinearLayout(context), OnClickListener {
 
     interface MultiViewControlBarListener {
+        fun onMultiviewIndicatorClick() {}
         fun onMultiviewPipButtonClicked() {}
         fun onMultiviewSwapButtonClicked() {}
     }
@@ -33,7 +34,8 @@ class MultiViewControlBar(
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.btn_multiview_indicator -> { // _TODO
+            R.id.btn_multiview_indicator -> {
+                multiViewControlBarListener?.onMultiviewIndicatorClick()
             }
 
             R.id.btn_multiview_pip -> {

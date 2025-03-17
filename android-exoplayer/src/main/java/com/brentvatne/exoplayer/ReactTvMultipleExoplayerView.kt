@@ -13,6 +13,7 @@ import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import com.brentvatne.util.Logger
 import com.brentvatne.util.ReadableMapUtils
+import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.bridge.ReadableMap
@@ -20,12 +21,13 @@ import com.facebook.react.uimanager.ThemedReactContext
 
 @SuppressLint("ViewConstructor")
 class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext),
-    MultiViewFocusableView.OnVolumeChangedListener {
+    MultiViewStateView.OnVolumeChangedListener {
 
     private val fullscreenControlBarHeight = (96 * themedReactContext.resources.displayMetrics.density).toInt()
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
     private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext, multiViewLayout)
+    var labelsTranslation: LabelsTranslation? = null
     val multiViewMode
         get() = multiViewLayout.multiViewMode
 
@@ -66,8 +68,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         return multiViewLayout.children.map { (it as ViewGroup)[0] as ReactTVExoplayerView }.toList()
     }
 
-    private fun getFocusableChildrenList(): List<MultiViewFocusableView> {
-        return multiViewLayout.children.map { it as MultiViewFocusableView }.toList()
+    private fun getFocusableChildrenList(): List<MultiViewStateView> {
+        return multiViewLayout.children.map { it as MultiViewStateView }.toList()
     }
 
     fun loadBottomOverlayComponent(src: ReadableMap) {
@@ -112,7 +114,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
             child.setMultipleViewMode(multiViewMode)
             child.setShowBottomComponent(!multiViewMode)
             child.setOnFocusChangeListener(childViewOnFocusChangeListener)
-            multiViewLayout.addView(MultiViewFocusableView(child, multiViewMode, this))
+            multiViewLayout.addView(MultiViewStateView(child, labelsTranslation, multiViewMode, this))
             requestLayout()
         }
     }
@@ -121,7 +123,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         (playerView as ReactTVExoplayerView).mute(!hasFocus)
     }
 
-    override fun onRequestVolume(view: MultiViewFocusableView) {
+    override fun onRequestVolume(view: MultiViewStateView) {
         getFocusableChildrenList().forEach { child ->
             child.mute(view != child)
         }
@@ -218,7 +220,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         multiViewControlBar.multiViewSize = getExoplayerChildrenList().size
         multiViewControlBar.setVisible(fullscreen)
         multiViewLayout.children.forEach { child ->
-            (child as MultiViewFocusableView).showVolumeIcon(fullscreen)
+            (child as MultiViewStateView).showVolumeIcon(fullscreen)
         }
     }
 }
