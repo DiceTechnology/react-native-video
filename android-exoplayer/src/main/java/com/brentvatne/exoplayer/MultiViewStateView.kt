@@ -18,6 +18,9 @@ import com.diceplatform.doris.entity.DorisPlayerEvent
 import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
+//TODO: ---- test code --------------------------------
+var index = 0
+
 @SuppressLint("ViewConstructor")
 class MultiViewStateView(
     private val tvExoplayerView: ReactTVExoplayerView,
@@ -28,16 +31,16 @@ class MultiViewStateView(
     DorisPlayerOutput {
 
     interface OnVolumeChangedListener {
-        fun onRequestVolume(view: MultiViewStateView)
+        fun onRequestMute(view: MultiViewStateView, mute: Boolean)
     }
 
     private val isRTL = I18nUtil.getInstance().isRTL(context)
-    private val iconSize = (24 * tvExoplayerView.resources.displayMetrics.density).toInt()
-    val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
-    val errorMsgView: TextView = TextView(tvExoplayerView.context)
+    private val iconSize = (40 * tvExoplayerView.resources.displayMetrics.density).toInt()
+    private val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
+    private val errorMsgView: TextView = TextView(tvExoplayerView.context)
     private val isMute: Boolean
         get() = tvExoplayerView.exoDorisPlayerView.isMute
-    private val isError: Boolean
+    val isError: Boolean
         get() = errorMsgView.isVisible
 
     init {
@@ -52,7 +55,10 @@ class MultiViewStateView(
         volumeIcon.visibility = View.INVISIBLE
         volumeIcon.isFocusable = false
         volumeIcon.onFocusChangeListener = this
+        volumeIcon.setBackgroundResource(R.drawable.ic_multiview_circle_bg)
         volumeIcon.setOnClickListener(this)
+        volumeIcon.setPadding(12)
+        volumeIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE
         addView(
             volumeIcon,
             LayoutParams(iconSize, iconSize).apply {
@@ -81,6 +87,23 @@ class MultiViewStateView(
                 gravity = Gravity.CENTER
             }
         )
+
+        //TODO: ---- test code --------------------------------
+        // test indicator
+        val textView = TextView(context)
+        textView.setPadding(30, 20, 30, 20)
+        textView.text = (index++).toString()
+        textView.textSize = 48f
+        textView.setTextColor(Color.MAGENTA)
+        textView.setGravity(Gravity.CENTER)
+        addView(
+            textView, LayoutParams(
+                LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.TOP or Gravity.RIGHT
+            }
+        )
     }
 
     override fun onAttachedToWindow() {
@@ -104,7 +127,8 @@ class MultiViewStateView(
     }
 
     override fun onClick(v: View) {
-        listener.onRequestVolume(this)
+        if (isError) return
+        listener.onRequestMute(this, !tvExoplayerView.exoDorisPlayerView.isMute)
     }
 
     override fun onFocusChange(v: View, hasFocus: Boolean) {
@@ -112,7 +136,6 @@ class MultiViewStateView(
     }
 
     fun showVolumeIcon(show: Boolean) {
-        isFocusable = !show
         volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
         volumeIcon.isFocusable = show
     }
@@ -120,23 +143,6 @@ class MultiViewStateView(
     fun mute(mute: Boolean) {
         tvExoplayerView.mute(mute)
         resetVolumeIcon()
-    }
-
-    fun swap(otherView: MultiViewStateView) {
-        // check error state first
-        val otherViewIsError = otherView.isError
-        otherView.setError(isError)
-        this.setError(otherViewIsError)
-        // swap player
-        val tag0PlayerView = (this.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
-        val tag1PlayerView = (otherView.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
-        val player = tag0PlayerView.player
-        tag0PlayerView.player = null
-        tag0PlayerView.player = tag1PlayerView.player
-        tag0PlayerView.mute(false)
-        tag1PlayerView.player = null
-        tag1PlayerView.player = player
-        tag1PlayerView.mute(true)
     }
 
     private fun resetVolumeIcon() {
@@ -147,4 +153,21 @@ class MultiViewStateView(
                 R.drawable.ic_multiview_volume_selector
         )
     }
+}
+
+internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView) {
+    // check error state first
+    val otherViewIsError = view2.isError
+    view2.setError(view1.isError)
+    view1.setError(otherViewIsError)
+    // swap player
+    val tag0PlayerView = (view1.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
+    val tag1PlayerView = (view2.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
+    val player = tag0PlayerView.player
+    tag0PlayerView.player = null
+    tag0PlayerView.player = tag1PlayerView.player
+    tag0PlayerView.mute(false)
+    tag1PlayerView.player = null
+    tag1PlayerView.player = player
+    tag1PlayerView.mute(true)
 }

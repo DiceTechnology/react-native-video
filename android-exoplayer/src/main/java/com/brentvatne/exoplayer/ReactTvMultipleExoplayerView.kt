@@ -18,6 +18,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
+import okhttp3.internal.toHexString
 
 @SuppressLint("ViewConstructor")
 class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext),
@@ -127,9 +128,17 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         (playerView as ReactTVExoplayerView).mute(!hasFocus)
     }
 
-    override fun onRequestVolume(view: MultiViewStateView) {
-        getFocusableChildrenList().forEach { child ->
-            child.mute(view != child)
+    override fun onRequestMute(view: MultiViewStateView, mute: Boolean) {
+        if (mute) {
+            view.mute(true)
+        } else {
+            getFocusableChildrenList().forEach { child ->
+                if (child.getTagPosition() == view.getTagPosition()) {
+                    child.mute(false)
+                } else {
+                    child.mute(true)
+                }
+            }
         }
     }
 
@@ -204,7 +213,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                     } else if (multiViewLayout.fullscreenMode) {
                         setFullscreenMode(false)
                     } else {
-                        getExoplayerChildrenList()[0].eventEmitter?.setMultiViewMode(false)
+                        getExoplayerChildrenList()[0].exitMultiViewMode()
                     }
                     return true
                 }
@@ -224,7 +233,10 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         multiViewControlBar.multiViewSize = getExoplayerChildrenList().size
         multiViewControlBar.setVisible(fullscreen)
         multiViewLayout.children.forEach { child ->
-            (child as MultiViewStateView).showVolumeIcon(fullscreen)
+            (child as MultiViewStateView).apply {
+                isFocusable = !fullscreen
+                showVolumeIcon(fullscreen)
+            }
         }
     }
 }

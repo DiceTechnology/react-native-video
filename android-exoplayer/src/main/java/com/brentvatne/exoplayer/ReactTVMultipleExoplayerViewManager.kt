@@ -283,14 +283,10 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         primaryViewManager.setIsFavourite(primaryView, isFavourite)
     }
 
-    //TODO: ---- test code --------------------------------
-    private var index = 0
-
     @ReactProp(name = "multiViewSources")
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
         Logger.log(this, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
-            index = 0
             rootView.getExoplayerChildrenList().filter { it != primaryView }.forEach {
                 rootView.removeView(it)
             }
@@ -309,7 +305,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     playerView.setIgnoreProgressUpdates(true)
                     playerView.tag = src
                     playerView.mute(mute)
-                    playerView.setTextView((++index).toString())
                     rootView.addMultiViewChild(playerView, true)
                     primaryViewManager.setSrc(playerView, src)
                     break
@@ -334,5 +329,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         if (multiViewMode) {
             rootView.removeView(primaryView)
         }
+        index = 0
     }
 }

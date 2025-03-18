@@ -2,7 +2,6 @@ package com.brentvatne.exoplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -12,13 +11,11 @@ import android.os.PowerManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 import android.view.Choreographer;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -351,9 +348,6 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     private final MediaSessionCompat mediaSession;
     private final MediaSessionConnector mediaSessionConnector;
 
-    //TODO: ---- test code --------------------------------
-    private TextView textView;
-
     public ReactTVExoplayerView(ThemedReactContext context) {
         super(context);
         this.themedReactContext = context;
@@ -377,25 +371,6 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         controller.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
         View playList = controller.findViewById(R.id.playlistView);
         playList.setLayoutDirection(isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
-
-        //TODO: ---- test code --------------------------------
-        textView = new TextView(getContext());
-        textView.setPadding(30, 20, 30, 20);
-        textView.setText("0");
-        textView.setTextSize(48);
-        textView.setTextColor(Color.MAGENTA);
-        textView.setGravity(Gravity.TOP | Gravity.START);
-        addView(textView);
-        //TODO: ---- test code --------------------------------
-    }
-
-    //TODO: ---- test code --------------------------------
-    public void setTextView(String text) {
-        textView.setText(text);
-    }
-
-    public VideoEventEmitter getEventEmitter() {
-        return eventEmitter;
     }
 
     @Override
@@ -1990,7 +1965,6 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
 
     @Override
     public void onMultiViewButtonClicked() {
-        //TODO: show to set false, exit multiView mode.
         eventEmitter.setMultiViewMode(true);
     }
 
@@ -2010,6 +1984,10 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
                 ? TrackPreferenceStorage.NONE
                 : language);
         eventEmitter.audioTrackChanged(language);
+    }
+
+    public void exitMultiViewMode() {
+        eventEmitter.setMultiViewMode(false);
     }
 
     public void replaceAdTagParameters(Map<String, Object> replaceAdTagParametersMap) {

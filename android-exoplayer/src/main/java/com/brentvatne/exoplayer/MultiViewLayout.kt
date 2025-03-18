@@ -4,14 +4,15 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.children
-import androidx.core.view.isInvisible
 import com.brentvatne.react.R
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControlBar.MultiViewControlBarListener {
 
+    private val pipModeWindowScaleToParent = 3
     private val isRTL = I18nUtil.getInstance().isRTL(context)
     private val childSizeRatio: Float = 16f / 9f // width / height
+    private var swapChildViewPlayer = false
     var gap: Int = 30 // pix
     var multiViewMode = false
     var fullscreenMode = false
@@ -25,22 +26,30 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         set(value) {
             if (field != value) {
                 field = value
+                if (swapChildViewPlayer) {
+                    swapPipView()
+                }
                 requestLayout()
-                resetPIP(value)
+                resetPIPViews(value)
             }
         }
 
-    private fun resetPIP(pipMode: Boolean) {
+    private fun resetPIPViews(pipMode: Boolean) {
         // pip mode, hide focus indicator foreground image
         children.forEach { view ->
             (view as MultiViewStateView).apply {
                 isFocusable = !pipMode
-                volumeIcon.isInvisible = pipMode
+                showVolumeIcon(!pipMode)
             }
         }
         // fullscreen player should always has audio. the pip one mute.
-        getChildByPositionTag(0).mute(false)
-        getChildByPositionTag(1).mute(true)
+        if (pipMode) {
+            (getChildAt(0) as MultiViewStateView).mute(false)
+            (getChildAt(1) as MultiViewStateView).mute(true)
+        } else {
+            getChildByPositionTag(0).mute(false)
+            getChildByPositionTag(1).mute(true)
+        }
     }
 
     override fun requestLayout() {
@@ -89,16 +98,29 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             }
 
             2 -> {
-                measureView(
-                    child = getChildByPositionTag(0),
-                    childWidth = if (pictureInPictureMode) parentMaxWidth else (parentMaxWidth - itemSpace * 3) / 2,
-                    childHeight = if (pictureInPictureMode) parentMaxHeight else parentMaxHeight - itemSpace * 2
-                )
-                measureView(
-                    child = getChildByPositionTag(1),
-                    childWidth = if (pictureInPictureMode) parentMaxWidth / 4 else (parentMaxWidth - itemSpace * 3) / 2,
-                    childHeight = if (pictureInPictureMode) parentMaxHeight / 4 else parentMaxHeight - itemSpace * 2
-                )
+                if (pictureInPictureMode) {
+                    measureView(
+                        child = getChildAt(0),
+                        childWidth = parentMaxWidth,
+                        childHeight = parentMaxHeight
+                    )
+                    measureView(
+                        child = getChildAt(1),
+                        childWidth = parentMaxWidth / pipModeWindowScaleToParent,
+                        childHeight = parentMaxHeight / pipModeWindowScaleToParent
+                    )
+                } else {
+                    measureView(
+                        child = getChildByPositionTag(0),
+                        childWidth = (parentMaxWidth - itemSpace * 3) / 2,
+                        childHeight = parentMaxHeight - itemSpace * 2
+                    )
+                    measureView(
+                        child = getChildByPositionTag(1),
+                        childWidth = (parentMaxWidth - itemSpace * 3) / 2,
+                        childHeight = parentMaxHeight - itemSpace * 2
+                    )
+                }
             }
 
             3 -> {
@@ -174,21 +196,21 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 // primary view size match as parent, secondary view locate in left|bottom or right|bottom.
                 if (pictureInPictureMode) {
                     layoutViewByPosition(
-                        child = getChildByPositionTag(0),
+                        child = getChildAt(0),
                         left = 0,
                         top = 0
                     )
                     if (isRTL) {
                         layoutViewByPosition(
-                            child = getChildByPositionTag(1),
+                            child = getChildAt(1),
                             left = gap,
-                            top = bottom - gap - getChildByPositionTag(1).measuredHeight
+                            top = bottom - gap - getChildAt(1).measuredHeight
                         )
                     } else {
                         layoutViewByPosition(
-                            child = getChildByPositionTag(1),
-                            left = right - gap - getChildByPositionTag(1).measuredWidth,
-                            top = bottom - gap - getChildByPositionTag(1).measuredHeight
+                            child = getChildAt(1),
+                            left = right - gap - getChildAt(1).measuredWidth,
+                            top = bottom - gap - getChildAt(1).measuredHeight
                         )
                     }
                 } else {
@@ -350,25 +372,34 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     }
 
     override fun onMultiviewSwapButtonClicked() {
-        if (pictureInPictureMode) {
-            getChildByPositionTag(0).swap(getChildByPositionTag(1))
+        if (childCount == 4) {
+            val tag0 = getChildByPositionTag(0)
+            val tag1 = getChildByPositionTag(1)
+            val tag2 = getChildByPositionTag(2)
+            val tag3 = getChildByPositionTag(3)
+            tag0.setTagPosition(1)
+            tag1.setTagPosition(3)
+            tag2.setTagPosition(0)
+            tag3.setTagPosition(2)
         } else {
-            if (childCount == 4) {
-                val tag0 = getChildByPositionTag(0)
-                val tag1 = getChildByPositionTag(1)
-                val tag2 = getChildByPositionTag(2)
-                val tag3 = getChildByPositionTag(3)
-                tag0.setTagPosition(1)
-                tag1.setTagPosition(3)
-                tag2.setTagPosition(0)
-                tag3.setTagPosition(2)
-            } else {
-                children.forEach {
-                    it.setTagPosition((it.getTagPosition() + 1) % childCount)
-                }
+            if (childCount == 2) {
+                swapChildViewPlayer = !swapChildViewPlayer
             }
-            requestLayout()
+            children.forEach {
+                it.setTagPosition((it.getTagPosition() + 1) % childCount)
+            }
         }
+        if (pictureInPictureMode) {
+            swapPipView()
+            return
+        }
+        requestLayout()
+    }
+
+    private fun swapPipView() {
+        val primaryView = getChildAt(0) as MultiViewStateView
+        val secondaryView = getChildAt(1) as MultiViewStateView
+        swapView(primaryView, secondaryView)
     }
 }
 
