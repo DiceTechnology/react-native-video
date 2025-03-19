@@ -183,10 +183,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     
     var jsProps = JSProps()
     var jsPlayerView: RNDReactNativeDiceVideo.JSPlayerView?
-  
-    deinit {
-      jsPlayerView?.removeMultiview()
-    }
     
     func seekToNow() {
         jsPlayerView?.seekNow()
