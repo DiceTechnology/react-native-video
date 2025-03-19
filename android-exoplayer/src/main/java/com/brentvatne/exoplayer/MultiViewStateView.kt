@@ -127,7 +127,7 @@ class MultiViewStateView(
     }
 
     override fun onClick(v: View) {
-        if (isError) return
+        if (isError || !volumeIcon.isVisible) return
         listener.onRequestMute(this, !tvExoplayerView.exoDorisPlayerView.isMute)
     }
 
@@ -152,6 +152,16 @@ class MultiViewStateView(
             else
                 R.drawable.ic_multiview_volume_selector
         )
+    }
+
+    fun showFocusUI(show: Boolean) {
+        if (volumeIcon.isFocusable) {
+            // show focus UI for volume icon only, conflict with pip mode. so only change it when it's focusable.
+            volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
+            if (!show) {
+                this.isSelected = false
+            }
+        }
     }
 }
 

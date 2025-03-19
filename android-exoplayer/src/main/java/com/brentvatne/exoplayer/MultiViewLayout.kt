@@ -200,17 +200,18 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                         left = 0,
                         top = 0
                     )
+                    val pipWindowMargin2Parent = getChildAt(1).measuredWidth / 8
                     if (isRTL) {
                         layoutViewByPosition(
                             child = getChildAt(1),
-                            left = gap,
-                            top = bottom - gap - getChildAt(1).measuredHeight
+                            left = pipWindowMargin2Parent,
+                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight
                         )
                     } else {
                         layoutViewByPosition(
                             child = getChildAt(1),
-                            left = right - gap - getChildAt(1).measuredWidth,
-                            top = bottom - gap - getChildAt(1).measuredHeight
+                            left = right - pipWindowMargin2Parent - getChildAt(1).measuredWidth,
+                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight
                         )
                     }
                 } else {
@@ -400,6 +401,12 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         val primaryView = getChildAt(0) as MultiViewStateView
         val secondaryView = getChildAt(1) as MultiViewStateView
         swapView(primaryView, secondaryView)
+    }
+
+    override fun onMultiviewControlBarVisibleChanged(visible: Boolean) {
+        children.forEach {
+            (it as MultiViewStateView).showFocusUI(visible)
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.get
@@ -27,7 +28,9 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private val fullscreenControlBarHeight = (96 * themedReactContext.resources.displayMetrics.density).toInt()
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
-    private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext, multiViewLayout)
+    private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext)
+    private val centerFocusAnchorView: View = View(themedReactContext) // all children focusable views hided, the parent will lose focus and can not receive dispatch key event fun.
+
     var labelsTranslation: LabelsTranslation? = null
     val multiViewMode
         get() = multiViewLayout.multiViewMode
@@ -57,7 +60,41 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 Gravity.BOTTOM
             )
         )
+        addView(
+            centerFocusAnchorView.apply {
+                visibility = View.GONE
+                isFocusable = true
+            },
+            LayoutParams(
+                1, 1, Gravity.CENTER
+            )
+        )
+        multiViewControlBar.multiViewControlBarListener = object : MultiViewControlBarListenerWrapper(multiViewLayout) {
+            override fun onMultiviewControlBarVisibleChangedBefore(visible: Boolean) {
+                centerFocusAnchorView.visibility = if (visible) View.GONE else View.VISIBLE
+            }
+        }
     }
+
+    //TODO: ---- test code --------------------------------
+    private val onGlobalFocusChangeListener = ViewTreeObserver.OnGlobalFocusChangeListener { oldView, newView ->
+        Logger.log(
+            "onGlobalFocusChangeListener",
+            "${oldView?.javaClass?.simpleName}[${oldView?.hashCode()?.toHexString()}] -> " +
+                    "${newView?.javaClass?.simpleName}[${newView?.hashCode()?.toHexString()}]"
+        )
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        viewTreeObserver.addOnGlobalFocusChangeListener(onGlobalFocusChangeListener)
+    }
+
+    override fun onDetachedFromWindow() {
+        viewTreeObserver.removeOnGlobalFocusChangeListener(onGlobalFocusChangeListener)
+        super.onDetachedFromWindow()
+    }
+    //TODO: ---- test code --------------------------------
 
     fun dropView() {
         (bottomContainer.getChildAt(0) as? ReactRootView)?.unmountReactApplication()
@@ -197,13 +234,27 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         }
         if (multiViewControlBar.isVisible && multiViewControlBar.measuredHeight > 0) {
             multiViewControlBar.layout(
-                left, bottom - multiViewControlBar.measuredHeight, right, bottom
+                left,
+                bottom - multiViewControlBar.measuredHeight,
+                right,
+                bottom
+            )
+        }
+        if (centerFocusAnchorView.isVisible) {
+            centerFocusAnchorView.layout(
+                measuredWidth / 2,
+                measuredHeight / 2,
+                measuredWidth / 2 + 1,
+                measuredHeight / 2 + 1,
             )
         }
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (multiViewMode) { // Exit multi view mode when back key is pressed.
+            if (multiViewControlBar.onKeyEvent(event)) {
+                return true
+            }
             if (event.keyCode == KeyEvent.KEYCODE_BACK) {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     return true
@@ -228,10 +279,11 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     }
 
     private fun setFullscreenMode(fullscreen: Boolean) {
+        centerFocusAnchorView.takeIf { !fullscreen }?.visibility = View.GONE
         bottomContainer.visibility = if (fullscreen) View.GONE else View.VISIBLE
         multiViewLayout.fullscreenMode = fullscreen
         multiViewControlBar.multiViewSize = getExoplayerChildrenList().size
-        multiViewControlBar.setVisible(fullscreen)
+        multiViewControlBar.setCanShowControlBar(fullscreen)
         multiViewLayout.children.forEach { child ->
             (child as MultiViewStateView).apply {
                 isFocusable = !fullscreen
