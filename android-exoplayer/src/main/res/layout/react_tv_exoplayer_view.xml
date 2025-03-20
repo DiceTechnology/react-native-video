@@ -9,13 +9,15 @@
     <com.diceplatform.doris.ui.ExoDorisTvPlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:surface_type="texture_view"/>
 
     <com.diceplatform.doris.ui.ExoDorisTvPlayerView
         android:id="@+id/secondaryPlayerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        app:use_controller="false" />
+        app:use_controller="false"
+        app:surface_type="texture_view"/>
 
 </FrameLayout>

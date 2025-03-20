@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import com.brentvatne.util.Logger
 import com.brentvatne.util.ReadableMapUtils
@@ -264,7 +265,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                     } else if (multiViewLayout.fullscreenMode) {
                         setFullscreenMode(false)
                     } else {
-                        getExoplayerChildrenList()[0].exitMultiViewMode()
+                        getExoplayerChildrenList().find { it.isNotEmpty() }?.exitMultiViewMode()
                     }
                     return true
                 }
