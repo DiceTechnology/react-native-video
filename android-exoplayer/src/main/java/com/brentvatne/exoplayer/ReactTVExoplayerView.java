@@ -449,9 +449,10 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         viewWidth = width;
         viewHeight = height;
-        if (trackSelector != null && width > 0 && height > 0) {
-            trackSelector.setParameters(trackSelector.buildUponParameters().setMaxVideoSize(viewWidth, viewHeight));
-        }
+        // TODO: these code will cause video renderer reselect, show loading.
+        // if (trackSelector != null && width > 0 && height > 0) {
+        //     trackSelector.setParameters(trackSelector.buildUponParameters().setMaxVideoSize(viewWidth, viewHeight));
+        // }
     }
 
     // LifecycleEventListener implementation
@@ -554,6 +555,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             exoPlayer.addListener(this);
             exoPlayer.addAnalyticsListener(this);
             Player realPlayer = player.createForwardPlayer();
+            //TODO:
             exoDorisPlayerView.setPlayer(realPlayer);
             exoDorisPlayerView.setAdPlayPauseEnabled(adType == AdType.YO_SSAI || adType == AdType.AMT_SSAI);
             audioBecomingNoisyReceiver.setListener(this);
