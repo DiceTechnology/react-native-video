@@ -99,8 +99,7 @@ class NewPlayerView: UIView, JSInputProtocol {
             self.jsProps.multiViewSources.value = convertSources
             let rndvJSProps = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
             jsPlayerView?.multiViewVideoData = rndvJSProps.multiViewVideoData.value
-            jsProps.source.value = nil
-          }
+          } 
         }
       }
     
