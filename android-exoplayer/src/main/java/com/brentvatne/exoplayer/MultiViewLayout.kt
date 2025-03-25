@@ -400,7 +400,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     private fun swapPipView() {
         val primaryView = getChildAt(0) as MultiViewStateView
         val secondaryView = getChildAt(1) as MultiViewStateView
-        swapView(primaryView, secondaryView)
+        swapView(primaryView, secondaryView, swapChildViewPlayer)
     }
 
     override fun onMultiviewControlBarVisibleChanged(visible: Boolean) {

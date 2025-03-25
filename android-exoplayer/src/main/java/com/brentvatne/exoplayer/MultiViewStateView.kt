@@ -145,7 +145,7 @@ class MultiViewStateView(
     }
 }
 
-internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView) {
+internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView, swapped: Boolean) {
     // check error state first
     val otherViewIsError = view2.isError
     view2.setError(view1.isError)
@@ -153,6 +153,13 @@ internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView) {
     // swap track max bitrate
     val tag1ReactView = view1.getChildAt(0) as ReactTVExoplayerView
     val tag2ReactView = view2.getChildAt(0) as ReactTVExoplayerView
+    if (swapped) {
+        tag1ReactView.onSizeChanged(tag2ReactView.measuredWidth, tag2ReactView.measuredHeight, 0, 0)
+        tag2ReactView.onSizeChanged(tag1ReactView.measuredWidth, tag1ReactView.measuredHeight, 0, 0)
+    } else {
+        tag1ReactView.onSizeChanged(tag1ReactView.measuredWidth, tag1ReactView.measuredHeight, 0, 0)
+        tag2ReactView.onSizeChanged(tag2ReactView.measuredWidth, tag2ReactView.measuredHeight, 0, 0)
+    }
 
     // swap player
     val tag1PlayerView = tag1ReactView.exoDorisPlayerView

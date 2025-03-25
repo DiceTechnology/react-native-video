@@ -449,7 +449,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         if (trackSelector != null && width > 0 && height > 0) {
             if (exoDorisPlayerView.isMultipleViewMode()) {
-                // trackSelector.setMaxBitrateByVideoSize(width, height);
+                trackSelector.setMaxBitrateByVideoSize(width, height);
             } else {
                 viewWidth = width;
                 viewHeight = height;
@@ -1108,7 +1108,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
 
-            // trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
+            trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
         }
     }
 
