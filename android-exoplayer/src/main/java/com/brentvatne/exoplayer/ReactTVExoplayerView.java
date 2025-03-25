@@ -449,10 +449,15 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         viewWidth = width;
         viewHeight = height;
-        // TODO: these code will cause video renderer reselect, show loading.
-        // if (trackSelector != null && width > 0 && height > 0) {
-        //     trackSelector.setParameters(trackSelector.buildUponParameters().setMaxVideoSize(viewWidth, viewHeight));
-        // }
+        if (trackSelector != null && width > 0 && height > 0) {
+            if (exoDorisPlayerView.isMultipleViewMode()) {
+                trackSelector.setMaxBitrateByVideoSize(width, height);
+            } else {
+                trackSelector.setParameters(trackSelector
+                        .buildUponParameters().setMaxVideoSize(viewWidth, viewHeight)
+                );
+            }
+        }
     }
 
     // LifecycleEventListener implementation
@@ -555,7 +560,6 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             exoPlayer.addListener(this);
             exoPlayer.addAnalyticsListener(this);
             Player realPlayer = player.createForwardPlayer();
-            //TODO:
             exoDorisPlayerView.setPlayer(realPlayer);
             exoDorisPlayerView.setAdPlayPauseEnabled(adType == AdType.YO_SSAI || adType == AdType.AMT_SSAI);
             audioBecomingNoisyReceiver.setListener(this);
@@ -1103,6 +1107,8 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             // MockStreamSource.logDceTracks(C.TRACK_TYPE_TEXT, exoPlayer, trackSelector);
             eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
+
+            trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
         }
     }
 
@@ -1527,7 +1533,6 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         return new ArrayList<>(trackSet);
     }
 
-    //TODO: ---- test code --------------------------------
     public ExoDorisTvPlayerView getExoDorisPlayerView() {
         return exoDorisPlayerView;
     }

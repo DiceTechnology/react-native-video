@@ -39,6 +39,7 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
     var multiViewSize: Int = 0
 
     init {
+        layoutDirection = if (isRTL) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
         inflate(context, R.layout.comp_multiview_controlbar, this)
         orientation = HORIZONTAL
         multiViewIndicator.onFocusChangeListener = this

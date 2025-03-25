@@ -6,7 +6,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.core.view.children
 import androidx.core.view.get
@@ -20,7 +19,6 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
-import okhttp3.internal.toHexString
 
 @SuppressLint("ViewConstructor")
 class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext),
@@ -76,26 +74,6 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
             }
         }
     }
-
-    //TODO: ---- test code --------------------------------
-    private val onGlobalFocusChangeListener = ViewTreeObserver.OnGlobalFocusChangeListener { oldView, newView ->
-        Logger.log(
-            "onGlobalFocusChangeListener",
-            "${oldView?.javaClass?.simpleName}[${oldView?.hashCode()?.toHexString()}] -> " +
-                    "${newView?.javaClass?.simpleName}[${newView?.hashCode()?.toHexString()}]"
-        )
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        viewTreeObserver.addOnGlobalFocusChangeListener(onGlobalFocusChangeListener)
-    }
-
-    override fun onDetachedFromWindow() {
-        viewTreeObserver.removeOnGlobalFocusChangeListener(onGlobalFocusChangeListener)
-        super.onDetachedFromWindow()
-    }
-    //TODO: ---- test code --------------------------------
 
     fun dropView() {
         (bottomContainer.getChildAt(0) as? ReactRootView)?.unmountReactApplication()

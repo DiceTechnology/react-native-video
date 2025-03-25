@@ -18,9 +18,6 @@ import com.diceplatform.doris.entity.DorisPlayerEvent
 import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
-//TODO: ---- test code --------------------------------
-var index = 0
-
 @SuppressLint("ViewConstructor")
 class MultiViewStateView(
     private val tvExoplayerView: ReactTVExoplayerView,
@@ -85,23 +82,6 @@ class MultiViewStateView(
                 LayoutParams.MATCH_PARENT
             ).apply {
                 gravity = Gravity.CENTER
-            }
-        )
-
-        //TODO: ---- test code --------------------------------
-        // test indicator
-        val textView = TextView(context)
-        textView.setPadding(30, 20, 30, 20)
-        textView.text = (index++).toString()
-        textView.textSize = 48f
-        textView.setTextColor(Color.MAGENTA)
-        textView.setGravity(Gravity.CENTER)
-        addView(
-            textView, LayoutParams(
-                LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT
-            ).apply {
-                gravity = Gravity.TOP or Gravity.RIGHT
             }
         )
     }
