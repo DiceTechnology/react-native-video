@@ -150,14 +150,18 @@ internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView) {
     val otherViewIsError = view2.isError
     view2.setError(view1.isError)
     view1.setError(otherViewIsError)
+    // swap track max bitrate
+    val tag1ReactView = view1.getChildAt(0) as ReactTVExoplayerView
+    val tag2ReactView = view2.getChildAt(0) as ReactTVExoplayerView
+
     // swap player
-    val tag0PlayerView = (view1.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
-    val tag1PlayerView = (view2.getChildAt(0) as ReactTVExoplayerView).exoDorisPlayerView
-    val player = tag0PlayerView.player
-    tag0PlayerView.player = null
-    tag0PlayerView.player = tag1PlayerView.player
-    tag0PlayerView.mute(false)
+    val tag1PlayerView = tag1ReactView.exoDorisPlayerView
+    val tag2PlayerView = tag2ReactView.exoDorisPlayerView
+    val player = tag1PlayerView.player
     tag1PlayerView.player = null
-    tag1PlayerView.player = player
-    tag1PlayerView.mute(true)
+    tag1PlayerView.player = tag2PlayerView.player
+    tag1PlayerView.mute(false)
+    tag2PlayerView.player = null
+    tag2PlayerView.player = player
+    tag2PlayerView.mute(true)
 }

@@ -447,12 +447,12 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     @Override
     protected void onSizeChanged(final int width, final int height, final int oldWidth, final int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        viewWidth = width;
-        viewHeight = height;
         if (trackSelector != null && width > 0 && height > 0) {
             if (exoDorisPlayerView.isMultipleViewMode()) {
-                trackSelector.setMaxBitrateByVideoSize(width, height);
+                // trackSelector.setMaxBitrateByVideoSize(width, height);
             } else {
+                viewWidth = width;
+                viewHeight = height;
                 trackSelector.setParameters(trackSelector
                         .buildUponParameters().setMaxVideoSize(viewWidth, viewHeight)
                 );
@@ -1108,7 +1108,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
 
-            trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
+            // trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
         }
     }
 
@@ -1531,6 +1531,10 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             }
         }
         return new ArrayList<>(trackSet);
+    }
+
+    public ExoDorisTrackSelector getTrackSelector() {
+        return trackSelector;
     }
 
     public ExoDorisTvPlayerView getExoDorisPlayerView() {
