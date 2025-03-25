@@ -332,6 +332,5 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         } else if (!rootView.getExoplayerChildrenList().contains(primaryView)) {
             rootView.addMultiViewChild(primaryView, false)
         }
-        index = 0
     }
 }

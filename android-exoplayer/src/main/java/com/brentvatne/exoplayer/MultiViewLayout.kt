@@ -79,7 +79,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 MeasureSpec.getSize(heightMeasureSpec)
             )
             val itemSpace = if (!fullscreenMode) gap else 0
-            measureChildrenSelf(width, height, itemSpace)
+            measureChildrenSelf(measuredWidth, measuredHeight, itemSpace)
         }
     }
 
