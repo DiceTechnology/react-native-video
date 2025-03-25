@@ -2,7 +2,6 @@ package com.brentvatne.util;
 
 import androidx.annotation.NonNull;
 
-import com.brentvatne.exoplayer.ReactTVMultipleExoplayerViewManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -71,5 +70,24 @@ public class ReadableMapUtils {
             }
         }
         return false;
+    }
+
+    public static ReadableMap updateConfigMuxDataPlayerName(ReadableMap src, String name) {
+        if (src == null || !src.hasKey("config")) return src;
+        ReadableMap config = src.getMap("config");
+        if (config == null || !config.hasKey("muxData")) return src;
+        ReadableMap muxData = config.getMap("muxData");
+        if (muxData == null || !muxData.hasKey("playerName")) return src;
+        String newPlayerName = muxData.getString("playerName") + "-" + name;
+        WritableMap newMuxData = Arguments.createMap();
+        newMuxData.merge(muxData);
+        newMuxData.putString("playerName", newPlayerName);
+        WritableMap newConfig = Arguments.createMap();
+        newConfig.merge(config);
+        newConfig.putMap("muxData", newMuxData);
+        WritableMap newSrc = Arguments.createMap();
+        newSrc.merge(src);
+        newSrc.putMap("config", newConfig);
+        return newSrc;
     }
 }

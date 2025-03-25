@@ -287,6 +287,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
         Logger.log(this, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
+            rootView.unloadButtonOverlayComponent()
             rootView.getExoplayerChildrenList().filter { it != primaryView }.forEach {
                 rootView.removeView(it)
             }
@@ -306,7 +307,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     playerView.tag = src
                     playerView.mute(mute)
                     rootView.addMultiViewChild(playerView, true)
-                    primaryViewManager.setSrc(playerView, src)
+                    primaryViewManager.setSrc(playerView, ReadableMapUtils.updateConfigMuxDataPlayerName(src, "${i + 1}"))
                     break
                 }
             }
@@ -328,6 +329,8 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         rootView.setMultiViewMode(multiViewMode)
         if (multiViewMode) {
             rootView.removeView(primaryView)
+        } else if (!rootView.getExoplayerChildrenList().contains(primaryView)) {
+            rootView.addMultiViewChild(primaryView, false)
         }
         index = 0
     }

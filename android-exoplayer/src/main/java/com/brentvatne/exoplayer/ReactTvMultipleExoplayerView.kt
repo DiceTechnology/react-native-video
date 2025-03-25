@@ -100,7 +100,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     fun dropView() {
         (bottomContainer.getChildAt(0) as? ReactRootView)?.unmountReactApplication()
         multiViewLayout.removeAllViews()
-        bottomContainer.removeAllViews()
+        unloadButtonOverlayComponent()
     }
 
     fun getExoplayerChildrenList(): List<ReactTVExoplayerView> {
@@ -134,6 +134,10 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 bottomContainer.addView(reactRootView)
             }
         }
+    }
+
+    fun unloadButtonOverlayComponent() {
+        bottomContainer.removeAllViews()
     }
 
     fun setMultiViewMode(multiViewMode: Boolean) {
@@ -183,6 +187,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     override fun removeView(view: View) {
         multiViewLayout.children.find { (it as ViewGroup)[0] == view }?.let { child ->
             multiViewLayout.removeView(child)
+            (child as? ViewGroup)?.removeViewAt(0)
             requestLayout()
         }
     }
