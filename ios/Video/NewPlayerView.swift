@@ -96,10 +96,13 @@ class NewPlayerView: UIView, JSInputProtocol {
                 onVideoError?(["value": dict, "error": (error as NSError).description])
               }
             }
-            self.jsProps.multiViewSources.value = convertSources
-            let rndvJSProps = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: self.jsProps)
+            jsProps.multiViewSources.value = convertSources
+            let rndvJSProps = PlayerViewProxy.convertRNVideoJSPropsToRNDV(jsProps: jsProps)
             jsPlayerView?.multiViewVideoData = rndvJSProps.multiViewVideoData.value
-          } 
+            jsProps.source.value = nil
+          } else {
+            jsProps.multiViewSources.value = nil
+          }
         }
       }
     
