@@ -53,7 +53,9 @@ class NewPlayerView: UIView, JSInputProtocol {
         didSet {
             do {
                 let source = try Source(dict: src)
-                guard source.uri.absoluteString != jsProps.source.value?.uri.absoluteString else { return }
+              if source.uri.absoluteString == jsProps.source.value?.uri.absoluteString || jsPlayerView?.multiViewVideoData?.count ?? 0 > 0 {
+                return
+              }
                 jsPlayerView?.removeFromSuperview()
                 jsPlayerView = nil
                 jsProps.source.value = source
