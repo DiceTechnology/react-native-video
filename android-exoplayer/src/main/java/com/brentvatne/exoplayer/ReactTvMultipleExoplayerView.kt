@@ -271,7 +271,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         multiViewLayout.children.forEach { child ->
             (child as MultiViewStateView).apply {
                 isFocusable = !fullscreen
-                showVolumeIcon(fullscreen)
+                setVolumeIconFocusable(fullscreen)
+                setVolumeIconVisible(true)
             }
         }
     }

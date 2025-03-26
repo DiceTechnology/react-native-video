@@ -1537,6 +1537,10 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         return trackSelector;
     }
 
+    public VideoEventEmitter getEventEmitter() {
+        return eventEmitter;
+    }
+
     public ExoDorisTvPlayerView getExoDorisPlayerView() {
         return exoDorisPlayerView;
     }

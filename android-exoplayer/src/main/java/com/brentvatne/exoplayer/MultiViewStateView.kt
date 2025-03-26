@@ -16,6 +16,7 @@ import com.brentvatne.react.R
 import com.diceplatform.doris.DorisPlayerOutput
 import com.diceplatform.doris.entity.DorisPlayerEvent
 import com.diceplatform.doris.ui.entity.LabelsTranslation
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 @SuppressLint("ViewConstructor")
@@ -49,7 +50,7 @@ class MultiViewStateView(
 
         // add volume icon
         resetVolumeIcon()
-        volumeIcon.visibility = View.INVISIBLE
+        volumeIcon.visibility = if (focusable) View.VISIBLE else View.INVISIBLE
         volumeIcon.isFocusable = false
         volumeIcon.onFocusChangeListener = this
         volumeIcon.setBackgroundResource(R.drawable.ic_multiview_circle_bg)
@@ -99,6 +100,18 @@ class MultiViewStateView(
     override fun onPlayerEvent(event: DorisPlayerEvent) {
         if (event.event == DorisPlayerEvent.Event.ERROR) {
             setError(true)
+        } else if (event.event == DorisPlayerEvent.Event.RELOAD_WITH_DRM_L3) {
+            // multiview not support reload with drm l3, so show error message
+            setError(true)
+            (tvExoplayerView.tag as? ReadableMap)?.let { src ->
+                src.getString("id")?.let { id ->
+                    tvExoplayerView.eventEmitter.error(
+                        id,
+                        "RELOAD_WITH_DRM_L3 error",
+                        event.details.error ?: Exception("RELOAD_WITH_DRM_L3 error")
+                    )
+                }
+            }
         }
     }
 
@@ -115,9 +128,12 @@ class MultiViewStateView(
         isSelected = hasFocus
     }
 
-    fun showVolumeIcon(show: Boolean) {
+    fun setVolumeIconVisible(show: Boolean) {
         volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        volumeIcon.isFocusable = show
+    }
+
+    fun setVolumeIconFocusable(focusable: Boolean) {
+        volumeIcon.isFocusable = focusable
     }
 
     fun mute(mute: Boolean) {
@@ -135,12 +151,10 @@ class MultiViewStateView(
     }
 
     fun showFocusUI(show: Boolean) {
-        if (volumeIcon.isFocusable) {
-            // show focus UI for volume icon only, conflict with pip mode. so only change it when it's focusable.
-            volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
-            if (!show) {
-                this.isSelected = false
-            }
+        // show focus UI for volume icon only, conflict with pip mode. so only change it when it's focusable.
+        volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        if (!show) {
+            this.isSelected = false
         }
     }
 }

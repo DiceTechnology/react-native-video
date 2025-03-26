@@ -39,7 +39,8 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         children.forEach { view ->
             (view as MultiViewStateView).apply {
                 isFocusable = !pipMode
-                showVolumeIcon(!pipMode)
+                setVolumeIconVisible(!pipMode)
+                setVolumeIconFocusable(!pipMode)
             }
         }
         // fullscreen player should always has audio. the pip one mute.
