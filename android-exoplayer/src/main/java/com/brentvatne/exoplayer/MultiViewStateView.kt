@@ -98,18 +98,20 @@ class MultiViewStateView(
     }
 
     override fun onPlayerEvent(event: DorisPlayerEvent) {
-        if (event.event == DorisPlayerEvent.Event.ERROR) {
-            setError(true)
-        } else if (event.event == DorisPlayerEvent.Event.RELOAD_WITH_DRM_L3) {
-            // multiview not support reload with drm l3, so show error message
-            setError(true)
-            (tvExoplayerView.tag as? ReadableMap)?.let { src ->
-                src.getString("id")?.let { id ->
-                    tvExoplayerView.eventEmitter.error(
-                        id,
-                        "RELOAD_WITH_DRM_L3 error",
-                        event.details.error ?: Exception("RELOAD_WITH_DRM_L3 error")
-                    )
+        if (tvExoplayerView.exoDorisPlayerView.isMultipleViewMode) {
+            if (event.event == DorisPlayerEvent.Event.ERROR) {
+                setError(true)
+            } else if (event.event == DorisPlayerEvent.Event.RELOAD_WITH_DRM_L3) {
+                // multiview not support reload with drm l3, so show error message
+                setError(true)
+                (tvExoplayerView.tag as? ReadableMap)?.let { src ->
+                    src.getString("id")?.let { id ->
+                        tvExoplayerView.eventEmitter.error(
+                            id,
+                            "RELOAD_WITH_DRM_L3 error",
+                            event.details.error ?: Exception("RELOAD_WITH_DRM_L3 error")
+                        )
+                    }
                 }
             }
         }
