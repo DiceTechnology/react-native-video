@@ -136,6 +136,9 @@ class MultiViewStateView(
 
     fun setVolumeIconFocusable(focusable: Boolean) {
         volumeIcon.isFocusable = focusable
+        if (!focusable) {
+            this.isSelected = false
+        }
     }
 
     fun mute(mute: Boolean) {
@@ -153,9 +156,13 @@ class MultiViewStateView(
     }
 
     fun showFocusUI(show: Boolean) {
-        // show focus UI for volume icon only, conflict with pip mode. so only change it when it's focusable.
-        volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        if (!show) {
+        if (volumeIcon.isFocusable) {
+            // show focus UI for volume icon only, conflict with pip mode. so only change it when it's focusable.
+            volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
+            if (!show) {
+                this.isSelected = false
+            }
+        } else {
             this.isSelected = false
         }
     }
