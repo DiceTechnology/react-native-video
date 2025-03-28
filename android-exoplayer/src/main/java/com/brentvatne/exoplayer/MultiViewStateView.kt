@@ -36,6 +36,7 @@ class MultiViewStateView(
     private val iconSize = (40 * tvExoplayerView.resources.displayMetrics.density).toInt()
     private val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
     private val errorMsgView: TextView = TextView(tvExoplayerView.context)
+    private var stateViewFocusable = focusable
     private val isMute: Boolean
         get() = tvExoplayerView.exoDorisPlayerView.isMute
     val isError: Boolean
@@ -134,9 +135,12 @@ class MultiViewStateView(
         volumeIcon.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
-    fun setVolumeIconFocusable(focusable: Boolean) {
+    fun setVolumeIconFocusable(focusable: Boolean, parentFocusable: Boolean = true) {
         volumeIcon.isFocusable = focusable
-        if (!focusable) {
+        if (focusable) {
+            this@MultiViewStateView.isFocusable = false
+        } else {
+            this@MultiViewStateView.isFocusable = stateViewFocusable && parentFocusable
             this.isSelected = false
         }
     }
