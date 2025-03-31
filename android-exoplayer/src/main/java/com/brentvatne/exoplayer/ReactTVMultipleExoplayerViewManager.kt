@@ -307,7 +307,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     playerView.tag = src
                     playerView.mute(mute)
                     rootView.addMultiViewChild(playerView, true)
-                    primaryViewManager.setSrc(playerView, ReadableMapUtils.updateConfigMuxDataPlayerName(src, "${i + 1}"))
+                    primaryViewManager.setSrc(playerView, src)
                     break
                 }
             }
