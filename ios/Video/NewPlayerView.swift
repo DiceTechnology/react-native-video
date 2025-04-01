@@ -32,7 +32,7 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var onEpgIconClick: RCTBubblingEventBlock?
     @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
     @objc var onWatchlistButtonClick: RCTBubblingEventBlock?
-    @objc var onSetMultiViewMode: RCTBubblingEventBlock?
+    @objc var onSetMultiViewActive: RCTBubblingEventBlock?
     
     //not used
     @objc var onVideoLoadStart: RCTBubblingEventBlock?
@@ -233,7 +233,7 @@ class NewPlayerView: UIView, JSInputProtocol {
         jsPlayerView.onWatchlistButtonClick = self.onWatchlistButtonClick
         jsPlayerView.onVideoBuffer = self.onVideoBuffer
         jsPlayerView.onVideoAboutToEnd = self.onVideoAboutToEnd
-        jsPlayerView.onSetMultiViewMode = self.onSetMultiViewMode
+        jsPlayerView.onSetMultiViewActive = self.onSetMultiViewActive
         
         jsPlayerView.translatesAutoresizingMaskIntoConstraints = false
         jsPlayerView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true

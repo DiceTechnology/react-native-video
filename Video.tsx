@@ -145,8 +145,8 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
     this.props.onBehindLiveWindowError?.(event.nativeEvent);
   }
 
-  onSetMultiViewMode = (event) => {
-    this.props.onSetMultiViewMode?.(event.nativeEvent);
+  onSetMultiViewActive = (event) => {
+    this.props.onSetMultiViewActive?.(event.nativeEvent);
   }
 
   /**
@@ -230,7 +230,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
       onWatchlistButtonClick: this.onWatchlistButtonClick,
       onReloadCurrentSource: this.onReloadCurrentSource,
       onBehindLiveWindowError: this.onBehindLiveWindowError,
-      onSetMultiViewMode: this.onSetMultiViewMode,
+      onSetMultiViewActive: this.onSetMultiViewActive,
     };
   };
 

@@ -37,5 +37,5 @@ protocol JSInputProtocol: AnyObject {
     var onAnnotationsButtonClick: RCTBubblingEventBlock? { get }
     var onSubtitleTrackChanged: RCTBubblingEventBlock? { get }
     var onAudioTrackChanged: RCTBubblingEventBlock? { get }
-    var onSetMultiViewMode: RCTBubblingEventBlock? { get }
+    var onSetMultiViewActive: RCTBubblingEventBlock? { get }
 }

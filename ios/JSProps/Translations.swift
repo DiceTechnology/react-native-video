@@ -35,4 +35,12 @@ struct Translations: SuperCodable {
     var audioOnlyBadge: String?
     var multiView: String?
     var multiViewPlaybackError: String?
+    var multiViewGuide1: String?
+    var multiViewGuide2: String?
+    var multiViewGuide3: String?
+    var multiViewGuide4: String?
+    var multiViewGuide5: String?
+    var next: String?
+    var previousIcon: String?
+    var skip: String?
 }

@@ -113,6 +113,14 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.multiView = translations.multiView
         dorisTranslationsViewModel.multiViewPlaybackError = translations.multiViewPlaybackError
+        dorisTranslationsViewModel.multiViewGuide1 = translations.multiViewGuide1
+        dorisTranslationsViewModel.multiViewGuide2 = translations.multiViewGuide2
+        dorisTranslationsViewModel.multiViewGuide3 = translations.multiViewGuide3
+        dorisTranslationsViewModel.multiViewGuide4 = translations.multiViewGuide4
+        dorisTranslationsViewModel.multiViewGuide5 = translations.multiViewGuide5
+        dorisTranslationsViewModel.next = translations.next
+        dorisTranslationsViewModel.previousIcon = translations.previousIcon
+        dorisTranslationsViewModel.skip = translations.skip
         return dorisTranslationsViewModel
     }
 
