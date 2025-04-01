@@ -43,7 +43,10 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
         if (isShowed()) return
 //        context.getMultiviewSharedPrefs().edit() { putBoolean("showed", true) }
         visibility = View.VISIBLE
-        if (isNotEmpty()) return
+        if (isNotEmpty()) {
+            post { skipButton.requestFocus() }
+            return
+        }
         val guideStrings = labelsTranslation?.getGuideStrings() ?: emptyList()
         LayoutInflater.from(context).inflate(R.layout.comp_multiview_guide, this)
         val adapter = GuideAdapter(context = context, guideStrings)
@@ -203,11 +206,18 @@ private class GuideViewHolder(itemView: View) : ViewHolder(itemView) {
 
 private fun LabelsTranslation.getGuideStrings(): List<String> {
     return mutableListOf<String>().apply {
-        get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        if (isEmpty()) {
+        add("Press < and > to select up to 4 streams.")
+        add("Focus on selected video, press \"OK\" to enter fullscreen.")
+        add("Press \"Back\" to return to Multi-view setup")
+        add("Focus on the icon and press \"OK\" to change the screen mode or swap the videos.")
+        add("Focus on the video and press \"OK\" to change the audio source")
+//        }
     }.toList()
 }
 

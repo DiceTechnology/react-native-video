@@ -54,7 +54,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
         private const val PROP_TRANSLATIONS: String = "translations"
         private const val PROP_RELATED_VIDEOS: String = "relatedVideos"
         private const val PROP_IS_FAVOURITE: String = "isFavourite"
-        private const val PROP_MULTI_VIEW_MODE: String = "multiViewMode"
+        private const val PROP_MULTI_VIEW_MODE: String = "isMultiViewActive"
     }
 
     private val primaryViewManager: ReactTVExoplayerViewManager = ReactTVExoplayerViewManager(reactApplicationContext)

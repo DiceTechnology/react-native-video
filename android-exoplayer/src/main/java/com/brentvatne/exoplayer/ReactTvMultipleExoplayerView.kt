@@ -150,7 +150,9 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 post { multiViewLayout.children.last().requestFocus() }
             }
 
-            multiViewGuide.show(labelsTranslation)
+            if (multiViewMode) {
+                multiViewGuide.show(labelsTranslation)
+            }
         }
     }
 

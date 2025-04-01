@@ -26,7 +26,7 @@
 
         <Button
             android:id="@+id/multiview_guide_skip_button"
-            style="@style/TextAppearance.MultiviewGuide"
+            style="@style/TextAppearance.MultiviewGuideButton"
             android:layout_marginStart="32dp"
             android:drawableEnd="@drawable/ic_multiview_guide_skip"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -36,7 +36,7 @@
 
         <Button
             android:id="@+id/multiview_guide_next_button"
-            style="@style/TextAppearance.MultiviewGuide"
+            style="@style/TextAppearance.MultiviewGuideButton"
             android:layout_marginEnd="32dp"
             android:drawableEnd="@drawable/ic_multiview_guide_arrow_right"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +47,7 @@
 
         <Button
             android:id="@+id/multiview_guide_previous_button"
-            style="@style/TextAppearance.MultiviewGuide"
+            style="@style/TextAppearance.MultiviewGuideButton"
             android:layout_marginEnd="20dp"
             android:drawableStart="@drawable/ic_multiview_guide_arrow_left"
             android:visibility="invisible"

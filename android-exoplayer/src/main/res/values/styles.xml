@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="DceTVPlayerTheme" parent="Theme.AppCompat">
         <item name="colorAccent">@color/dce_player_main_accent_color</item>
@@ -81,7 +81,7 @@
         <item name="android:paddingBottom">4dp</item>
     </style>
 
-    <style name="TextAppearance.MultiviewGuide">
+    <style name="TextAppearance.MultiviewGuideButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:textSize">16dp</item>
@@ -93,6 +93,17 @@
         <item name="android:drawablePadding">12dp</item>
         <item name="android:textColor">@color/dce_watch_from_text_selector</item>
         <item name="android:background">@drawable/bg_multiview_btn_selector</item>
+    </style>
+
+    <style name="TextAppearance.MultiviewGuideText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:textSize" tools:ignore="SpUsage">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">20dp</item>
+        <item name="android:layout_margin">18dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>
