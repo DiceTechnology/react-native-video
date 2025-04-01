@@ -29,6 +29,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
     private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext)
     private val centerFocusAnchorView: View = View(themedReactContext) // all children focusable views hided, the parent will lose focus and can not receive dispatch key event fun.
+    private val multiViewGuide: MultiViewGuide = MultiViewGuide(themedReactContext)
 
     var labelsTranslation: LabelsTranslation? = null
     val multiViewMode
@@ -57,6 +58,13 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 LayoutParams.MATCH_PARENT,
                 fullscreenControlBarHeight,
                 Gravity.BOTTOM
+            )
+        )
+        addView(
+            multiViewGuide,
+            LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
             )
         )
         addView(
@@ -141,6 +149,8 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
             if (!child.exoDorisPlayerView.isMute) {
                 post { multiViewLayout.children.last().requestFocus() }
             }
+
+            multiViewGuide.show(labelsTranslation)
         }
     }
 
@@ -222,6 +232,14 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 bottom - multiViewControlBar.measuredHeight,
                 right,
                 bottom
+            )
+        }
+        if (multiViewGuide.isVisible) {
+            multiViewGuide.layout(
+                left,
+                top,
+                left + multiViewGuide.measuredWidth,
+                top + multiViewGuide.measuredHeight
             )
         }
         if (centerFocusAnchorView.isVisible) {

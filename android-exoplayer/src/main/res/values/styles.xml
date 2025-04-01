@@ -81,4 +81,18 @@
         <item name="android:paddingBottom">4dp</item>
     </style>
 
+    <style name="TextAppearance.MultiviewGuide">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:textColor">@color/dce_watch_from_text_selector</item>
+        <item name="android:background">@drawable/bg_multiview_btn_selector</item>
+    </style>
+
 </resources>
