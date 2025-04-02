@@ -1,6 +1,7 @@
 package com.brentvatne.exoplayer
 
 import android.content.Context
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -136,6 +137,15 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
             return
         }
     }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.keyCode == KeyEvent.KEYCODE_DPAD_UP
+            || event.keyCode == KeyEvent.KEYCODE_DPAD_DOWN
+        ) {
+            return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
 }
 
 // ---------------------------------------------------
@@ -206,18 +216,16 @@ private class GuideViewHolder(itemView: View) : ViewHolder(itemView) {
 
 private fun LabelsTranslation.getGuideStrings(): List<String> {
     return mutableListOf<String>().apply {
-//        get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        if (isEmpty()) {
-        add("Press < and > to select up to 4 streams.")
-        add("Focus on selected video, press \"OK\" to enter fullscreen.")
-        add("Press \"Back\" to return to Multi-view setup")
-        add("Focus on the icon and press \"OK\" to change the screen mode or swap the videos.")
-        add("Focus on the video and press \"OK\" to change the audio source")
-//        }
+        get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
+        get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
+        get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
+        get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
+        get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
+//        add("Press < and > to select up to 4 streams.")
+//        add("Focus on selected video, press \"OK\" to enter fullscreen.")
+//        add("Press \"Back\" to return to Multi-view setup")
+//        add("Focus on the icon and press \"OK\" to change the screen mode or swap the videos.")
+//        add("Focus on the video and press \"OK\" to change the audio source")
     }.toList()
 }
 
