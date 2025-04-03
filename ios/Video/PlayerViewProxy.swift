@@ -90,11 +90,11 @@ class PlayerViewProxy {
     static func convertRNVideoTranslationsToMultiViewTranslations(translations: Translations) -> JSMultiViewTranslations {
         var multiViewTranslations = JSMultiViewTranslations()
         multiViewTranslations.multiViewPlaybackError =   translations.multiViewPlaybackError
-        multiViewTranslations.multiViewGuide1 = translations.multiViewGuide1
-        multiViewTranslations.multiViewGuide2 = translations.multiViewGuide2
-        multiViewTranslations.multiViewGuide3 = translations.multiViewGuide3
-        multiViewTranslations.multiViewGuide4 = translations.multiViewGuide4
-        multiViewTranslations.multiViewGuide5 = translations.multiViewGuide5
+        multiViewTranslations.multiViewGuide1 = (translations.multiViewGuide1?.count ?? 0 > 0) ? translations.multiViewGuide1 : nil
+        multiViewTranslations.multiViewGuide2 = (translations.multiViewGuide2?.count ?? 0 > 0) ? translations.multiViewGuide2 : nil
+        multiViewTranslations.multiViewGuide3 = (translations.multiViewGuide3?.count ?? 0 > 0) ? translations.multiViewGuide3 : nil
+        multiViewTranslations.multiViewGuide4 = (translations.multiViewGuide4?.count ?? 0 > 0) ? translations.multiViewGuide4 : nil
+        multiViewTranslations.multiViewGuide5 = (translations.multiViewGuide5?.count ?? 0 > 0) ? translations.multiViewGuide5 : nil
         multiViewTranslations.next = translations.next
         multiViewTranslations.previousIcon = translations.previousIcon
         multiViewTranslations.skip = translations.skip
