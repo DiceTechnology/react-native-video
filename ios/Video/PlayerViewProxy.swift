@@ -83,9 +83,24 @@ class PlayerViewProxy {
     private static func convertRNVideoTranslationsToRNDV(translations: Translations?) -> JSTranslations? {
         guard let translations else { return nil }
         let dorisTranslationsViewModel = convertRNVideoTranslationsToDorisTranslations(translations: translations)
-        return JSTranslations(beaconTranslations: nil, dorisTranslations: dorisTranslationsViewModel)
+        let multiViewTranslationsViewModel = convertRNVideoTranslationsToMultiViewTranslations(translations: translations)
+        return JSTranslations(beaconTranslations: nil, dorisTranslations: dorisTranslationsViewModel, multiViewTranslations: multiViewTranslationsViewModel)
     }
 
+    static func convertRNVideoTranslationsToMultiViewTranslations(translations: Translations) -> JSMultiViewTranslations {
+        var multiViewTranslations = JSMultiViewTranslations()
+        multiViewTranslations.multiViewPlaybackError =   translations.multiViewPlaybackError
+        multiViewTranslations.multiViewGuide1 = (translations.multiViewGuide1?.count ?? 0 > 0) ? translations.multiViewGuide1 : nil
+        multiViewTranslations.multiViewGuide2 = (translations.multiViewGuide2?.count ?? 0 > 0) ? translations.multiViewGuide2 : nil
+        multiViewTranslations.multiViewGuide3 = (translations.multiViewGuide3?.count ?? 0 > 0) ? translations.multiViewGuide3 : nil
+        multiViewTranslations.multiViewGuide4 = (translations.multiViewGuide4?.count ?? 0 > 0) ? translations.multiViewGuide4 : nil
+        multiViewTranslations.multiViewGuide5 = (translations.multiViewGuide5?.count ?? 0 > 0) ? translations.multiViewGuide5 : nil
+        multiViewTranslations.next = translations.next
+        multiViewTranslations.previousIcon = translations.previousIcon
+        multiViewTranslations.skip = translations.skip
+        return multiViewTranslations
+    }
+  
     static func convertRNVideoTranslationsToDorisTranslations(translations: Translations) -> DorisTranslationsViewModel {
         var dorisTranslationsViewModel = DorisTranslationsViewModel()
         dorisTranslationsViewModel.play = translations.playerPlayButton
@@ -112,15 +127,6 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
         dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.multiView = translations.multiView
-        dorisTranslationsViewModel.multiViewPlaybackError = translations.multiViewPlaybackError
-        dorisTranslationsViewModel.multiViewGuide1 = translations.multiViewGuide1
-        dorisTranslationsViewModel.multiViewGuide2 = translations.multiViewGuide2
-        dorisTranslationsViewModel.multiViewGuide3 = translations.multiViewGuide3
-        dorisTranslationsViewModel.multiViewGuide4 = translations.multiViewGuide4
-        dorisTranslationsViewModel.multiViewGuide5 = translations.multiViewGuide5
-        dorisTranslationsViewModel.next = translations.next
-        dorisTranslationsViewModel.previousIcon = translations.previousIcon
-        dorisTranslationsViewModel.skip = translations.skip
         return dorisTranslationsViewModel
     }
 
