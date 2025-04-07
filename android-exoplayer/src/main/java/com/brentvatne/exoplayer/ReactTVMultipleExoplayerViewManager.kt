@@ -1,7 +1,6 @@
 package com.brentvatne.exoplayer
 
 import android.view.ViewGroup.LayoutParams
-import com.brentvatne.util.Logger
 import com.brentvatne.util.ReadableMapUtils
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -75,7 +74,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     }
 
     override fun createViewInstance(context: ThemedReactContext): ReactTvMultipleExoplayerView {
-        Logger.warn(this, "createViewInstance")
         if (this::rootView.isInitialized) { // createViewInstance may be called multiple times, so we need to clean up the previous instance first.
             rootView.dropView()
             primaryViewManager.onDropViewInstance(primaryView)
@@ -89,7 +87,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
     }
 
     override fun onDropViewInstance(view: ReactTvMultipleExoplayerView) {
-        Logger.warn(this, "onDropViewInstance")
         if (!hasDroppedView) {
             view.dropView()
             primaryViewManager.onDropViewInstance(primaryView)
@@ -99,7 +96,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = PROP_SRC)
     fun setSrc(videoView: ReactTvMultipleExoplayerView, src: ReadableMap?) {
-        Logger.log(this, "setSrc: ${src?.getString("id")}")
         primaryViewManager.setSrc(primaryView, src)
     }
 
@@ -285,7 +281,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = "multiViewSources")
     fun setMultiVideos(videoView: ReactTvMultipleExoplayerView, array: ReadableArray?) {
-        Logger.log(this, "setMultiVideos: $array")
         if (array == null || array.size() == 0) {
             rootView.unloadButtonOverlayComponent()
             rootView.getExoplayerChildrenList().filter { it != primaryView }.forEach {
@@ -325,7 +320,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
 
     @ReactProp(name = PROP_MULTI_VIEW_MODE)
     fun setMultiViewMode(videoView: ReactTvMultipleExoplayerView, multiViewMode: Boolean) {
-        Logger.log(this, "setMultiViewMode: $multiViewMode")
         rootView.setMultiViewMode(multiViewMode)
         if (multiViewMode) {
             rootView.removeView(primaryView)

@@ -12,7 +12,6 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
-import com.brentvatne.util.Logger
 import com.brentvatne.util.ReadableMapUtils
 import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.ReactApplication
@@ -112,7 +111,6 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                     if (width > 0) width else LayoutParams.MATCH_PARENT,
                     if (height > 0) height else LayoutParams.WRAP_CONTENT
                 )
-                Logger.log(this, "startReactApplication: $component")
                 reactRootView.startReactApplication(
                     (context.applicationContext as ReactApplication)
                         .reactNativeHost.reactInstanceManager, component, null

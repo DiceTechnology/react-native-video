@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.isNotEmpty
 import androidx.core.widget.TextViewCompat
@@ -42,8 +41,10 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
 
     fun show(labelsTranslation: LabelsTranslation?) {
         if (isShowed()) return
-        context.getMultiviewSharedPrefs().edit { putBoolean("showed", true) }
+        //TODO: test guide feature, remove later
+//        context.getMultiviewSharedPrefs().edit { putBoolean("showed", true) }
         visibility = View.VISIBLE
+        //TODO: test guide feature, remove later
         if (isNotEmpty()) {
             post { skipButton.requestFocus() }
             return
