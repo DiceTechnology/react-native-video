@@ -9,7 +9,6 @@ import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
@@ -48,9 +47,8 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
             post { skipButton.requestFocus() }
             return
         }
-        val guideStrings = labelsTranslation?.getGuideStrings() ?: emptyList()
         LayoutInflater.from(context).inflate(R.layout.comp_multiview_guide, this)
-        val adapter = GuideAdapter(context = context, guideStrings)
+        val adapter = GuideAdapter(context = context, labelsTranslation.getGuideStrings())
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = adapter
         val circleIndicator = findViewById<CircleIndicator2>(R.id.multiview_guide_indicator)
@@ -155,23 +153,27 @@ private class GuideAdapter(
     context: Context,
     private val guideStrings: List<String>,
 ) : Adapter<GuideViewHolder>() {
+    private val guideCount = 5
     private val layoutInflater = LayoutInflater.from(context)
-    private val images = intArrayOf(
-        R.drawable.multiview_guide_1,
-        R.drawable.multiview_guide_2,
-        R.drawable.multiview_guide_3,
-        R.drawable.multiview_guide_4,
-        R.drawable.multiview_guide_5
-    )
 
-    override fun getItemCount(): Int = images.size
+    override fun getItemCount(): Int = guideCount
+
+    override fun getItemViewType(position: Int): Int = position
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GuideViewHolder {
-        return GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item, parent, false))
+        return when (viewType) {
+            0 -> GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item_1, parent, false))
+            1 -> GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item_2, parent, false))
+            2 -> GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item_3, parent, false))
+            3 -> GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item_4, parent, false))
+            else -> GuideViewHolder(layoutInflater.inflate(R.layout.comp_multiview_guide_item_5, parent, false))
+        }
     }
 
     override fun onBindViewHolder(holder: GuideViewHolder, position: Int) {
-        holder.onBindData(images[position], guideStrings, position)
+        if (position < guideStrings.size) {
+            holder.textView.text = guideStrings[position]
+        }
     }
 }
 
@@ -179,53 +181,18 @@ private class GuideAdapter(
 // ---- view holder
 // ---------------------------------------------------
 private class GuideViewHolder(itemView: View) : ViewHolder(itemView) {
-
-    private val imageView: ImageView = itemView.findViewById(R.id.image)
-    private val leftTopText: TextView = itemView.findViewById(R.id.left_top_text)
-    private val leftBottomText: TextView = itemView.findViewById(R.id.left_bottom_text)
-    private val rightTopText: TextView = itemView.findViewById(R.id.right_top_text)
-    private val rightBottomText: TextView = itemView.findViewById(R.id.right_bottom_text)
-
-    fun onBindData(
-        imageRes: Int,
-        guideStrings: List<String>,
-        position: Int,
-    ) {
-        val textString = if (position < guideStrings.size) guideStrings[position] else null
-        imageView.setImageResource(imageRes)
-        leftTopText.text = null
-        leftBottomText.text = null
-        rightTopText.text = null
-        rightBottomText.text = null
-        when (position) {
-            0, 5 -> {
-                leftTopText.text = textString
-            }
-
-            1, 2, 4 -> {
-                leftBottomText.text = textString
-            }
-
-            3 -> {
-                rightTopText.text = textString
-            }
-        }
-    }
-
+    val textView: TextView = itemView.findViewById(R.id.text)
 }
 
-private fun LabelsTranslation.getGuideStrings(): List<String> {
+private fun LabelsTranslation?.getGuideStrings(): List<String> {
     return mutableListOf<String>().apply {
-        get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
-        get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
-//        add("Press < and > to select up to 4 streams.")
-//        add("Focus on selected video, press \"OK\" to enter fullscreen.")
-//        add("Press \"Back\" to return to Multi-view setup")
-//        add("Focus on the icon and press \"OK\" to change the screen mode or swap the videos.")
-//        add("Focus on the video and press \"OK\" to change the audio source")
+        if (this@getGuideStrings != null) {
+            get("multiViewGuide1")?.takeIf { it.isNotBlank() }?.let { add(it) }
+            get("multiViewGuide2")?.takeIf { it.isNotBlank() }?.let { add(it) }
+            get("multiViewGuide3")?.takeIf { it.isNotBlank() }?.let { add(it) }
+            get("multiViewGuide4")?.takeIf { it.isNotBlank() }?.let { add(it) }
+            get("multiViewGuide5")?.takeIf { it.isNotBlank() }?.let { add(it) }
+        }
     }.toList()
 }
 
