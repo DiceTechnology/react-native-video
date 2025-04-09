@@ -139,7 +139,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         if (child is ReactTVExoplayerView) {
             child.id = id
             child.setMultipleViewMode(multiViewMode)
-            child.setShowBottomComponent(!multiViewMode)
+            child.setShowBottomOverlayComponent(!multiViewMode)
             child.setOnFocusChangeListener(childViewOnFocusChangeListener)
             multiViewLayout.addView(MultiViewStateView(child, labelsTranslation, multiViewMode, this))
             requestLayout()

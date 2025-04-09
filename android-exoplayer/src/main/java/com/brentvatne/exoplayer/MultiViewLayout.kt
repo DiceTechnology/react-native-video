@@ -5,15 +5,20 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.children
 import com.brentvatne.react.R
+import com.diceplatform.doris.custom.utils.ScreenUtils
 import com.facebook.react.modules.i18nmanager.I18nUtil
 
 class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControlBar.MultiViewControlBarListener {
 
-    private val pipModeWindowScaleToParent = 3
+    companion object {
+        private const val PIP_MODE_WINDOW_SCALE_TO_PARENT = 3
+        private const val CHILD_SIZE_RATIO = 16f / 9f       // width / height
+        private const val DEFAULT_MULTIVIEW_LAYOUT_GAP = 16f // dp
+    }
+
     private val isRTL = I18nUtil.getInstance().isRTL(context)
-    private val childSizeRatio: Float = 16f / 9f // width / height
     private var swapChildViewPlayer = false
-    var gap: Int = 30 // pix
+    var multiViewLayoutGap: Int = ScreenUtils.convertDpToPixel(context, DEFAULT_MULTIVIEW_LAYOUT_GAP)
     var multiViewMode = false
     var fullscreenMode = false
         set(value) {
@@ -30,11 +35,11 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                     swapPipView()
                 }
                 requestLayout()
-                resetPIPViews(value)
+                resetPipViews(value)
             }
         }
 
-    private fun resetPIPViews(pipMode: Boolean) {
+    private fun resetPipViews(pipMode: Boolean) {
         // pip mode, hide focus indicator foreground image
         children.forEach { view ->
             (view as MultiViewStateView).apply {
@@ -79,7 +84,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 MeasureSpec.getSize(widthMeasureSpec),
                 MeasureSpec.getSize(heightMeasureSpec)
             )
-            val itemSpace = if (!fullscreenMode) gap else 0
+            val itemSpace = if (!fullscreenMode) multiViewLayoutGap else 0
             measureChildrenSelf(measuredWidth, measuredHeight, itemSpace)
         }
     }
@@ -107,8 +112,8 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                     )
                     measureView(
                         child = getChildAt(1),
-                        childWidth = parentMaxWidth / pipModeWindowScaleToParent,
-                        childHeight = parentMaxHeight / pipModeWindowScaleToParent
+                        childWidth = parentMaxWidth / PIP_MODE_WINDOW_SCALE_TO_PARENT,
+                        childHeight = parentMaxHeight / PIP_MODE_WINDOW_SCALE_TO_PARENT
                     )
                 } else {
                     measureView(
@@ -161,10 +166,10 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     ) {
         var adjustedWidth = childWidth
         var adjustedHeight = childHeight
-        if (childWidth * 1f / childHeight > childSizeRatio) {
-            adjustedWidth = (childHeight * childSizeRatio).toInt()
+        if (childWidth * 1f / childHeight > CHILD_SIZE_RATIO) {
+            adjustedWidth = (childHeight * CHILD_SIZE_RATIO).toInt()
         } else {
-            adjustedHeight = (childWidth / childSizeRatio).toInt()
+            adjustedHeight = (childWidth / CHILD_SIZE_RATIO).toInt()
         }
         child.measure(
             MeasureSpec.makeMeasureSpec(adjustedWidth, MeasureSpec.EXACTLY),
@@ -183,7 +188,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             super.onLayout(changed, left, top, right, bottom)
             return
         }
-        val itemSpace = if (!fullscreenMode) gap else 0
+        val itemSpace = if (!fullscreenMode) multiViewLayoutGap else 0
         when (childCount) {
             1 -> {
                 layoutViewInCenterByOffset(

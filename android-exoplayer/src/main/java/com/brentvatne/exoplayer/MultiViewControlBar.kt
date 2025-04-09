@@ -18,7 +18,11 @@ import com.facebook.react.modules.i18nmanager.I18nUtil
 
 @SuppressLint("ViewConstructor")
 class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickListener, View.OnFocusChangeListener,
-    ControlBarHandler.Callback {
+    AutoHideControlsHandler.Callback {
+
+    companion object {
+        private const val SCALE_PERCENT = 1.3f
+    }
 
     interface MultiViewControlBarListener {
         fun onMultiviewIndicatorClick() {}
@@ -27,12 +31,11 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
         fun onMultiviewControlBarVisibleChanged(visible: Boolean) {}
     }
 
-    private val scalePercent = 1.3f
     private val isRTL = I18nUtil.getInstance().isRTL(context)
     private val multiViewIndicator: ImageView by lazy { findViewById(R.id.btn_multiview_indicator) }
     private val pipButton: ImageView by lazy { findViewById(R.id.btn_multiview_pip) }
     private val swapButton: ImageView by lazy { findViewById(R.id.btn_multiview_swap) }
-    private val controlBarHandler = ControlBarHandler(this)
+    private val autoHideControlsHandler = AutoHideControlsHandler(this)
     var multiViewControlBarListener: MultiViewControlBarListener? = null
 
     private var canShowControlBar: Boolean = false
@@ -61,8 +64,8 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
 
     override fun onFocusChange(child: View, hasFocus: Boolean) {
         ViewCompat.animate(child)
-            .scaleX(if (hasFocus) scalePercent else 1.0f)
-            .scaleY(if (hasFocus) scalePercent else 1.0f)
+            .scaleX(if (hasFocus) SCALE_PERCENT else 1.0f)
+            .scaleY(if (hasFocus) SCALE_PERCENT else 1.0f)
             .translationZ(if (hasFocus) 1f else 0f)
             .start()
     }
@@ -106,13 +109,13 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
                 && event.action == KeyEvent.ACTION_UP
             ) {
                 setControlBarVisible(false)
-                controlBarHandler.stop()
+                autoHideControlsHandler.stop()
                 return true
             } else if (isVisible) {
-                controlBarHandler.start()
+                autoHideControlsHandler.start()
             } else if (!isVisible && isDpadKeyEvent(event)) {
                 setControlBarVisible(true)
-                controlBarHandler.start()
+                autoHideControlsHandler.start()
                 return true
             }
         }
@@ -133,9 +136,9 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
         setControlBarVisible(showControlBar)
         if (showControlBar) {
             resetButtonsVisible()
-            controlBarHandler.start()
+            autoHideControlsHandler.start()
         } else {
-            controlBarHandler.stop()
+            autoHideControlsHandler.stop()
         }
     }
 
@@ -162,14 +165,16 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
     }
 }
 
-internal class ControlBarHandler(private val callback: Callback) : Handler(Looper.getMainLooper()) {
+internal class AutoHideControlsHandler(private val callback: Callback) : Handler(Looper.getMainLooper()) {
+
+    companion object {
+        private const val MSG_HIDE_CONTROLS = 1
+        private const val DELAY_MILLIS = 5 * 1000L
+    }
 
     interface Callback {
         fun onHandlerCallback() {}
     }
-
-    private val msg = 1
-    private var delayMillis: Long = 5 * 1000L
 
     override fun handleMessage(message: Message) {
         callback.onHandlerCallback()
@@ -177,11 +182,11 @@ internal class ControlBarHandler(private val callback: Callback) : Handler(Loope
 
     fun start() {
         stop()
-        sendEmptyMessageDelayed(msg, delayMillis)
+        sendEmptyMessageDelayed(MSG_HIDE_CONTROLS, DELAY_MILLIS)
     }
 
     fun stop() {
-        removeMessages(msg)
+        removeMessages(MSG_HIDE_CONTROLS)
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import com.brentvatne.react.R
 import com.diceplatform.doris.DorisPlayerOutput
+import com.diceplatform.doris.custom.utils.ScreenUtils
 import com.diceplatform.doris.entity.DorisPlayerEvent
 import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.bridge.ReadableMap
@@ -28,12 +29,18 @@ class MultiViewStateView(
 ) : FrameLayout(tvExoplayerView.context), OnFocusChangeListener, OnClickListener,
     DorisPlayerOutput {
 
+    companion object {
+        private const val ICON_SIZE_DP = 50f
+        private const val ICON_MARGIN_DP = 10f
+        private const val ERROR_MSG_PADDING_DP = 16f
+    }
+
     interface OnVolumeChangedListener {
         fun onRequestMute(view: MultiViewStateView, mute: Boolean)
     }
 
     private val isRTL = I18nUtil.getInstance().isRTL(context)
-    private val iconSize = (40 * tvExoplayerView.resources.displayMetrics.density).toInt()
+    private val iconSize = ScreenUtils.convertDpToPixel(context, ICON_SIZE_DP)
     private val volumeIcon: ImageView = ImageView(tvExoplayerView.context)
     private val errorMsgView: TextView = TextView(tvExoplayerView.context)
     private var stateViewFocusable = focusable
@@ -56,16 +63,15 @@ class MultiViewStateView(
         volumeIcon.onFocusChangeListener = this
         volumeIcon.setBackgroundResource(R.drawable.ic_multiview_circle_bg)
         volumeIcon.setOnClickListener(this)
-        volumeIcon.setPadding(12)
         volumeIcon.scaleType = ImageView.ScaleType.CENTER_INSIDE
         addView(
             volumeIcon,
             LayoutParams(iconSize, iconSize).apply {
                 gravity = Gravity.TOP or Gravity.END
-                topMargin = 32
-                bottomMargin = 32
-                leftMargin = 32
-                rightMargin = 32
+                topMargin = ScreenUtils.convertDpToPixel(context, ICON_MARGIN_DP)
+                bottomMargin = ScreenUtils.convertDpToPixel(context, ICON_MARGIN_DP)
+                leftMargin = ScreenUtils.convertDpToPixel(context, ICON_MARGIN_DP)
+                rightMargin = ScreenUtils.convertDpToPixel(context, ICON_MARGIN_DP)
             }
         )
 
@@ -76,7 +82,7 @@ class MultiViewStateView(
             gravity = Gravity.CENTER
             visibility = View.GONE
             setBackgroundColor(Color.BLACK)
-            setPadding(16)
+            setPadding(ScreenUtils.convertDpToPixel(context, ERROR_MSG_PADDING_DP))
         }
         addView(
             errorMsgView, LayoutParams(
@@ -101,10 +107,10 @@ class MultiViewStateView(
     override fun onPlayerEvent(event: DorisPlayerEvent) {
         if (tvExoplayerView.exoDorisPlayerView.isMultipleViewMode) {
             if (event.event == DorisPlayerEvent.Event.ERROR) {
-                setError(true)
+                showErrorView(true)
             } else if (event.event == DorisPlayerEvent.Event.RELOAD_WITH_DRM_L3) {
                 // multiview not support reload with drm l3, so show error message
-                setError(true)
+                showErrorView(true)
                 (tvExoplayerView.tag as? ReadableMap)?.let { src ->
                     src.getString("id")?.let { id ->
                         tvExoplayerView.eventEmitter.error(
@@ -118,7 +124,7 @@ class MultiViewStateView(
         }
     }
 
-    fun setError(error: Boolean) {
+    fun showErrorView(error: Boolean) {
         errorMsgView.visibility = if (error) View.VISIBLE else View.GONE
     }
 
@@ -175,8 +181,8 @@ class MultiViewStateView(
 internal fun swapView(view1: MultiViewStateView, view2: MultiViewStateView, swapped: Boolean) {
     // check error state first
     val otherViewIsError = view2.isError
-    view2.setError(view1.isError)
-    view1.setError(otherViewIsError)
+    view2.showErrorView(view1.isError)
+    view1.showErrorView(otherViewIsError)
     // swap track max bitrate
     val tag1ReactView = view1.getChildAt(0) as ReactTVExoplayerView
     val tag2ReactView = view2.getChildAt(0) as ReactTVExoplayerView

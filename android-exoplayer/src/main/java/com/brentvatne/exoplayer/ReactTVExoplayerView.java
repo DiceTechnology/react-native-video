@@ -336,7 +336,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
     };
 
     private boolean playInBackground = false;
-    private boolean showBottomComponent = true;
+    private boolean showBottomOverlayComponent = true;
 
     //Drm
     private ActionToken actionToken;
@@ -1423,10 +1423,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         }
     }
 
-    public void setMetadata(@Nullable Map<String, String> map) {
-        if (map == null) {
-            return;
-        }
+    public void setMetadata(Map<String, String> map) {
         this.metadata = new ContentMetadata.Builder()
                 .setThumbnailUrl(map.get(KEY_METADATA_THUMBNAIL_URL))
                 .setEpisodeTitle(map.get(KEY_METADATA_EPISODE_INFO))
@@ -1659,8 +1656,8 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         this.playInBackground = playInBackground;
     }
 
-    public void setShowBottomComponent(boolean showBottomComponent) {
-        this.showBottomComponent = showBottomComponent;
+    public void setShowBottomOverlayComponent(boolean showBottomOverlayComponent) {
+        this.showBottomOverlayComponent = showBottomOverlayComponent;
     }
 
     public void setDisableFocus(boolean disableFocus) {
@@ -1767,7 +1764,7 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
         if (component == null || component.isEmpty()) return;
         if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key))
             return;
-        if (!showBottomComponent)
+        if (!showBottomOverlayComponent)
             return;
         // add frameLayout to ExoPlayerView, ReactRootView load data first, move to ExoPlayerControllerView.
         ReactRootFrameLayout frameLayout = new ReactRootFrameLayout(getContext());

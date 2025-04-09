@@ -1,6 +1,7 @@
 package com.brentvatne.exoplayer
 
 import android.content.Context
+import android.graphics.Rect
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
 import androidx.core.view.isNotEmpty
+import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -26,7 +28,10 @@ import me.relex.circleindicator.CircleIndicator2
 
 class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, OnFocusChangeListener {
 
-    private val scalePercent: Float = 1.2f
+    companion object {
+        private const val SCALE_PERCENT = 1.2f
+    }
+
     private val isRtl = I18nUtil.getInstance().isRTL(context)
     private val recyclerView: RecyclerView by lazy { findViewById(R.id.multiview_guide_recycler_view) }
     private val skipButton: Button by lazy { findViewById(R.id.multiview_guide_skip_button) }
@@ -40,7 +45,7 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
     }
 
     fun show(labelsTranslation: LabelsTranslation?) {
-        if (isShowed()) return
+        if (isGuideCompleted()) return
         //TODO: test guide feature, remove later
 //        context.getMultiviewSharedPrefs().edit { putBoolean("showed", true) }
         visibility = View.VISIBLE
@@ -78,7 +83,7 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
         postDelayed({ nextButton.requestFocus() }, 500L)
     }
 
-    private fun isShowed(): Boolean {
+    private fun isGuideCompleted(): Boolean {
         return context.getMultiviewSharedPrefs().getBoolean("showed", false)
     }
 
@@ -88,8 +93,8 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
             AppCompatResources.getColorStateList(context, R.color.dce_watch_from_text_selector)
         )
         ViewCompat.animate(v)
-            .scaleX(if (hasFocus) scalePercent else 1.0f)
-            .scaleY(if (hasFocus) scalePercent else 1.0f)
+            .scaleX(if (hasFocus) SCALE_PERCENT else 1.0f)
+            .scaleY(if (hasFocus) SCALE_PERCENT else 1.0f)
             .translationZ(if (hasFocus) 1f else 0f)
             .start()
     }
@@ -135,6 +140,13 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
             prevButton.visibility = View.GONE
             nextButton.requestFocus()
             return
+        }
+    }
+
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+        if (!gainFocus) { // sometimes player bottom list will gain focus, Guide will lose focus
+            nextButton.takeIf { it.isVisible }?.requestFocus() ?: skipButton.takeIf { it.isVisible }?.requestFocus()
         }
     }
 
