@@ -288,7 +288,7 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
             }
             return
         }
-        if (array.size() == 1 && rootView.multiViewMode) {
+        if (rootView.multiViewMode) {
             rootView.loadBottomOverlayComponent(array.getMap(0))
         }
         val mute = rootView.getExoplayerChildrenList().isNotEmpty()
@@ -303,7 +303,6 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
                     playerView.mute(mute)
                     rootView.addMultiViewChild(playerView, true)
                     primaryViewManager.setSrc(playerView, src)
-                    break
                 }
             }
         } else if (array.size() < rootView.getExoplayerChildrenList().size) {
