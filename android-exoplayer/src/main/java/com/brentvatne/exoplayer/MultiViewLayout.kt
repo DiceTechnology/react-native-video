@@ -30,6 +30,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
     private val isRTL = I18nUtil.getInstance().isRTL(context)
     private val multiViewLayoutGap: Int = ScreenUtils.convertDpToPixel(context, DEFAULT_MULTIVIEW_LAYOUT_GAP)
     private var swapChildViewPlayer = false
+    private var pipViewBottomMargin: Int = 0
     var mode: MultiViewMode = NORMAL
         set(value) {
             if (field != value) {
@@ -229,13 +230,13 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                         layoutViewByPosition(
                             child = getChildAt(1),
                             left = pipWindowMargin2Parent,
-                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight
+                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight - pipViewBottomMargin
                         )
                     } else {
                         layoutViewByPosition(
                             child = getChildAt(1),
                             left = right - pipWindowMargin2Parent - getChildAt(1).measuredWidth,
-                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight
+                            top = bottom - pipWindowMargin2Parent - getChildAt(1).measuredHeight - pipViewBottomMargin
                         )
                     }
                 } else {
@@ -382,6 +383,13 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             if (it.getTagPosition() > position) {
                 it.setTagPosition(it.getTagPosition() - 1)
             }
+        }
+    }
+
+    fun setPipViewBottomMargin(margin: Int) {
+        pipViewBottomMargin = margin
+        if (isPictureInPictureMode) {
+            requestLayout()
         }
     }
 

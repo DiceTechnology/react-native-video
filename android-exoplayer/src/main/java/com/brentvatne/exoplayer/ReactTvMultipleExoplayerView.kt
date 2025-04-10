@@ -86,6 +86,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
         multiViewControlBar.multiViewControlBarListener = object : MultiViewControlBarListenerWrapper(multiViewLayout) {
             override fun onMultiviewControlBarVisibleChangedBefore(visible: Boolean) {
                 centerFocusAnchorView.visibility = if (visible) View.GONE else View.VISIBLE
+                multiViewLayout.setPipViewBottomMargin(if (visible) fullscreenControlBarHeight else 0)
             }
         }
     }
