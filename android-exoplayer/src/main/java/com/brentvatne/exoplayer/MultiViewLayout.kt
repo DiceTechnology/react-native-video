@@ -4,6 +4,10 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.children
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.FULLSCREEN
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.MULTIVIEW
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.NORMAL
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.PICTURE_IN_PICTURE
 import com.brentvatne.react.R
 import com.diceplatform.doris.custom.utils.ScreenUtils
 import com.facebook.react.modules.i18nmanager.I18nUtil
@@ -16,28 +20,42 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         private const val DEFAULT_MULTIVIEW_LAYOUT_GAP = 16f // dp
     }
 
+    enum class MultiViewMode {
+        NORMAL,
+        MULTIVIEW,
+        FULLSCREEN,
+        PICTURE_IN_PICTURE
+    }
+
     private val isRTL = I18nUtil.getInstance().isRTL(context)
+    private val multiViewLayoutGap: Int = ScreenUtils.convertDpToPixel(context, DEFAULT_MULTIVIEW_LAYOUT_GAP)
     private var swapChildViewPlayer = false
-    var multiViewLayoutGap: Int = ScreenUtils.convertDpToPixel(context, DEFAULT_MULTIVIEW_LAYOUT_GAP)
-    var multiViewMode = false
-    var fullscreenMode = false
+    var mode: MultiViewMode = NORMAL
         set(value) {
             if (field != value) {
+                val oldMode = field
                 field = value
-                requestLayout()
+                resetMode(value, oldMode)
             }
         }
-    var pictureInPictureMode = false
-        set(value) {
-            if (field != value) {
-                field = value
-                if (swapChildViewPlayer) {
-                    swapPipView()
-                }
-                requestLayout()
-                resetPipViews(value)
+    val isMultiViewMode: Boolean
+        get() = mode == MULTIVIEW || mode == FULLSCREEN || mode == PICTURE_IN_PICTURE
+    val isFullscreenMode: Boolean
+        get() = mode == FULLSCREEN
+    val isPictureInPictureMode: Boolean
+        get() = mode == PICTURE_IN_PICTURE
+
+    private fun resetMode(currentMode: MultiViewMode, oldMode: MultiViewMode) {
+        if (currentMode == PICTURE_IN_PICTURE || oldMode == PICTURE_IN_PICTURE) {
+            if (swapChildViewPlayer) {
+                swapPipView()
             }
+            requestLayout()
+            resetPipViews(currentMode == PICTURE_IN_PICTURE)
+        } else if (oldMode != NORMAL) {
+            requestLayout()
         }
+    }
 
     private fun resetPipViews(pipMode: Boolean) {
         // pip mode, hide focus indicator foreground image
@@ -60,7 +78,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
     override fun requestLayout() {
         super.requestLayout()
-        if (multiViewMode && width > 0 && height > 0) {
+        if (isMultiViewMode && width > 0 && height > 0) {
             post(measureAndLayout)
         }
     }
@@ -77,14 +95,14 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         widthMeasureSpec: Int,
         heightMeasureSpec: Int,
     ) {
-        if (!multiViewMode || width <= 0 || height <= 0) {
+        if (mode == NORMAL || width <= 0 || height <= 0) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         } else {
             setMeasuredDimension(
                 MeasureSpec.getSize(widthMeasureSpec),
                 MeasureSpec.getSize(heightMeasureSpec)
             )
-            val itemSpace = if (!fullscreenMode) multiViewLayoutGap else 0
+            val itemSpace = if (!isFullscreenMode) multiViewLayoutGap else 0
             measureChildrenSelf(measuredWidth, measuredHeight, itemSpace)
         }
     }
@@ -104,7 +122,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
             }
 
             2 -> {
-                if (pictureInPictureMode) {
+                if (isPictureInPictureMode) {
                     measureView(
                         child = getChildAt(0),
                         childWidth = parentMaxWidth,
@@ -184,11 +202,11 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
         right: Int,
         bottom: Int,
     ) {
-        if (!multiViewMode) {
+        if (mode == NORMAL) {
             super.onLayout(changed, left, top, right, bottom)
             return
         }
-        val itemSpace = if (!fullscreenMode) multiViewLayoutGap else 0
+        val itemSpace = if (!isFullscreenMode) multiViewLayoutGap else 0
         when (childCount) {
             1 -> {
                 layoutViewInCenterByOffset(
@@ -200,7 +218,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
             2 -> {
                 // primary view size match as parent, secondary view locate in left|bottom or right|bottom.
-                if (pictureInPictureMode) {
+                if (isPictureInPictureMode) {
                     layoutViewByPosition(
                         child = getChildAt(0),
                         left = 0,
@@ -369,13 +387,13 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
 
     // ----------------- MultiViewControlBar.MultiViewControlBarListener -----------------
     override fun onMultiviewIndicatorClick() {
-        if (pictureInPictureMode) {
-            pictureInPictureMode = false
+        if (isPictureInPictureMode) {
+            mode = FULLSCREEN
         }
     }
 
     override fun onMultiviewPipButtonClicked() {
-        pictureInPictureMode = true
+        mode = PICTURE_IN_PICTURE
     }
 
     override fun onMultiviewSwapButtonClicked() {
@@ -396,7 +414,7 @@ class MultiViewLayout(context: Context) : FrameLayout(context), MultiViewControl
                 it.setTagPosition((it.getTagPosition() + 1) % childCount)
             }
         }
-        if (pictureInPictureMode) {
+        if (isPictureInPictureMode) {
             swapPipView()
             return
         }

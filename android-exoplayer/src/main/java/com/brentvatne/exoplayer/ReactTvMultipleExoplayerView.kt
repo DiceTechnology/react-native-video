@@ -12,7 +12,11 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.FULLSCREEN
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.MULTIVIEW
+import com.brentvatne.exoplayer.MultiViewLayout.MultiViewMode.NORMAL
 import com.brentvatne.util.ReadableMapUtils
+import com.diceplatform.doris.custom.utils.ScreenUtils
 import com.diceplatform.doris.ui.entity.LabelsTranslation
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
@@ -23,7 +27,11 @@ import com.facebook.react.uimanager.ThemedReactContext
 class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) : FrameLayout(themedReactContext),
     MultiViewStateView.OnVolumeChangedListener {
 
-    private val fullscreenControlBarHeight = (96 * themedReactContext.resources.displayMetrics.density).toInt()
+    companion object {
+        private const val CONTROL_BAR_HEIGHT = 96f
+    }
+
+    private val fullscreenControlBarHeight = ScreenUtils.convertDpToPixel(context, CONTROL_BAR_HEIGHT)
     private val multiViewLayout: MultiViewLayout = MultiViewLayout(themedReactContext)
     private val bottomContainer: FrameLayout = FrameLayout(themedReactContext)
     private val multiViewControlBar: MultiViewControlBar = MultiViewControlBar(themedReactContext)
@@ -32,7 +40,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 
     var labelsTranslation: LabelsTranslation? = null
     val multiViewMode
-        get() = multiViewLayout.multiViewMode
+        get() = multiViewLayout.isMultiViewMode
 
     init {
         addView(
@@ -125,7 +133,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     }
 
     fun setMultiViewMode(multiViewMode: Boolean) {
-        multiViewLayout.multiViewMode = multiViewMode
+        multiViewLayout.mode = if (multiViewMode) MULTIVIEW else NORMAL
     }
 
     override fun setId(id: Int) {
@@ -254,6 +262,9 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (multiViewMode) { // Exit multi view mode when back key is pressed.
+            if (multiViewGuide.onKeyEvent(event)) {
+                return true
+            }
             if (multiViewControlBar.onKeyEvent(event)) {
                 return true
             }
@@ -261,9 +272,9 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     return true
                 } else if (event.action == KeyEvent.ACTION_UP) {
-                    if (multiViewLayout.pictureInPictureMode) {
-                        multiViewLayout.pictureInPictureMode = false
-                    } else if (multiViewLayout.fullscreenMode) {
+                    if (multiViewLayout.isPictureInPictureMode) {
+                        multiViewLayout.mode = FULLSCREEN
+                    } else if (multiViewLayout.isFullscreenMode) {
                         setFullscreenMode(false)
                     } else {
                         getExoplayerChildrenList().find { it.isNotEmpty() }?.exitMultiViewMode()
@@ -283,7 +294,7 @@ class ReactTvMultipleExoplayerView(val themedReactContext: ThemedReactContext) :
     private fun setFullscreenMode(fullscreen: Boolean) {
         centerFocusAnchorView.takeIf { !fullscreen }?.visibility = View.GONE
         bottomContainer.visibility = if (fullscreen) View.GONE else View.VISIBLE
-        multiViewLayout.fullscreenMode = fullscreen
+        multiViewLayout.mode = if (fullscreen) FULLSCREEN else MULTIVIEW
         multiViewControlBar.multiViewSize = getExoplayerChildrenList().size
         multiViewControlBar.setCanShowControlBar(fullscreen)
         multiViewLayout.children.forEach { child ->

@@ -21,7 +21,7 @@ class MultiViewControlBar(context: Context) : LinearLayout(context), OnClickList
     AutoHideControlsHandler.Callback {
 
     companion object {
-        private const val SCALE_PERCENT = 1.3f
+        private const val SCALE_PERCENT = 1.2f
     }
 
     interface MultiViewControlBarListener {

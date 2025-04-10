@@ -1,7 +1,6 @@
 package com.brentvatne.exoplayer
 
 import android.content.Context
-import android.graphics.Rect
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,8 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
-import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,14 +45,8 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
 
     fun show(labelsTranslation: LabelsTranslation?) {
         if (isGuideCompleted()) return
-        //TODO: test guide feature, remove later
-//        context.getMultiviewSharedPrefs().edit { putBoolean("showed", true) }
         visibility = View.VISIBLE
-        //TODO: test guide feature, remove later
-        if (isNotEmpty()) {
-            post { skipButton.requestFocus() }
-            return
-        }
+        context.getMultiviewSharedPrefs().edit { putBoolean("showed", true) }
         LayoutInflater.from(context).inflate(R.layout.comp_multiview_guide, this)
         val adapter = GuideAdapter(context = context, labelsTranslation.getGuideStrings())
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -83,6 +76,10 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
         postDelayed({ nextButton.requestFocus() }, 500L)
     }
 
+    private fun hide() {
+        this@MultiViewGuide.visibility = View.GONE
+    }
+
     private fun isGuideCompleted(): Boolean {
         return context.getMultiviewSharedPrefs().getBoolean("showed", false)
     }
@@ -102,7 +99,7 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.multiview_guide_skip_button -> {
-                this@MultiViewGuide.visibility = View.GONE
+                hide()
             }
 
             R.id.multiview_guide_previous_button -> {
@@ -143,11 +140,21 @@ class MultiViewGuide(context: Context) : FrameLayout(context), OnClickListener, 
         }
     }
 
-    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-        if (!gainFocus) { // sometimes player bottom list will gain focus, Guide will lose focus
-            nextButton.takeIf { it.isVisible }?.requestFocus() ?: skipButton.takeIf { it.isVisible }?.requestFocus()
+    fun onKeyEvent(event: KeyEvent): Boolean {
+        if (isVisible) {
+            if (event.keyCode == KeyEvent.KEYCODE_BACK) {
+                if (event.action == KeyEvent.ACTION_UP) {
+                    hide()
+                }
+                return true
+            } else if (focusedChild == null) {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    nextButton.takeIf { it.isVisible }?.requestFocus()
+                        ?: skipButton.takeIf { it.isVisible }?.requestFocus()
+                }
+            }
         }
+        return false
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
