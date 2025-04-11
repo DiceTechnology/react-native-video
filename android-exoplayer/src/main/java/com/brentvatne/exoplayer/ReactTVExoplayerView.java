@@ -1108,7 +1108,11 @@ public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventL
             eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
 
-            trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
+            if (trackSelector != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
+                if (exoDorisPlayerView.isMultipleViewMode()) {
+                    trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredWidth());
+                }
+            }
         }
     }
 
