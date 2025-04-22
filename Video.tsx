@@ -7,6 +7,7 @@ import {
   Platform,
   findNodeHandle,
   View,
+  UIManager,
 } from 'react-native';
 
 import { IVideoPlayer } from './types/player';
@@ -127,14 +128,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
 
   replaceAdTagParameters = (payload: IVideoReplaceAdTagParametersPayload) => {
     let command = 'replaceAdTagParameters';
-
-    if (this.refPlayer) {
-      NativeModules.UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refPlayer.current),
-        NativeModules.UIManager.RCTVideo.Commands[command],
-        [payload]
-      );
-    }
+    this.callNativeMethod(command, [payload]);
   };
 
   onReloadCurrentSource = (event) => {
@@ -164,13 +158,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
       args.push(time);
     }
 
-    if (this.refPlayer) {
-      NativeModules.UIManager.dispatchViewManagerCommand(
-        findNodeHandle(this.refPlayer.current),
-        NativeModules.UIManager.RCTVideo.Commands[command],
-        args
-      );
-    }
+    this.callNativeMethod(command, args);
   };
 
   /**
@@ -179,11 +167,15 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
    */
   seekTo = (time: number) => {
     const command = SeekToCommand.SEEK_TO_POSITION;
-    if (this.refPlayer) {
-      NativeModules.UIManager.dispatchViewManagerCommand(
+    this.callNativeMethod(command, [time]);
+  };
+
+  private callNativeMethod = (command: string, args: any[]) => {
+    if (this.refPlayer?.current) {
+      UIManager.dispatchViewManagerCommand(
         findNodeHandle(this.refPlayer.current),
-        NativeModules.UIManager.RCTVideo.Commands[command],
-        [time]
+        (UIManager as any).RCTVideo?.Commands[command],
+        args
       );
     }
   };
