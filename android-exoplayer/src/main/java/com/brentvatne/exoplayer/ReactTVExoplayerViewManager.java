@@ -322,7 +322,8 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             ImaCsaiProperties imaCsai = (ImaCsaiProperties) adProperties[0];
             TracksPolicy tracksPolicy = ReactTVPropsParser.parseTracksPolicy(ReadableMapUtils.getMap(src, "tracksPolicy"));
 
-            Log.i(WebUtil.DEBUG, String.format("setSrc - id %s, title %s, mimeType %s, isYoSsai %b, isAmtSsai %b, isImaDai %b, adTag %s, midRoll %s, license %s, url %s",
+            Log.i(WebUtil.DEBUG, String.format("setSrc - id %s, title %s, mimeType %s, isYoSsai %b, isAmtSsai %b, " +
+                            "isImaDai %b, adTag %s, midRoll %s, license %s, url %s",
                     id,
                     channelName == null && muxData != null && muxData.hasKey("videoTitle") ? muxData.getString("videoTitle") : channelName,
                     mimeType,
