@@ -46,7 +46,7 @@ public final class ReactTVExoDorisExtensionFactory implements ExoDorisExtension.
                 extension = new ExoDorisYoSsaiExtension(player, serviceContainer, checkNotNull(adViewProvider), adChoicesClickViewRenderer);
                 break;
             case AMT_SSAI:
-                extension = new ExoDorisAmtSsaiExtension(player, serviceContainer, checkNotNull(adViewProvider));
+                extension = new ExoDorisAmtSsaiExtension(player, serviceContainer, checkNotNull(adViewProvider), adChoicesClickViewRenderer);
                 break;
             case IMA_DAI:
                 extension = new ExoDorisImaDaiExtension(player, serviceContainer, checkNotNull(adViewProvider));

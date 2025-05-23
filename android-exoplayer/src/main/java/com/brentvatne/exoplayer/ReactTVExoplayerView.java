@@ -67,10 +67,11 @@ import com.diceplatform.doris.ExoDorisTrackSelector;
 import com.diceplatform.doris.common.ad.AdGlobalSettings;
 import com.diceplatform.doris.common.ad.ui.AdLabels;
 import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
-import com.diceplatform.doris.entity.AdMarkers;
 import com.diceplatform.doris.entity.AdTagParameters;
 import com.diceplatform.doris.entity.AdType;
+import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.DorisAdEvent;
+import com.diceplatform.doris.entity.DorisAdMarkers;
 import com.diceplatform.doris.entity.DorisPlayerEvent;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.ImaDaiProperties;
@@ -590,6 +591,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setUrl(src.getUrl())
                     .setMimeType(src.getMimeType())
                     .setYoSsaiProperties(src.getYoSsai())
+                    .setAmtSsaiProperties(src.getAmtSsai())
                     .setAdGlobalSettings(adGlobalSettings)
                     .setTextTracks(src.getTextTracks())
                     .setDrmParams(actionToken);
@@ -1344,6 +1346,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             ImaCsaiProperties imaCsai,
             Map<String, Object> imaDai,
             YoSsaiProperties yoSsai,
+            AmtSsaiProperties amtSsai,
             String channelId,
             String seriesId,
             String seasonId,
@@ -1370,6 +1373,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             this.isImaDaiStreamLoaded = false;
             if (yoSsai != null) {
                 this.adType = AdType.YO_SSAI;
+            } else if (amtSsai != null) {
+                this.adType = AdType.AMT_SSAI;
             } else if (imaDai != null && !imaDai.isEmpty()) {
                 this.adType = AdType.IMA_DAI;
                 this.imaDaiSrc = new RNImaDaiSource(imaDai);
@@ -1400,6 +1405,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     apsTestFlag,
                     imaCsai,
                     yoSsai,
+                    amtSsai,
                     limitedSeekRange,
                     tracksPolicy,
                     dvrSeekForwardInterval,
@@ -1413,7 +1419,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
     }
 
-    public void setMetadata(Map<String, String> map) {
+    public void setMetadata(@Nullable Map<String, String> map) {
+        if (map == null) {
+            return;
+        }
         this.metadata = new ContentMetadata.Builder()
                 .setThumbnailUrl(map.get(KEY_METADATA_THUMBNAIL_URL))
                 .setEpisodeTitle(map.get(KEY_METADATA_EPISODE_INFO))
@@ -2060,7 +2069,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             } else if (adEvent instanceof DorisAdEvent.AdMarkersChanged) {
                 if (adEvent.getAdType() != AdType.IMA_CSAI && exoDorisPlayerView != null) {
                     DorisAdEvent.AdMarkersChanged event = (DorisAdEvent.AdMarkersChanged) adEvent;
-                    AdMarkers adMarkers = event.getAdMarkers();
+                    DorisAdMarkers adMarkers = event.getAdMarkers();
                     exoDorisPlayerView.setExtraAdGroupMarkers(adMarkers.getAdGroupTimesMs(), adMarkers.getPlayedAdGroups());
                     Log.d(TAG, adEvent.getAdType() + " Ad Stream ID = " + event.getStreamId());
                 }
