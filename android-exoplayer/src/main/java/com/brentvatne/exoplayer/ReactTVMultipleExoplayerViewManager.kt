@@ -288,8 +288,8 @@ class ReactTVMultipleExoplayerViewManager(reactApplicationContext: ReactApplicat
             }
             return
         }
-        if (rootView.multiViewMode) {
-            rootView.loadBottomOverlayComponent(array.getMap(0))
+        if (rootView.multiViewMode && array.getMap(0) is ReadableMap) {
+            rootView.loadBottomOverlayComponent(array.getMap(0) as ReadableMap)
         }
         val mute = rootView.getExoplayerChildrenList().isNotEmpty()
         if (array.size() > rootView.getExoplayerChildrenList().size) {
