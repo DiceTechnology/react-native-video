@@ -203,7 +203,8 @@ class PlayerViewProxy {
                 episodeInfo: jsProps.metadata.value?.episodeInfo, //tvos new
                 startDate: sourceValue.nowPlaying?.startDate,
                 endDate: sourceValue.nowPlaying?.endDate,
-                dateFormat: sourceValue.nowPlaying?.dateFormat)
+                dateFormat: sourceValue.nowPlaying?.dateFormat,
+                contentRating: sourceValue.nowPlaying?.contentRating)
             rndvJsProps.nowPlaying.value = jsNowPlaying
             
             let rndvJSIma = PlayerViewProxy.convertRNVideoImaToRNDV(sourceIma: sourceValue.ima)

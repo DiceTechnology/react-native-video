@@ -13,4 +13,5 @@ struct JSNowPlaying: SuperCodable {
     let startDate: Double?
     let endDate: Double?
     let dateFormat: String?
+    let contentRating: String?
 }

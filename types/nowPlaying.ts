@@ -4,4 +4,5 @@ export interface INowPlaying {
   startDate?: number; //miliseconds
   title: string;
   dateFormat?: string;
+  contentRating?: string;
 }
