@@ -21,4 +21,14 @@ export interface IVideoPlayerTranslations {
   adsCountdownOf: string;
   tvPlayerEPG: string;
   audioOnlyBadge: string;
+  multiView: string;
+  multiViewPlaybackError: string;
+  multiViewGuide1: String;
+  multiViewGuide2: String;
+  multiViewGuide3: String;
+  multiViewGuide4: String;
+  multiViewGuide5: String;
+  next: String;
+  previousIcon: String;
+  skip: String;
 }

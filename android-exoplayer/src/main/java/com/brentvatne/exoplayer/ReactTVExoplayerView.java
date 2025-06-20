@@ -130,7 +130,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 @SuppressLint("ViewConstructor")
-class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener,
+public class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener,
         Player.Listener,
         AnalyticsListener,
         BecomingNoisyListener,
@@ -197,6 +197,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private int viewHeight = 0;
     private boolean hasReloadedCurrentSource = false;
     private boolean isMuted = false;
+    private boolean ignoreProgressUpdates = false;
 
     // Props from React
     private RNSource src;
@@ -268,7 +269,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         eventEmitter.videoAboutToEnd(isAboutToEnd);
                     }
 
-                    eventEmitter.progressChanged(contentTimestampMs, position, bufferedDuration, duration);
+                    if (!ignoreProgressUpdates) {
+                        eventEmitter.progressChanged(contentTimestampMs, position, bufferedDuration, duration);
+                    }
 
                     jsProgressHandler.removeMessages(SHOW_JS_PROGRESS);
                     msg = obtainMessage(SHOW_JS_PROGRESS);
@@ -336,6 +339,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     };
 
     private boolean playInBackground = false;
+    private boolean showBottomOverlayComponent = true;
 
     //Drm
     private ActionToken actionToken;
@@ -446,10 +450,16 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     @Override
     protected void onSizeChanged(final int width, final int height, final int oldWidth, final int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        viewWidth = width;
-        viewHeight = height;
         if (trackSelector != null && width > 0 && height > 0) {
-            trackSelector.setParameters(trackSelector.buildUponParameters().setMaxVideoSize(viewWidth, viewHeight));
+            if (exoDorisPlayerView.isMultipleViewMode()) {
+                trackSelector.setMaxBitrateByVideoSize(width, height);
+            } else {
+                viewWidth = width;
+                viewHeight = height;
+                trackSelector.setParameters(trackSelector
+                        .buildUponParameters().setMaxVideoSize(viewWidth, viewHeight)
+                );
+            }
         }
     }
 
@@ -850,7 +860,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private void handleDrmSessionManagerError(Exception exception) {
         final int errorStringId = R.string.error_drm_session_manager;
         final String errorString = getContext().getString(errorStringId);
-        eventEmitter.error("DRM exception: " + errorString, exception);
+        eventEmitter.error(src.getId(), "DRM exception: " + errorString, exception);
     }
 
     private void releasePlayer() {
@@ -962,7 +972,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         setKeepScreenOn(false);
     }
 
-    private void stopPlayback() {
+    public void stopPlayback() {
         hideWatermark();
         onStopPlayback();
         releasePlayer();
@@ -1104,8 +1114,13 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             int height = videoFormat != null ? videoFormat.height : 0;
             // MockStreamSource.logDceTracks(C.TRACK_TYPE_AUDIO, exoPlayer, trackSelector);
             // MockStreamSource.logDceTracks(C.TRACK_TYPE_TEXT, exoPlayer, trackSelector);
-            eventEmitter.load(exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
+            eventEmitter.load(src.getId(), exoPlayer.getDuration(), exoPlayer.getCurrentPosition(), width, height,
                     getAudioTrackInfo(), getTextTrackInfo());
+            if (trackSelector != null && getMeasuredWidth() > 0 && getMeasuredHeight() > 0) {
+                if (exoDorisPlayerView.isMultipleViewMode()) {
+                    trackSelector.setMaxBitrateByVideoSize(getMeasuredWidth(), getMeasuredHeight());
+                }
+            }
         }
     }
 
@@ -1298,7 +1313,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         }
         if (errorString != null) {
             resetSourceUrl();
-            eventEmitter.error("Playback exception: " + errorString, ex);
+            eventEmitter.error(src.getId(), "Playback exception: " + errorString, ex);
         }
     }
 
@@ -1538,6 +1553,18 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         return new ArrayList<>(trackSet);
     }
 
+    public ExoDorisTrackSelector getTrackSelector() {
+        return trackSelector;
+    }
+
+    public VideoEventEmitter getEventEmitter() {
+        return eventEmitter;
+    }
+
+    public ExoDorisTvPlayerView getExoDorisPlayerView() {
+        return exoDorisPlayerView;
+    }
+
     public void setPausedModifier(boolean paused) {
         isPaused = paused;
         if (player != null) {
@@ -1571,6 +1598,22 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (player != null) {
             player.getExoPlayer().setVolume(volume);
         }
+    }
+
+    public void setMultipleViewMode(boolean multipleViewMode) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.setMultipleViewMode(multipleViewMode);
+        }
+    }
+
+    public void mute(boolean mute) {
+        if (exoDorisPlayerView != null) {
+            exoDorisPlayerView.mute(mute);
+        }
+    }
+
+    public void setIgnoreProgressUpdates(boolean ignoreProgressUpdates) {
+        this.ignoreProgressUpdates = ignoreProgressUpdates;
     }
 
     public void resumeTo(long positionMs) {
@@ -1631,6 +1674,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setPlayInBackground(boolean playInBackground) {
         this.playInBackground = playInBackground;
+    }
+
+    public void setShowBottomOverlayComponent(boolean showBottomOverlayComponent) {
+        this.showBottomOverlayComponent = showBottomOverlayComponent;
     }
 
     public void setDisableFocus(boolean disableFocus) {
@@ -1715,13 +1762,15 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean showFavouriteButton,
             boolean showEpgButton,
             boolean showStatsButton,
-            boolean showAnnotationsButton) {
+            boolean showAnnotationsButton,
+            boolean showMultiViewButton) {
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setShowWatchlistButton(showWatchlistButton);
             exoDorisPlayerView.setShowFavoriteButton(showFavouriteButton);
             exoDorisPlayerView.setShowEpgButton(showEpgButton);
             exoDorisPlayerView.setShowStatsButton(showStatsButton);
             exoDorisPlayerView.setShowAnnotationsButton(showAnnotationsButton);
+            exoDorisPlayerView.setShowMultiViewButton(showMultiViewButton);
         }
     }
 
@@ -1734,6 +1783,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     public void setBottomOverlayComponent(String key, String component, int width, int height) {
         if (component == null || component.isEmpty()) return;
         if (TextUtils.equals((String) exoDorisPlayerView.getTag(R.id.bottomComponentTag), key))
+            return;
+        if (!showBottomOverlayComponent)
             return;
         // add frameLayout to ExoPlayerView, ReactRootView load data first, move to ExoPlayerControllerView.
         ReactRootFrameLayout frameLayout = new ReactRootFrameLayout(getContext());
@@ -1950,6 +2001,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     @Override
+    public void onMultiViewButtonClicked() {
+        eventEmitter.setMultiViewMode(true);
+    }
+
+    @Override
     public void onSubtitleSelected(String language) {
         TrackPreferenceStorage storage = TrackPreferenceStorage.getInstance(getContext());
         storage.storePreferredSubtitleLanguage(language == null
@@ -1965,6 +2021,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 ? TrackPreferenceStorage.NONE
                 : language);
         eventEmitter.audioTrackChanged(language);
+    }
+
+    public void exitMultiViewMode() {
+        eventEmitter.setMultiViewMode(false);
     }
 
     public void replaceAdTagParameters(Map<String, Object> replaceAdTagParametersMap) {
@@ -2007,9 +2067,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             } else if (playerEvent instanceof DorisPlayerEvent.PositionChanged) {
                 DorisPlayerEvent.PositionChanged event = (DorisPlayerEvent.PositionChanged) playerEvent;
                 dorisMessaging.onProgressChanged(
-                    event.getCurrentPosition(),
-                    event.getDuration(),
-                    event.getWindowStartTimeMs()
+                        event.getCurrentPosition(),
+                        event.getDuration(),
+                        event.getWindowStartTimeMs()
                 );
             } else if (playerEvent instanceof DorisPlayerEvent.TrackInfoChanged) {
                 if (selectUserPreferredTrack) {
@@ -2036,7 +2096,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     handlePlaybackError((PlaybackException) error);
                 } else if (error != null) {
                     resetSourceUrl();
-                    eventEmitter.error("Player exception", error);
+                    eventEmitter.error(src.getId(), "Player exception", error);
                 }
             }
         }
@@ -2049,7 +2109,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             }
             if (adEvent instanceof DorisAdEvent.AdBreakStarted) {
                 if (areControlsAllowed) {
-                  setControls(false);
+                    setControls(false);
                 }
             } else if (adEvent instanceof DorisAdEvent.AdBreakEnded) {
                 // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
@@ -2102,7 +2162,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     }
                 }
                 if (!ignoreAdError) {
-                    eventEmitter.error("Ad exception", error);
+                    eventEmitter.error(src.getId(), "Ad exception", error);
                 }
             }
         }

@@ -34,4 +34,10 @@
     <string name="error_drm_unsupported_scheme">This device does not support the required DRM scheme</string>
     <string name="error_drm_unknown">An unknown DRM error occurred</string>
     <string name="error_drm_session_manager">A DRM session manager error occurred</string>
+    <!-- Multiview Guide Description -->
+    <string name="multiview_guide_description_1">Press  \"&lt;\"  and  \"&gt;\"  \nto select up to 4 streams</string>
+    <string name="multiview_guide_description_2">Focus on selected video,\npress \"OK\" to enter fullscreen</string>
+    <string name="multiview_guide_description_3">Press \"Back\" to return \nto Multi-view setup</string>
+    <string name="multiview_guide_description_4">Focus on the icon \nand press \"OK\" \nto change the screen mode \nor swap the videos</string>
+    <string name="multiview_guide_description_5">Focus on the video and press \"OK\" \nto change the audio source</string>
 </resources>

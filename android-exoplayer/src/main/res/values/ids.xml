@@ -2,4 +2,5 @@
 <resources>
     <item name="bottomComponentTag" type="id" />
     <item name="bottom_overlay_component" type="id" />
+    <item name="multiview_position_tag" type="id" />
 </resources>

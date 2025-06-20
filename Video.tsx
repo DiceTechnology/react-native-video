@@ -145,6 +145,10 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
     this.props.onBehindLiveWindowError?.(event.nativeEvent);
   }
 
+  onSetMultiViewActive = (event) => {
+    this.props.onSetMultiViewActive?.(event.nativeEvent);
+  }
+
   /**
    * seekToResume jumps to a certain position for vod and live content
    * time parameter can be the following:
@@ -226,6 +230,7 @@ export default class Video extends React.PureComponent<IVideoPlayer, IState> {
       onWatchlistButtonClick: this.onWatchlistButtonClick,
       onReloadCurrentSource: this.onReloadCurrentSource,
       onBehindLiveWindowError: this.onBehindLiveWindowError,
+      onSetMultiViewActive: this.onSetMultiViewActive,
     };
   };
 

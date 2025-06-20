@@ -1,8 +1,9 @@
 package com.brentvatne.react;
 
-import com.brentvatne.exoplayer.ReactTVExoplayerViewManager;
+import androidx.annotation.NonNull;
+
+import com.brentvatne.exoplayer.ReactTVMultipleExoplayerViewManager;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
@@ -12,33 +13,15 @@ import java.util.List;
 
 public class ReactVideoPackage implements ReactPackage {
 
-    private final PlayerType type;
-
-    public enum PlayerType {
-        MOBILE,
-        TV
-    }
-
-    public ReactVideoPackage() {
-        this.type = PlayerType.MOBILE;
-    }
-
-    public ReactVideoPackage(PlayerType type) {
-        this.type = type;
-    }
-
+    @NonNull
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         return Collections.emptyList();
     }
 
-    // Deprecated RN 0.47
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return Collections.emptyList();
-    }
-
+    @NonNull
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Collections.<ViewManager>singletonList(new ReactTVExoplayerViewManager(reactContext));
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
+        return Collections.singletonList(new ReactTVMultipleExoplayerViewManager(reactContext));
     }
 }

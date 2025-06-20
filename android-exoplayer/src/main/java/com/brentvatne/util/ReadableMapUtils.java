@@ -60,4 +60,13 @@ public class ReadableMapUtils {
         }
         return map.hasKey(key) ? map.getDouble(key) : 0;
     }
+
+    public static boolean contain(ReadableArray array, ReadableMap map) {
+        for (int i = 0; i < array.size(); i++) {
+            if (array.getMap(i).equals(map)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -63,6 +63,7 @@ class VideoEventEmitter {
     private static final String EVENT_ANNOTATIONS_BUTTON_CLICK = "onAnnotationsButtonClick";
     private static final String EVENT_SUBTITLE_TRACK_CHANGED = "onSubtitleTrackChanged";
     private static final String EVENT_AUDIO_TRACK_CHANGED = "onAudioTrackChanged";
+    private static final String EVENT_SET_MULTIPLE_VIEW_ACTIVE = "onSetMultiViewActive";
 
     static final String[] Events = {
             EVENT_LOAD_START,
@@ -100,7 +101,8 @@ class VideoEventEmitter {
             EVENT_AUDIO_TRACK_CHANGED,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
-            EVENT_BEHIND_LIVE_WINDOW_ERROR
+            EVENT_BEHIND_LIVE_WINDOW_ERROR,
+            EVENT_SET_MULTIPLE_VIEW_ACTIVE
     };
 
     @Retention(RetentionPolicy.SOURCE)
@@ -140,7 +142,8 @@ class VideoEventEmitter {
             EVENT_AUDIO_TRACK_CHANGED,
             EVENT_REQUIRE_AD_PARAMETERS,
             EVENT_RELOAD_CURRENT_SOURCE,
-            EVENT_BEHIND_LIVE_WINDOW_ERROR
+            EVENT_BEHIND_LIVE_WINDOW_ERROR,
+            EVENT_SET_MULTIPLE_VIEW_ACTIVE
     })
     @interface VideoEvents {
     }
@@ -155,6 +158,7 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ID = "id";
     private static final String EVENT_PROP_TYPE = "type";
     private static final String EVENT_PROP_DURATION = "duration";
+    private static final String EVENT_PROP_VIDEO_ID = "videoId";
 
     private static final String EVENT_PROP_PLAYABLE_DURATION = "playableDuration";
     private static final String EVENT_PROP_SEEKABLE_DURATION = "seekableDuration";
@@ -184,6 +188,7 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ERROR_EXCEPTION = "errorException";
 
     private static final String EVENT_PROP_TIMED_METADATA = "metadata";
+    private static final String EVENT_PROP_IS_MULTIVIEW = "isMultiViewActive";
 
     void setViewId(int viewId) {
         this.viewId = viewId;
@@ -194,7 +199,7 @@ class VideoEventEmitter {
     }
 
     void load(
-            double duration, double currentPosition, int videoWidth, int videoHeight,
+            String videoId, double duration, double currentPosition, int videoWidth, int videoHeight,
             WritableArray audioTracks, WritableArray textTracks) {
         WritableMap event = Arguments.createMap();
         event.putDouble(EVENT_PROP_DURATION, duration / 1000D);
@@ -212,6 +217,7 @@ class VideoEventEmitter {
 
         event.putArray(EVENT_PROP_AUDIO_TRACKS, audioTracks);
         event.putArray(EVENT_PROP_TEXT_TRACKS, textTracks);
+        event.putString(EVENT_PROP_VIDEO_ID, videoId);
 
         // TODO: Actually check if you can.
         event.putBoolean(EVENT_PROP_FAST_FORWARD, true);
@@ -285,12 +291,13 @@ class VideoEventEmitter {
         receiveEvent(EVENT_FULLSCREEN_DID_DISMISS, null);
     }
 
-    void error(String errorString, Exception exception) {
+    void error(String videoId, String errorString, Exception exception) {
         WritableMap error = Arguments.createMap();
         error.putString(EVENT_PROP_ERROR_STRING, errorString);
         error.putString(EVENT_PROP_ERROR_EXCEPTION, android.util.Log.getStackTraceString(exception));
         WritableMap event = Arguments.createMap();
         event.putMap(EVENT_PROP_ERROR, error);
+        event.putString(EVENT_PROP_VIDEO_ID, videoId);
         receiveEvent(EVENT_ERROR, event);
     }
 
@@ -430,6 +437,12 @@ class VideoEventEmitter {
         event.putString(EVENT_PROP_ID, id);
         event.putString(EVENT_PROP_TYPE, type);
         receiveEvent(EVENT_RELOAD_CURRENT_SOURCE, event);
+    }
+
+    void setMultiViewMode(boolean mode) {
+        WritableMap map = Arguments.createMap();
+        map.putBoolean(EVENT_PROP_IS_MULTIVIEW, mode);
+        receiveEvent(EVENT_SET_MULTIPLE_VIEW_ACTIVE, map);
     }
 
     void behindLiveWindowError() {

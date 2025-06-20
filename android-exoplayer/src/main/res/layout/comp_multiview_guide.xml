@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#dd000000">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/multiview_guide_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/multiview_guide_skip_button"
+            style="@style/TextAppearance.MultiviewGuideButton"
+            android:layout_marginStart="32dp"
+            android:drawableEnd="@drawable/ic_multiview_guide_skip"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpUsage" />
+
+        <Button
+            android:id="@+id/multiview_guide_next_button"
+            style="@style/TextAppearance.MultiviewGuideButton"
+            android:layout_marginEnd="32dp"
+            android:drawableEnd="@drawable/ic_multiview_guide_arrow_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpUsage"
+            tools:text="Next" />
+
+        <Button
+            android:id="@+id/multiview_guide_previous_button"
+            style="@style/TextAppearance.MultiviewGuideButton"
+            android:layout_marginEnd="20dp"
+            android:drawableStart="@drawable/ic_multiview_guide_arrow_left"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/multiview_guide_next_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginEnd="32dp"
+            tools:ignore="SpUsage"
+            tools:text="Prev" />
+
+        <me.relex.circleindicator.CircleIndicator2
+            android:id="@+id/multiview_guide_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:ci_animator="@anim/scale_with_alpha"
+            app:ci_height="10dp"
+            app:ci_width="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
