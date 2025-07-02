@@ -69,7 +69,7 @@ class NewPlayerView: UIView, JSInputProtocol {
             jsProps.translations.value = translationsModel
             if let translationsModel, jsPlayerView?.dorisGlue != nil, translations != oldValue {
                 let dorisTranslations = PlayerViewProxy.convertRNVideoTranslationsToDorisTranslations(translations: translationsModel)
-                jsPlayerView?.dorisGlue?.doris?.viewModel.rendering.translationsViewModel = dorisTranslations
+                jsPlayerView?.dorisGlue?.doris?.ui.viewModel.rendering.translationsViewModel = dorisTranslations
             }
         }
     }
@@ -77,9 +77,9 @@ class NewPlayerView: UIView, JSInputProtocol {
         didSet {
             let buttonsModel = try? Buttons(dict: buttons)
             jsProps.buttons.value = buttonsModel
-            if let buttonsModel, buttons != oldValue, let toggles = jsPlayerView?.dorisGlue?.doris?.viewModel.toggles {
+            if let buttonsModel, buttons != oldValue, let toggles = jsPlayerView?.dorisGlue?.doris?.ui.viewModel.toggles {
                 toggles.isFavouriteButtonHidden = !buttonsModel.favourite
-                toggles.isSettingsButtonHidden = !(buttonsModel.settings ?? true)
+                toggles.isSettingsButtonVisible = buttonsModel.settings ?? true
                 toggles.isStatsButtonHidden = !buttonsModel.stats
                 toggles.isFullScreenButtonHidden = !(buttonsModel.fullscreen ?? true)
                 toggles.isWatchlistButtonHidden = !(buttonsModel.watchlist ?? false)
@@ -209,7 +209,6 @@ class NewPlayerView: UIView, JSInputProtocol {
         jsPlayerView.onAudioTrackChanged = self.onAudioTrackChanged
         
         //api diff
-        jsPlayerView.onRequestPlayNextSource = self.onRelatedVideoClicked
         jsPlayerView.onVideoEnded = self.onVideoEnd
         jsPlayerView.onVideoPaused = self.onPlaybackRateChange
         
@@ -237,19 +236,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     //moved to source
     func setInitialSeek(position: Double) {
         jsProps.startAt.value = position
-    }
-    
-    //moved to source
-    func setupLimitedSeekableRange(with range: Source.LimitedSeekableRange?) {
-        let start = Date(timeIntervalSince1970InMilliseconds: range?.start)
-        let end = Date(timeIntervalSince1970InMilliseconds: range?.end)
-        
-        if let end = end, end > Date() {
-            //avoid finishing playback when ongoing live program reaches its end
-            jsPlayerView?.dorisGlue?.doris?.player.setLimitedSeekableRange(range: (start: start, end: nil))
-        } else {
-            jsPlayerView?.dorisGlue?.doris?.player.setLimitedSeekableRange(range: (start: start, end: end))
-        }
     }
     
     override func layoutSubviews() {

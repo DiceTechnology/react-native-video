@@ -190,8 +190,7 @@ class PlayerViewProxy {
     static func convertRNVideoJSPropsToRNDV(jsProps: JSProps) -> RNDReactNativeDiceVideo.JSProps {
         let rndvJsProps = RNDReactNativeDiceVideo.JSProps()
         rndvJsProps.isFullScreen.value = true
-        rndvJsProps.isMinimised.value = false
-        rndvJsProps.highlightUrl.value = nil
+        rndvJsProps.isMinimiseButton.value = false
         rndvJsProps.isFavourite.value = jsProps.isFavourite.value
         rndvJsProps.locale.value = jsProps.locale.value
 
@@ -223,33 +222,33 @@ class PlayerViewProxy {
             
             let metadata = JSMetadata(metadata: sourceValue.metadata)
 
-            rndvJSSource = RNDReactNativeDiceVideo.JSSource(
-                id: sourceValue.id ?? "",
-                ima: rndvJSIma,
-                uri: sourceValue.uri,
-                drm: rndvJSDrm,
-                progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
-                type: sourceValue.type,
-                title: sourceValue.title ?? "",
-                description: jsProps.metadata.value?.description, //tvos new
-                live: sourceValue.live,
-                partialVideoInformation: jsPartialVideoInformation,
-                isAudioOnly: sourceValue.isAudioOnly,
-                config: jsConfig,
-                imageUri: jsProps.metadata.value?.thumbnailUrl,
-                thumbnailsPreview: sourceValue.thumbnailsPreview,
-                resumePosition: jsProps.startAt.value,
-                delay: nil,
-                ads: sourceValue.ads,
-                metadata: metadata,
-                subtitles: jsSubtitles,
-                limitedSeekableRange: jsLimitedSeekableRange,
-                selectedAudioTrack: nil,
-                selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
-                selectedPlaybackQuality: nil,
-                nowPlaying: jsNowPlaying,
-                preferredAudioTracks: sourceValue.preferredAudioTracks,
-                watchContext: nil) //tvos new
+          rndvJSSource = RNDReactNativeDiceVideo.JSSource(
+                         id: sourceValue.id ?? "",
+                         ima: rndvJSIma,
+                         uri: sourceValue.uri,
+                         drm: rndvJSDrm,
+                         progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
+                         type: sourceValue.type,
+                         title: sourceValue.title ?? "",
+                         description: jsProps.metadata.value?.description, //tvos new
+                         live: sourceValue.live,
+                         partialVideoInformation: jsPartialVideoInformation,
+                         isAudioOnly: sourceValue.isAudioOnly,
+                         config: jsConfig,
+                         imageUri: jsProps.metadata.value?.thumbnailUrl,
+                         thumbnailsPreview: sourceValue.thumbnailsPreview,
+                         resumePosition: jsProps.startAt.value,
+                         delay: nil,
+                         ads: sourceValue.ads,
+                         metadata: metadata,
+                         subtitles: jsSubtitles,
+                         limitedSeekableRange: jsLimitedSeekableRange,
+                         selectedAudioTrack: nil,
+                         selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
+                         selectedPlaybackQuality: nil,
+                         nowPlaying: jsNowPlaying,
+                         preferredAudioTracks: sourceValue.preferredAudioTracks,
+                         watchContext: nil) //tvos new
         }
 
         let jsTranslations = PlayerViewProxy.convertRNVideoTranslationsToRNDV(translations: jsProps.translations.value)

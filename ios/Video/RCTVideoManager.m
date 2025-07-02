@@ -69,6 +69,5 @@ RCT_EXTERN_METHOD(seekToTimestamp:(nonnull NSNumber *)node isoDate:(NSString *)i
 RCT_EXTERN_METHOD(seekToPosition:(nonnull NSNumber *)node position:(double)position)
 RCT_EXTERN_METHOD(replaceAdTagParameters:(nonnull NSNumber *)node payload:(NSDictionary)payload)
 RCT_EXTERN_METHOD(seekToResumePosition:(nonnull NSNumber *)node position:(double)position)
-RCT_EXTERN_METHOD(limitSeekableRange:(nonnull NSNumber *)node payload:(NSDictionary)payload)
 
 @end

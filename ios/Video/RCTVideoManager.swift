@@ -76,14 +76,6 @@ class RCTVideoManager: RCTViewManager {
         }
     }
     
-    @objc public func limitSeekableRange(_ node: NSNumber, payload: NSDictionary) {
-        DispatchQueue.main.async {
-            let component = self.bridge.uiManager.view(forReactTag: node) as? NewPlayerView
-            if let limitedSeekbleRange = try? Source.LimitedSeekableRange(dict: payload) {
-                component?.setupLimitedSeekableRange(with: limitedSeekbleRange)
-            }
-        }
-    }
 
     override static func requiresMainQueueSetup() -> Bool {
         return true
