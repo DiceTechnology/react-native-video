@@ -222,7 +222,7 @@ class PlayerViewProxy {
             
             let metadata = JSMetadata(metadata: sourceValue.metadata)
 
-          rndvJSSource = RNDReactNativeDiceVideo.JSSource(
+            rndvJSSource = RNDReactNativeDiceVideo.JSSource(
                 id: sourceValue.id ?? "",
                 ima: rndvJSIma,
                 uri: sourceValue.uri,
