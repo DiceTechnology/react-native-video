@@ -211,6 +211,7 @@ class NewPlayerView: UIView, JSInputProtocol {
         //api diff
         jsPlayerView.onVideoEnded = self.onVideoEnd
         jsPlayerView.onVideoPaused = self.onPlaybackRateChange
+        jsPlayerView.onRequestPlayNextSource = self.onRelatedVideoClicked
         
         //new props
         jsPlayerView.onFavouriteButtonClick = self.onFavouriteButtonClick
