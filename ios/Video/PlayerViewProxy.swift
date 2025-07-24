@@ -194,6 +194,7 @@ class PlayerViewProxy {
         rndvJsProps.isFavourite.value = jsProps.isFavourite.value
         rndvJsProps.locale.value = jsProps.locale.value
         rndvJsProps.displayType.value = JSPlayerViewDisplayType(layoutType: .fullscreen)
+        rndvJsProps.plugins.value = jsProps.source.value?.plugins
 
         var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
         if let sourceValue = jsProps.source.value {
