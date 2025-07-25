@@ -903,6 +903,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         if (bottomOverlayView instanceof ReactRootView) {
             ((ReactRootView) bottomOverlayView).unmountReactApplication();
         }
+        ViewGroup bottomComponentContainer = exoDorisPlayerView.findViewById(R.id.bottomComponentContainer);
+        if (bottomComponentContainer != null) {
+            bottomComponentContainer.removeAllViews();
+        }
     }
 
     private boolean requestAudioFocus() {
