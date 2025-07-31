@@ -263,7 +263,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         LimitedSeekRange limitedSeekRange = generateRange(src.hasKey(PROP_SRC_LIMIT_RANGE) ? src.getMap(PROP_SRC_LIMIT_RANGE) : null);
         long resumePosition = ResumePositionHandler.RESUME_UNSET;
         if (src.hasKey(PROP_SRC_RESUME_POSITION) && !src.isNull(PROP_SRC_RESUME_POSITION)) {
-            long rawPosition = Math.round(src.getDouble("resumePosition"));
+            long rawPosition = Math.round(src.getDouble(PROP_SRC_RESUME_POSITION));
             if (rawPosition > 0) {
                 resumePosition = (videoView.isLive() ? rawPosition : rawPosition * 1000);
             }
