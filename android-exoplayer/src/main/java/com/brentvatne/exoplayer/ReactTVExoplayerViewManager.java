@@ -700,9 +700,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                 "seekToPosition",
                 COMMAND_SEEK_TO_POSITION,
                 "replaceAdTagParameters",
-                COMMAND_REPLACE_AD_TAG_PARAMETERS,
-                "limitSeekableRange",
-                COMMAND_LIMIT_SEEKABLE_RANGE
+                COMMAND_REPLACE_AD_TAG_PARAMETERS
         );
     }
 
@@ -717,10 +715,6 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                 break;
             case COMMAND_REPLACE_AD_TAG_PARAMETERS:
                 root.replaceAdTagParameters(args.getMap(0) != null ? args.getMap(0).toHashMap() : null);
-                break;
-            case COMMAND_LIMIT_SEEKABLE_RANGE:
-                // Move the COMMAND_LIMIT_SEEKABLE_RANGE as PROP_SRC_LIMIT_RANGE
-                // root.setLimitedSeekRange(generateRange(args.getMap(0)));
                 break;
         }
     }
