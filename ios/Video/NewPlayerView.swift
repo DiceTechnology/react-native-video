@@ -177,13 +177,6 @@ class NewPlayerView: UIView, JSInputProtocol {
     var jsProps = JSProps()
     var jsPlayerView: RNDReactNativeDiceVideo.JSPlayerView?
     
-    func seekToNow() {
-        jsPlayerView?.seekNow()
-    }
-    
-    func seekToTimestamp(isoDate: String) {
-        jsPlayerView?.seek(isoDate)
-    }
     
     //TODO: pass this value as part of source
     func seekToPosition(position: Double) {
@@ -232,11 +225,6 @@ class NewPlayerView: UIView, JSInputProtocol {
         self.jsPlayerView = jsPlayerView
       
         self.jsProps.startAt = Dynamic(nil)
-    }
-    
-    //moved to source
-    func setInitialSeek(position: Double) {
-        jsProps.startAt.value = position
     }
     
     override func layoutSubviews() {
