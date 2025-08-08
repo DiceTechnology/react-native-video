@@ -193,7 +193,7 @@ class PlayerViewProxy {
         rndvJsProps.isMinimiseButton.value = false
         rndvJsProps.isFavourite.value = jsProps.isFavourite.value
         rndvJsProps.locale.value = jsProps.locale.value
-        rndvJsProps.displayType.value = JSPlayerViewDisplayType(layoutType: .fullscreen)
+        rndvJsProps.displayType.value = JSPlayerViewDisplayType(layoutType: .max)
         rndvJsProps.plugins.value = jsProps.source.value?.plugins
 
         var rndvJSSource: RNDReactNativeDiceVideo.JSSource?
@@ -247,7 +247,7 @@ class PlayerViewProxy {
                 limitedSeekableRange: jsLimitedSeekableRange,
                 selectedAudioTrack: nil,
                 selectedSubtitleTrack: sourceValue.selectedSubtitleTrack,
-                selectedPlaybackQuality: nil,
+                bandwidthPolicy: nil,
                 nowPlaying: jsNowPlaying,
                 preferredAudioTracks: sourceValue.preferredAudioTracks,
                 watchContext: nil) //tvos new
