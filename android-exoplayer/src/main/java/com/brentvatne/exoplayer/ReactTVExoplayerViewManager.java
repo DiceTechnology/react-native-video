@@ -15,13 +15,13 @@ import androidx.media3.common.util.Log;
 import androidx.media3.datasource.RawResourceDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
 
+import com.brentvatne.entity.ProgramInfo;
 import com.brentvatne.entity.RelatedVideo;
 import com.brentvatne.entity.Watermark;
 import com.brentvatne.react.BuildConfig;
 import com.brentvatne.react.R;
 import com.brentvatne.util.ReadableMapUtils;
 import com.dice.shield.drm.entity.ActionToken;
-import com.diceplatform.doris.custom.ui.entity.program.ProgramInfo;
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.TracksPolicy;
