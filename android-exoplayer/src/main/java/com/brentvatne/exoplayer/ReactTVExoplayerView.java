@@ -159,7 +159,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private static final String KEY_END_DATE = "endDate";
     private static final String KEY_METADATA_DESCRIPTION = "description";
     private static final String KEY_METADATA_THUMBNAIL_URL = "thumbnailUrl";
-    private static final String KEY_METADATA_TYPE = "type";
     private static final String KEY_METADATA_EPISODE_INFO = "episodeInfo";
 
     private static final CookieManager DEFAULT_COOKIE_MANAGER;
@@ -170,6 +169,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     private final VideoEventEmitter eventEmitter;
+    private final LocalizationService localizationService;
 
     private final ReactTVExoDorisFactory exoDorisFactory;
     private ExoDorisTvPlayerView exoDorisPlayerView;
@@ -198,7 +198,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     // Props from React
     private RNSource src;
     private ContentMetadata metadata;
-    private String type;
     private boolean repeat;
     private boolean disableFocus;
     private boolean isLive = false;
@@ -372,6 +371,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         this.themedReactContext = context;
         createViews();
         this.eventEmitter = new VideoEventEmitter(context);
+        this.localizationService = new LocalizationService(new LocalizationService.Config());
         powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         themedReactContext.addLifecycleEventListener(this);
@@ -797,7 +797,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     @Nullable
     private TextTrack[] getTextTracks(ReadableArray textTracks) {
-        LocalizationService localizationService = new LocalizationService(new LocalizationService.Config());
         if (textTracks != null && textTracks.size() > 0) {
             TextTrack[] dorisTextTracks = new TextTrack[textTracks.size()];
             for (int i = 0; i < textTracks.size(); ++i) {
@@ -1269,6 +1268,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     private void reloadCurrentSource() {
         if (src != null && metadata != null) {
+            String type = isLive ? "LIVE" : "VOD";
             Log.i(TAG, "Reload current source, id " + src.getId() + ", type " + type);
             eventEmitter.reloadCurrentSource(src.getId(), type);
             return;
@@ -1400,7 +1400,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 .setEpisodeTitle(map.get(KEY_METADATA_EPISODE_INFO))
                 .setDescription(map.get(KEY_METADATA_DESCRIPTION))
                 .build();
-        this.type = map.get(KEY_METADATA_TYPE);
 
         if (exoDorisPlayerView != null) {
             exoDorisPlayerView.setMetadata(metadata);
@@ -1463,7 +1462,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private void selectTrack(TracksPolicy.TrackPolicy trackPolicy, int trackType, @Nullable List<String> preferredLanguages) {
         Track track = null;
         List<Track> trackList = getTracks(player.getExoPlayer().getCurrentTracks());
-        LocalizationService localizationService = new LocalizationService(new LocalizationService.Config());
         if (trackType == C.TRACK_TYPE_TEXT) {
             if (preferredLanguages == null || preferredLanguages.isEmpty() || preferredLanguages.get(0) == null) { // "OFF" or user not select preferred subtitle
                 if (trackPolicy != null) { // track policy is active, select track policy subtitle
