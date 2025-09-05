@@ -33,10 +33,10 @@ class NewPlayerView: UIView, JSInputProtocol {
     @objc var onAnnotationsButtonClick: RCTBubblingEventBlock?
     @objc var onWatchlistButtonClick: RCTBubblingEventBlock?
     @objc var onSkipMarkerButton: RCTBubblingEventBlock?
+    @objc var onVideoSeek: RCTBubblingEventBlock?
     
     //not used
     @objc var onVideoLoadStart: RCTBubblingEventBlock?
-    @objc var onVideoSeek: RCTBubblingEventBlock?
     @objc var onTimedMetadata: RCTBubblingEventBlock?
     @objc var onVideoAudioBecomingNoisy: RCTBubblingEventBlock?
     @objc var onVideoFullscreenPlayerWillPresent: RCTBubblingEventBlock?
@@ -215,6 +215,7 @@ class NewPlayerView: UIView, JSInputProtocol {
         jsPlayerView.onAnnotationsButtonClick = self.onAnnotationsButtonClick
         jsPlayerView.onWatchlistButtonClick = self.onWatchlistButtonClick
         jsPlayerView.onSkipMarkerButton = self.onSkipMarkerButton
+        jsPlayerView.onSeekEvent = self.onVideoSeek
         jsPlayerView.onVideoBuffer = self.onVideoBuffer
         jsPlayerView.onVideoAboutToEnd = self.onVideoAboutToEnd
         
