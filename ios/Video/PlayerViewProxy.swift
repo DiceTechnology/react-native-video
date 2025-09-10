@@ -94,6 +94,7 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
         dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.unknown = translations.unknown
+        dorisTranslationsViewModel.seekSpeedTooltip = translations.seekSpeedTooltip
         return dorisTranslationsViewModel
     }
 
