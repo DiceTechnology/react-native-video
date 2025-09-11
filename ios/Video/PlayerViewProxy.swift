@@ -94,6 +94,8 @@ class PlayerViewProxy {
         dorisTranslationsViewModel.audioOnlyBadge = translations.audioOnlyBadge
         dorisTranslationsViewModel.schedule = translations.tvPlayerEPG
         dorisTranslationsViewModel.unknown = translations.unknown
+        dorisTranslationsViewModel.seconds = translations.seconds
+        dorisTranslationsViewModel.seekSpeedTooltip = translations.seekSpeedTooltip
         return dorisTranslationsViewModel
     }
 
@@ -232,7 +234,7 @@ class PlayerViewProxy {
                 drm: rndvJSDrm,
                 progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
                 type: sourceValue.type,
-                title: sourceValue.title ?? "",
+                title: sourceValue.nowPlaying?.title ?? jsProps.metadata.value?.title ?? "",
                 description: jsProps.metadata.value?.description, //tvos new
                 live: sourceValue.live,
                 partialVideoInformation: jsPartialVideoInformation,
