@@ -253,7 +253,8 @@ class PlayerViewProxy {
                 bandwidthPolicy: nil,
                 nowPlaying: jsNowPlaying,
                 preferredAudioTracks: sourceValue.preferredAudioTracks,
-                watchContext: nil) //tvos new
+                watchContext: nil,
+                is4K: sourceValue.is4K)
         }
 
         let jsTranslations = PlayerViewProxy.convertRNVideoTranslationsToRNDV(translations: jsProps.translations.value)
