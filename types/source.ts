@@ -86,5 +86,5 @@ export interface IVideoPlayerSource {
   live?: boolean;
   isAudioOnly?: boolean;
   resumePosition?: number;
-  is4K?: booelan;
+  is4K?: boolean;
 }
