@@ -84,6 +84,4 @@ internal fun createOffTrack(trackType: Int, isSelected: Boolean = true): Track =
     /* language = */ "",
     /* isSelected = */ isSelected,
     /* isOff = */ true,
-    /* width = */ -1,
-    /* height = */-1
 )
