@@ -21,5 +21,4 @@ export interface IVideoPlayerTranslations {
   adsCountdownOf: string;
   tvPlayerEPG: string;
   audioOnlyBadge: string;
-  seekSpeedTooltip: string;
 }
