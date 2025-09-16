@@ -234,7 +234,7 @@ class PlayerViewProxy {
                 drm: rndvJSDrm,
                 progressUpdateInterval: sourceValue.progressUpdateInterval ?? 6,
                 type: sourceValue.type,
-                title: sourceValue.nowPlaying?.title ?? jsProps.metadata.value?.title ?? sourceValue.title "",
+                title: sourceValue.nowPlaying?.title ?? jsProps.metadata.value?.title ?? sourceValue.title ?? "",
                 description: jsProps.metadata.value?.description, //tvos new
                 live: sourceValue.live,
                 partialVideoInformation: jsPartialVideoInformation,
