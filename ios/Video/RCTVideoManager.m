@@ -33,6 +33,7 @@ RCT_EXPORT_VIEW_PROPERTY(nowPlaying, NSDictionary);
 RCT_EXPORT_VIEW_PROPERTY(hideAdUiElements, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(isWhyThisAdIconEnabled, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(locale, NSString);
+RCT_EXPORT_VIEW_PROPERTY(isPlayPauseEnabled, BOOL);
 
 /* Should support: onLoadStart, onLoad, and onError to stay consistent with Image */
 RCT_EXPORT_VIEW_PROPERTY(onVideoLoadStart, RCTBubblingEventBlock);
@@ -63,6 +64,7 @@ RCT_EXPORT_VIEW_PROPERTY(onEpgIconClick, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAnnotationsButtonClick, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSubtitleTrackChanged, RCTBubblingEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onAudioTrackChanged, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onSkipMarkerButton, RCTBubblingEventBlock);
 
 RCT_EXTERN_METHOD(seekToPosition:(nonnull NSNumber *)node position:(double)position)
 RCT_EXTERN_METHOD(replaceAdTagParameters:(nonnull NSNumber *)node payload:(NSDictionary)payload)
