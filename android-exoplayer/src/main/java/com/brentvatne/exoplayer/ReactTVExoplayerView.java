@@ -1919,8 +1919,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     @Override
-    public void onSkipMarkerClicked(SkipMarker skipMarker) {
+    public void onSkipMarkerClicked(long currentTimeMs, SkipMarker skipMarker) {
         eventEmitter.skipMarkerClick(skipMarker);
+        eventEmitter.skipMarkerSeek(currentTimeMs, skipMarker.endTimeMs);
     }
 
     @Override
@@ -1931,6 +1932,31 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     @Override
     public void onStatsButtonClicked() {
         eventEmitter.statsIconClick();
+    }
+
+    @Override
+    public void onVideoPlayPauseButtonClick(boolean playing) {
+        eventEmitter.playPauseButtonClick(playing);
+    }
+
+    @Override
+    public void onAdPlayPauseButtonClick(boolean playing) {
+        eventEmitter.playPauseButtonClick(playing);
+    }
+
+    @Override
+    public void onGoToLiveButtonClick(long seekStartAt, long seekEndAt) {
+        eventEmitter.goToLiveSeek(seekStartAt, seekEndAt);
+    }
+
+    @Override
+    public void onForwardRewindButtonClick(long seekStartAt, long seekEndAt) {
+        eventEmitter.forwardRewindSeek(seekStartAt, seekEndAt);
+    }
+
+    @Override
+    public void onContinuousSeekClick(long seekStartAt, long seekEndAt) {
+        eventEmitter.continuousSeek(seekStartAt, seekEndAt);
     }
 
     @Override
