@@ -1919,7 +1919,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     @Override
-    public void onSkipMarkerClicked(SkipMarker skipMarker) {
+    public void onSkipMarkerClicked(long currentPosition, SkipMarker skipMarker) {
         eventEmitter.skipMarkerClick(skipMarker);
     }
 
