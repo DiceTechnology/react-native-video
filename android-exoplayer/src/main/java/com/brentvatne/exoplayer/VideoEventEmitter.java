@@ -199,7 +199,6 @@ class VideoEventEmitter {
     private static final String EVENT_PROP_ERROR_EXCEPTION = "errorException";
 
     private static final String EVENT_PROP_TIMED_METADATA = "metadata";
-    private static final String EVENT_PROP_SEEK_SKIP_MARKER = "skipMarker";
     private static final String EVENT_PROP_SEEK_GO_TO_LIVE = "liveBadge";
     private static final String EVENT_PROP_SEEK_SKIP = "skip";
     private static final String EVENT_PROP_SEEK = "seek";
@@ -262,10 +261,6 @@ class VideoEventEmitter {
         event.putDouble(EVENT_PROP_CURRENT_TIME, currentPosition / 1000D);
         event.putDouble(EVENT_PROP_SEEK_TIME, seekTime / 1000D);
         receiveEvent(EVENT_SEEK, event);
-    }
-
-    void skipMarkerSeek(long seekStartAt, long seekEndAt) {
-        onSeek(EVENT_PROP_SEEK_SKIP_MARKER, seekStartAt, seekEndAt);
     }
 
     void goToLiveSeek(long seekStartAt, long seekEndAt) {
