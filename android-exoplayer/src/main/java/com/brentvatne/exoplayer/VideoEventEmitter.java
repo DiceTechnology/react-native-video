@@ -278,8 +278,8 @@ class VideoEventEmitter {
     private void onSeek(String seekType, long seekStartAt, long seekEndAt) {
         WritableMap event = Arguments.createMap();
         event.putString(EVENT_PROP_SEEK_TYPE, seekType);
-        event.putDouble(EVENT_PROP_SEEK_START_TIME, seekStartAt);
-        event.putDouble(EVENT_PROP_SEEK_END_TIME, seekEndAt);
+        event.putDouble(EVENT_PROP_SEEK_START_TIME, seekStartAt / 1000D);
+        event.putDouble(EVENT_PROP_SEEK_END_TIME, seekEndAt / 1000D);
         receiveEvent(EVENT_SEEK_ENDED, event);
     }
 
