@@ -7,8 +7,8 @@ export enum IVideoPlayerSeekType {
 }
 
 export enum IVideoPlayerMediaTrackAction {
-  USER = "user",
-  SYSTEM = "system",
+  UI = "ui",
+  PLAYER = "player",
 }
 
 export interface IVideoPlayerSeekEndedEvent {
