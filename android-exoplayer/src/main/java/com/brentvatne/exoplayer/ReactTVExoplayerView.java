@@ -207,6 +207,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private boolean isWhyThisAdIconEnabled;
     private boolean isPlayPauseEnabled = true;
     private boolean shouldAutoStart = true;
+    private boolean isPauseAdsEnabled = false;
+    private boolean treatAllOverlayAdsAsPauseAds = false;
     private float jsProgressUpdateInterval = 250.0f;
     // \ End props
 
@@ -564,6 +566,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             player.setMediaSessionControlsEnabled(isPlayPauseEnabled);
             player.setOutput(dorisListener);
+            player.setAdEventListener(exoDorisPlayerView);
             trackSelector = player.getTrackSelector();
             ExoPlayer exoPlayer = player.getExoPlayer();
 
@@ -652,6 +655,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             exoDorisPlayerView.setExtraAdGroupMarkers(null, null);
             exoDorisPlayerView.setLimitedSeekRange(limitedSeekRange);
+            exoDorisPlayerView.setAdGlobalSettings(adGlobalSettings);
 
             playerNeedsSource = false;
             eventEmitter.loadStart();
@@ -679,6 +683,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 .setHideAdUiElements(hideAdUiElements)
                 .setWhyThisAdIconEnabled(isWhyThisAdIconEnabled)
                 .setAdLabels(adLabels)
+                .setPauseAdsEnabled(isPauseAdsEnabled && treatAllOverlayAdsAsPauseAds)
                 .build();
     }
 
@@ -1899,6 +1904,14 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setShouldAutoStart(boolean shouldAutoStart) {
         this.shouldAutoStart = shouldAutoStart;
+    }
+
+    public void setIsPauseAdsEnabled(boolean isPauseAdsEnabled) {
+        this.isPauseAdsEnabled = isPauseAdsEnabled;
+    }
+
+    public void setTreatAllOverlayAdsAsPauseAd(boolean treatAllOverlayAdsAsPauseAds) {
+        this.treatAllOverlayAdsAsPauseAds = treatAllOverlayAdsAsPauseAds;
     }
 
     private boolean isUnauthorizedAdError(Exception error) {
