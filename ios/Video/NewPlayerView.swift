@@ -159,7 +159,7 @@ class NewPlayerView: UIView, JSInputProtocol {
             jsProps.shouldAutoStart.value = shouldAutoStart
         }
     }
-  
+
     //FIXME: review unused variables
     @objc var selectedTextTrack: NSDictionary?
     @objc var selectedAudioTrack: NSDictionary?
