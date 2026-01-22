@@ -1,7 +1,7 @@
 {
     "name": "react-native-video",
     "version": "7.13.6",
-    "dorisAndroidVersion": "0.0.260120-cc9f359",
+    "dorisAndroidVersion": "0.0.260122-2a9f028",
     "messagingAndroidVersion": "1.1.0",
     "description": "A <Video /> element for react-native",
     "main": "Video.tsx",
