@@ -1317,7 +1317,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             boolean shouldSaveSubtitleSelection,
             String selectedSubtitleTrack,
             List<String> preferredAudioTracks,
-            SubtitlesPolicy tracksPolicy,
+            SubtitlesPolicy subtitlesPolicy,
             long dvrSeekForwardInterval,
             long dvrSeekBackwardInterval) {
 
@@ -1366,7 +1366,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     amtSsai,
                     limitedSeekRange,
                     resumePosition,
-                    tracksPolicy,
+                    subtitlesPolicy,
                     dvrSeekForwardInterval,
                     dvrSeekBackwardInterval);
             this.actionToken = actionToken;
