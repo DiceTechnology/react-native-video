@@ -89,6 +89,7 @@ import com.diceplatform.doris.ui.ExoDorisPlayerTvControlView;
 import com.diceplatform.doris.ui.ExoDorisPlayerView;
 import com.diceplatform.doris.ui.ExoDorisPlayerViewListener;
 import com.diceplatform.doris.ui.ExoDorisTvPlayerView;
+import com.diceplatform.doris.ui.accessibility.TvAccessibilityManager;
 import com.diceplatform.doris.ui.entity.LabelsTranslation;
 import com.diceplatform.doris.ui.entity.VideoTile;
 import com.diceplatform.doris.ui.skipmarker.SkipMarker;
@@ -2055,6 +2056,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         event.getDuration(),
                         event.getWindowStartTimeMs()
                 );
+                if (TvAccessibilityManager.Companion.isAccessibilityTTSEnabled(getContext())) {
+                    View timeBar = exoDorisPlayerView.findViewById(R.id.exo_progress);
+                    timeBar.setFocusable(false);
+                    timeBar.setFocusableInTouchMode(false);
+                }
             } else if (playerEvent instanceof DorisPlayerEvent.TrackInfoChanged) {
                 if (selectUserPreferredTrack) {
                     selectUserPreferredTrack = false;
