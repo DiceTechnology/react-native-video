@@ -24,7 +24,7 @@ import com.brentvatne.util.ReadableMapUtils;
 import com.dice.shield.drm.entity.ActionToken;
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
-import com.diceplatform.doris.entity.TracksPolicy;
+import com.diceplatform.doris.entity.SubtitlesPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.internal.ResumePositionHandler;
 import com.diceplatform.doris.ui.skipmarker.SkipMarker;
@@ -322,7 +322,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
             Object[] adProperties = ReactTVPropsParser.parseAdUnitsV2(videoView.isLive(), src);
             if (adProperties == null || adProperties.length != 3) return;
             ImaCsaiProperties imaCsai = (ImaCsaiProperties) adProperties[0];
-            TracksPolicy tracksPolicy = ReactTVPropsParser.parseTracksPolicy(ReadableMapUtils.getMap(src, "tracksPolicy"));
+            SubtitlesPolicy subtitlesPolicy = ReactTVPropsParser.parseSubtitlesPolicy(ReadableMapUtils.getMap(src, "tracksPolicy"));
 
             Log.i(WebUtil.DEBUG, String.format("setSrc - id %s, title %s, resumePosition %d, mimeType %s, isYoSsai %b, isAmtSsai %b, " +
                             "isImaDai %b, adTag %s, midRoll %s, license %s, url %s",
@@ -367,7 +367,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
                     shouldSaveSubtitleSelection,
                     selectedSubtitleTrack,
                     preferredAudioTracks,
-                    tracksPolicy,
+                    subtitlesPolicy,
                     forwardInterval,
                     backwardInterval);
         } else {

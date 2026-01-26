@@ -8,8 +8,8 @@ import androidx.media3.common.endeavor.LimitedSeekRange;
 
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
+import com.diceplatform.doris.entity.SubtitlesPolicy;
 import com.diceplatform.doris.entity.TextTrack;
-import com.diceplatform.doris.entity.TracksPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class RNSource {
     private final AmtSsaiProperties amtSsai;
     private final LimitedSeekRange limitedSeekRange;
     private final long resumePosition;
-    private final TracksPolicy tracksPolicy;
+    private final SubtitlesPolicy subtitlesPolicy;
     private final long dvrSeekForwardInterval;
     private final long dvrSeekBackwardInterval;
 
@@ -71,7 +71,7 @@ public class RNSource {
             @Nullable AmtSsaiProperties amtSsai,
             @Nullable LimitedSeekRange limitedSeekRange,
             long resumePosition,
-            TracksPolicy tracksPolicy,
+            SubtitlesPolicy subtitlesPolicy,
             long dvrSeekForwardInterval,
             long dvrSeekBackwardInterval) {
 
@@ -98,7 +98,7 @@ public class RNSource {
         this.amtSsai = amtSsai;
         this.limitedSeekRange = limitedSeekRange;
         this.resumePosition = resumePosition;
-        this.tracksPolicy = tracksPolicy;
+        this.subtitlesPolicy = subtitlesPolicy;
         this.dvrSeekForwardInterval = TimeUnit.SECONDS.toMillis(dvrSeekForwardInterval);
         this.dvrSeekBackwardInterval = TimeUnit.SECONDS.toMillis(dvrSeekBackwardInterval);
     }
@@ -231,7 +231,7 @@ public class RNSource {
         return resumePosition;
     }
 
-    public TracksPolicy getTracksPolicy() {
-        return tracksPolicy;
+    public SubtitlesPolicy getSubtitlesPolicy() {
+        return subtitlesPolicy;
     }
 }

@@ -72,4 +72,5 @@ internal fun Format.toMediaTrack(type: Int, selected: Boolean) = Track(
     label,
     language,
     selected,
+    false,
 )

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import com.brentvatne.util.ReadableMapUtils;
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
-import com.diceplatform.doris.entity.TracksPolicy;
+import com.diceplatform.doris.entity.SubtitlesPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.entity.YoSsaiProperties.YoVideoType;
 import com.facebook.react.bridge.ReadableArray;
@@ -26,8 +26,8 @@ public class ReactTVPropsParser {
     }
 
     @Nullable
-    public static TracksPolicy parseTracksPolicy(@Nullable ReadableMap tracksPolicy) {
-        List<TracksPolicy.TrackPolicy> trackPolicyList = new ArrayList<>();
+    public static SubtitlesPolicy parseSubtitlesPolicy(@Nullable ReadableMap tracksPolicy) {
+        List<SubtitlesPolicy.SubtitlePolicy> subtitlePolicyList = new ArrayList<>();
         ReadableArray array = ReadableMapUtils.getArray(tracksPolicy, "items");
         if (array == null) {
             return null;
@@ -37,10 +37,10 @@ public class ReactTVPropsParser {
             String audio = ReadableMapUtils.getString(map, "audio");
             String subtitle = ReadableMapUtils.getString(map, "subtitle");
             if (audio != null && subtitle != null) {
-                trackPolicyList.add(new TracksPolicy.TrackPolicy(audio, subtitle));
+                subtitlePolicyList.add(new SubtitlesPolicy.SubtitlePolicy(audio, subtitle));
             }
         }
-        return trackPolicyList.isEmpty() ? null : new TracksPolicy(trackPolicyList);
+        return subtitlePolicyList.isEmpty() ? null : new SubtitlesPolicy(subtitlePolicyList);
     }
 
     /**
