@@ -8,6 +8,7 @@ import androidx.media3.common.endeavor.LimitedSeekRange;
 
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
+import com.diceplatform.doris.entity.SmartSubtitleMapping;
 import com.diceplatform.doris.entity.SubtitlesPolicy;
 import com.diceplatform.doris.entity.TextTrack;
 import com.diceplatform.doris.entity.YoSsaiProperties;
@@ -30,6 +31,7 @@ public class RNSource {
     private final Map<String, Object> muxData;
     private final List<String> preferredAudioTracks;
     private final String selectedSubtitleTrack;
+    private final List<SmartSubtitleMapping> smartSubtitleMappings;
     private final String locale;
     private final String channelId;
     private final String seriesId;
@@ -58,6 +60,7 @@ public class RNSource {
             @Nullable Map<String, Object> muxData,
             @Nullable List<String> preferredAudioTracks,
             @Nullable String selectedSubtitleTrack,
+            @Nullable List<SmartSubtitleMapping> smartSubtitleMappings,
             @Nullable String locale,
             @Nullable String channelId,
             @Nullable String seriesId,
@@ -85,6 +88,7 @@ public class RNSource {
         this.muxData = muxData;
         this.preferredAudioTracks = preferredAudioTracks;
         this.selectedSubtitleTrack = selectedSubtitleTrack;
+        this.smartSubtitleMappings = smartSubtitleMappings;
         this.locale = locale;
         this.channelId = channelId;
         this.seriesId = seriesId;
@@ -172,6 +176,11 @@ public class RNSource {
     @Nullable
     public String getSelectedSubtitleTrack() {
         return selectedSubtitleTrack;
+    }
+
+    @Nullable
+    public List<SmartSubtitleMapping> getSmartSubtitleMappings() {
+        return smartSubtitleMappings;
     }
 
     @Nullable

@@ -73,6 +73,7 @@ import com.diceplatform.doris.entity.DorisPlayerEvent;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
 import com.diceplatform.doris.entity.ImaDaiProperties;
 import com.diceplatform.doris.entity.ImaDaiPropertiesBuilder;
+import com.diceplatform.doris.entity.SmartSubtitleMapping;
 import com.diceplatform.doris.entity.Source;
 import com.diceplatform.doris.entity.SourceBuilder;
 import com.diceplatform.doris.entity.State;
@@ -616,6 +617,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     .setMimeType(src.getMimeType())
                     .setPreferredAudioLanguages(getPreferredAudioLang())
                     .setPreferredTextLanguages(getPreferredSubtitleLang())
+                    .setPreferredSmartSubtitles(src.getSmartSubtitleMappings())
                     .setYoSsaiProperties(src.getYoSsai())
                     .setAmtSsaiProperties(src.getAmtSsai())
                     .setAdGlobalSettings(adGlobalSettings)
@@ -1315,6 +1317,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
             LimitedSeekRange limitedSeekRange,
             long resumePosition,
             boolean shouldSaveSubtitleSelection,
+            List<SmartSubtitleMapping> smartSubtitleMappings,
             String selectedSubtitleTrack,
             List<String> preferredAudioTracks,
             SubtitlesPolicy subtitlesPolicy,
@@ -1353,6 +1356,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     muxData,
                     preferredAudioTracks,
                     selectedSubtitleTrack,
+                    smartSubtitleMappings,
                     null,
                     channelId,
                     seriesId,
@@ -1973,6 +1977,9 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                         exoDorisPlayerView.hideController();
                     }
                 }
+            } else if (playerEvent instanceof DorisPlayerEvent.SubtitlePreferenceChanged) {
+                DorisPlayerEvent.SubtitlePreferenceChanged event = (DorisPlayerEvent.SubtitlePreferenceChanged) playerEvent;
+                eventEmitter.subtitlePreferenceChanged(event.getMappings());
             } else if (playerEvent instanceof DorisPlayerEvent.PositionChanged) {
                 DorisPlayerEvent.PositionChanged event = (DorisPlayerEvent.PositionChanged) playerEvent;
                 dorisMessaging.onProgressChanged(

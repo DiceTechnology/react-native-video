@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import com.brentvatne.util.ReadableMapUtils;
 import com.diceplatform.doris.entity.AmtSsaiProperties;
 import com.diceplatform.doris.entity.ImaCsaiProperties;
+import com.diceplatform.doris.entity.SmartSubtitleMapping;
+import com.diceplatform.doris.entity.SmartSubtitleMapping.KindType;
+import com.diceplatform.doris.entity.SmartSubtitleMapping.SubtitleLanguage;
 import com.diceplatform.doris.entity.SubtitlesPolicy;
 import com.diceplatform.doris.entity.YoSsaiProperties;
 import com.diceplatform.doris.entity.YoSsaiProperties.YoVideoType;
@@ -41,6 +44,39 @@ public class ReactTVPropsParser {
             }
         }
         return subtitlePolicyList.isEmpty() ? null : new SubtitlesPolicy(subtitlePolicyList);
+    }
+
+    @Nullable
+    public static List<SmartSubtitleMapping> parseSmartSubtitleMappings(@Nullable ReadableArray smartSubtitleMappings) {
+        if (smartSubtitleMappings == null) {
+            return null;
+        }
+
+        int mappingCount = smartSubtitleMappings.size();
+        List<SmartSubtitleMapping> mappingList = new ArrayList<>(mappingCount);
+        for (int i = 0; i < mappingCount; i++) {
+            ReadableMap itemMap = smartSubtitleMappings.getMap(i);
+
+            // audio: { code: "en" }
+            ReadableMap audioMap = ReadableMapUtils.getMap(itemMap, "audio");
+            String audioLanguage = ReadableMapUtils.getString(audioMap, "code");
+            if (TextUtils.isEmpty(audioLanguage)) continue;
+            // subtitles: [{ code: "fr", kind: "captions" }]
+            ReadableArray subtitles = ReadableMapUtils.getArray(itemMap, "subtitles");
+            int subtitleCount = subtitles == null ? 0 : subtitles.size();
+            List<SubtitleLanguage> subtitleList = new ArrayList<>(subtitleCount);
+            for (int j = 0; j < subtitleCount; j++) {
+                ReadableMap subtitleMap = subtitles.getMap(j);
+                String code = ReadableMapUtils.getString(subtitleMap, "code");
+                if (TextUtils.isEmpty(code)) continue;
+
+                String kind = ReadableMapUtils.getString(subtitleMap, "kind");
+                subtitleList.add(new SubtitleLanguage(code, KindType.from(kind)));
+            }
+
+            mappingList.add(new SmartSubtitleMapping(audioLanguage, subtitleList));
+        }
+        return mappingList;
     }
 
     /**
