@@ -109,3 +109,4 @@ export interface IVideoPlayerSource {
   is4K?: boolean;
   preferredSmartSubtitles?: PreferredSmartSubtitle[];
 }
+
