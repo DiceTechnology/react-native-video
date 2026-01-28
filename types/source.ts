@@ -49,7 +49,7 @@ export enum SkipMarkerType {
 }
 
 export interface IVideoPlayerPreferredSmartSubtitlesChangedPayload {
-  preferredSmartSubtitles?: PreferredSmartSubtitle[]
+  preferredSmartSubtitles?: PreferredSmartSubtitle[];
 }
 
 export interface PreferredSmartSubtitle {
