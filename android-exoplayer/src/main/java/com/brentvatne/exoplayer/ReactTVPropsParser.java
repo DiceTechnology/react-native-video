@@ -61,6 +61,7 @@ public class ReactTVPropsParser {
             ReadableMap audioMap = ReadableMapUtils.getMap(itemMap, "audio");
             String audioLanguage = ReadableMapUtils.getString(audioMap, "code");
             if (TextUtils.isEmpty(audioLanguage)) continue;
+
             // subtitles: [{ code: "fr", kind: "captions" }]
             ReadableArray subtitles = ReadableMapUtils.getArray(itemMap, "subtitles");
             int subtitleCount = subtitles == null ? 0 : subtitles.size();
