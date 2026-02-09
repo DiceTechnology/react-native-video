@@ -24,7 +24,7 @@ class RNVJSOverlayBuilder: OverlayBuilderProtocol {
                                         moduleName: config.name,
                                         initialProperties: config.initialProps)
         componentView.backgroundColor = .clear
-        componentView.tvRemoteHandler.disableTVMenuKey()
+        componentView.tvRemoteHandler?.disableTVMenuKey()
 
         return (view: componentView,
                 button: config.buttonIconUrl,
@@ -54,13 +54,13 @@ class RNVJSOverlayBuilder: OverlayBuilderProtocol {
                                                   moduleName: sideComponent.name,
                                                   initialProperties: initialSideComponentProps)
             sideJSComponentView.backgroundColor = .clear
-            sideJSComponentView.tvRemoteHandler.disableTVMenuKey()
+            sideJSComponentView.tvRemoteHandler?.disableTVMenuKey()
 
             let bottomJSComponentView = RCTRootView(bridge: bridge,
                                                     moduleName: bottomComponent.name,
                                                     initialProperties: initialBottomComponentProps)
             bottomJSComponentView.backgroundColor = .clear
-            bottomJSComponentView.tvRemoteHandler.disableTVMenuKey()
+            bottomJSComponentView.tvRemoteHandler?.disableTVMenuKey()
 
             let overlayType = OverlayType.rightAndBottom(rightView: sideJSComponentView,
                                                          bottomView: bottomJSComponentView,
@@ -93,7 +93,7 @@ class RNVJSOverlayBuilder: OverlayBuilderProtocol {
                                                   moduleName: sideComponent.name,
                                                   initialProperties: initialSideComponentProps)
             sideJSComponentView.backgroundColor = .clear
-            sideJSComponentView.tvRemoteHandler.disableTVMenuKey()
+            sideJSComponentView.tvRemoteHandler?.disableTVMenuKey()
 
             let overlayType = OverlayType.right(rightView: sideJSComponentView, closeAction: nil)
             
