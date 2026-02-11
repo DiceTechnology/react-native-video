@@ -118,6 +118,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -561,7 +562,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     null,
                     adViewProvider,
                     exoDorisPlayerView,
-                    src.getSubtitlesPolicy());
+                    src.getSubtitlesPolicy(),
+                    localizationService);
 
             player.setMediaSessionControlsEnabled(isPlayPauseEnabled);
             player.setOutput(dorisListener);
@@ -1700,8 +1702,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     public void setAppLanguageLocale(String locale) {
-        if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setAppLanguageLocale(locale);
+        String languageCode = localizationService.getCanonicalLanguageCode(locale);
+        if (languageCode != null) {
+            // Update display language in LocalizationService
+            LocalizationService.Config config = localizationService.getConfig();
+            localizationService.setConfig(config.withDisplayLanguage(languageCode));
         }
     }
 
@@ -1809,10 +1814,29 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         controlsAutoHideTimeout = hideTimeout;
     }
 
-    public void setTranslations(Map<String, String> map) {
-        if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setTranslation(map);
+    public void setTranslations(@Nullable Map<String, String> map) {
+        if (exoDorisPlayerView == null) {
+            return;
         }
+
+        // Set translations
+        exoDorisPlayerView.setTranslation(map);
+
+        // Add OFF and UND translations to LocalizationService
+        String offValue = exoDorisPlayerView
+                .getLabelsTranslation()
+                .get(LabelsTranslation.KEY_TRACKS_OFF);
+
+        String undValue = exoDorisPlayerView
+                .getLabelsTranslation()
+                .get(LabelsTranslation.KEY_TRACKS_UNKNOWN);
+
+        HashMap<LocalizationService.Config.LabelKey, String> labelsMap = new HashMap<>();
+        labelsMap.put(LocalizationService.Config.LabelKey.OFF, offValue);
+        labelsMap.put(LocalizationService.Config.LabelKey.UND, undValue);
+
+        LocalizationService.Config config = localizationService.getConfig();
+        localizationService.setConfig(config.withLabels(labelsMap));
     }
 
     public void applyPrimaryColor(@ColorInt int primaryColor) {
