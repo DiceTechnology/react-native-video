@@ -202,6 +202,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private boolean hasStats;
     private boolean hideAdUiElements;
     private boolean isWhyThisAdIconEnabled;
+    private boolean isLoopPauseAds = true;
     private boolean isPlayPauseEnabled = true;
     private boolean shouldAutoStart = true;
     private boolean isPauseAdsEnabled = false;
@@ -552,8 +553,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             player = exoDorisFactory.createPlayer(
                     getContext(),
-                    adType,
-                    shouldAutoStart,
                     null,
                     MAX_LOAD_BUFFER_MS,
                     exoDorisPlayerView.getFastForwardIncrementMs(),
@@ -684,6 +683,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 .setHideAdUiElements(hideAdUiElements)
                 .setWhyThisAdIconEnabled(isWhyThisAdIconEnabled)
                 .setAdLabels(adLabels)
+                .setLoopPauseAdsEnabled(isLoopPauseAds)
                 .setPauseAdsEnabled(isPauseAdsEnabled && treatAllOverlayAdsAsPauseAds)
                 .build();
     }
@@ -1827,6 +1827,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setIs4K(boolean is4K) {
         exoDorisPlayerView.setIs4K(is4K);
+    }
+
+    public void setLoopPauseAds(boolean loopPauseAds) {
+        isLoopPauseAds = loopPauseAds;
     }
 
     public void setPlayPauseEnabled(boolean playPauseEnabled) {
