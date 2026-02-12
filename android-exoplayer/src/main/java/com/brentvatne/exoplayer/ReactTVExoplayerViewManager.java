@@ -647,7 +647,7 @@ public class ReactTVExoplayerViewManager extends ViewGroupManager<ReactTVExoplay
         videoView.setAppLanguageLocale(locale);
     }
 
-    @ReactProp(name = PROP_IS_LOOP_PAUSE_ADS, defaultBoolean = true)
+    @ReactProp(name = PROP_IS_LOOP_PAUSE_ADS, defaultBoolean = false)
     public void setIsLoopPauseAds(final ReactTVExoplayerView videoView, boolean isLoopPauseAds) {
         videoView.setLoopPauseAds(isLoopPauseAds);
     }
