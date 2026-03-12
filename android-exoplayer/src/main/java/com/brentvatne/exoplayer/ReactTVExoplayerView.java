@@ -118,6 +118,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -195,6 +196,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     // Props from React
     private RNSource src;
     private ContentMetadata metadata;
+    private String locale;
     private boolean repeat;
     private boolean disableFocus;
     private boolean isLive = false;
@@ -202,6 +204,7 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     private boolean hasStats;
     private boolean hideAdUiElements;
     private boolean isWhyThisAdIconEnabled;
+    private boolean isLoopPauseAds = true;
     private boolean isPlayPauseEnabled = true;
     private boolean shouldAutoStart = true;
     private boolean isPauseAdsEnabled = false;
@@ -552,8 +555,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
             player = exoDorisFactory.createPlayer(
                     getContext(),
-                    adType,
-                    shouldAutoStart,
                     null,
                     MAX_LOAD_BUFFER_MS,
                     exoDorisPlayerView.getFastForwardIncrementMs(),
@@ -561,7 +562,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                     null,
                     adViewProvider,
                     exoDorisPlayerView,
-                    src.getSubtitlesPolicy());
+                    src.getSubtitlesPolicy(),
+                    localizationService);
 
             player.setMediaSessionControlsEnabled(isPlayPauseEnabled);
             player.setOutput(dorisListener);
@@ -684,6 +686,8 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 .setHideAdUiElements(hideAdUiElements)
                 .setWhyThisAdIconEnabled(isWhyThisAdIconEnabled)
                 .setAdLabels(adLabels)
+                .setAdLanguage(locale)
+                .setLoopPauseAdsEnabled(isLoopPauseAds)
                 .setPauseAdsEnabled(isPauseAdsEnabled && treatAllOverlayAdsAsPauseAds)
                 .build();
     }
@@ -1700,8 +1704,12 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
     }
 
     public void setAppLanguageLocale(String locale) {
-        if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setAppLanguageLocale(locale);
+        this.locale = locale;
+        String languageCode = localizationService.getCanonicalLanguageCode(locale);
+        if (languageCode != null) {
+            // Update display language in LocalizationService
+            LocalizationService.Config config = localizationService.getConfig();
+            localizationService.setConfig(config.withDisplayLanguage(languageCode));
         }
     }
 
@@ -1809,10 +1817,29 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
         controlsAutoHideTimeout = hideTimeout;
     }
 
-    public void setTranslations(Map<String, String> map) {
-        if (exoDorisPlayerView != null) {
-            exoDorisPlayerView.setTranslation(map);
+    public void setTranslations(@Nullable Map<String, String> map) {
+        if (exoDorisPlayerView == null) {
+            return;
         }
+
+        // Set translations
+        exoDorisPlayerView.setTranslation(map);
+
+        // Add OFF and UND translations to LocalizationService
+        String offValue = exoDorisPlayerView
+                .getLabelsTranslation()
+                .get(LabelsTranslation.KEY_TRACKS_OFF);
+
+        String undValue = exoDorisPlayerView
+                .getLabelsTranslation()
+                .get(LabelsTranslation.KEY_TRACKS_UNKNOWN);
+
+        HashMap<LocalizationService.Config.LabelKey, String> labelsMap = new HashMap<>();
+        labelsMap.put(LocalizationService.Config.LabelKey.OFF, offValue);
+        labelsMap.put(LocalizationService.Config.LabelKey.UND, undValue);
+
+        LocalizationService.Config config = localizationService.getConfig();
+        localizationService.setConfig(config.withLabels(labelsMap));
     }
 
     public void applyPrimaryColor(@ColorInt int primaryColor) {
@@ -1827,6 +1854,10 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
 
     public void setIs4K(boolean is4K) {
         exoDorisPlayerView.setIs4K(is4K);
+    }
+
+    public void setLoopPauseAds(boolean loopPauseAds) {
+        isLoopPauseAds = loopPauseAds;
     }
 
     public void setPlayPauseEnabled(boolean playPauseEnabled) {
@@ -2019,6 +2050,11 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 exoDorisPlayerView.onAdEvent(adEvent);
             }
             if (adEvent instanceof DorisAdEvent.AdBreakStarted) {
+                // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
+                if (isCsaiLiveEvent(adEvent)) {
+                    secondaryPlayerView.setVisibility(View.VISIBLE);
+                    exoDorisPlayerView.setVisibility(View.GONE);
+                }
                 if (areControlsAllowed) {
                     setControls(false);
                 }
@@ -2031,12 +2067,6 @@ class ReactTVExoplayerView extends FrameLayout implements LifecycleEventListener
                 }
                 if (areControlsAllowed) {
                     setControls(true);
-                }
-            } else if (adEvent instanceof DorisAdEvent.AdResumed) {
-                // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
-                if (isCsaiLiveEvent(adEvent)) {
-                    secondaryPlayerView.setVisibility(View.VISIBLE);
-                    exoDorisPlayerView.setVisibility(View.GONE);
                 }
             } else if (adEvent instanceof DorisAdEvent.AdLoading) {
                 // PlayerView does not expose SurfaceView, we should call setVisibility() and setPlayer().
